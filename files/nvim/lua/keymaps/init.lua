@@ -84,10 +84,10 @@ wk.register({
 }, { prefix = '<leader>' })
 
 -- Tmux emulation
-wk.register({
-	['<C-a>'] = {
-		name = '+tmux-like',
-		['%'] = { '<cmd>vsplit<cr>', 'Split Vertical' },
-		['"'] = { '<cmd>split<cr>', 'Split Horizontal' },
-	}
-})
+-- wk.register({
+-- 	['<C-a>'] = {
+-- 		name = '+tmux-like',
+-- 		['%'] = { '<cmd>vsplit<cr>', 'Split Vertical' },
+-- 		['"'] = { '<cmd>split<cr>', 'Split Horizontal' },
+-- 	}
+-- })
