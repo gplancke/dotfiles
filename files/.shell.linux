@@ -1,0 +1,2 @@
+# For snap and flatpak apps to appear in gnome ubuntu
+[ -f "/etc/profile.d/app-bin-path.sh" ] && emulate sh -c 'source /etc/profile.d/apps-bin-path.sh'

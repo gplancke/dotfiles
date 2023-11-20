@@ -1,0 +1,17 @@
+export WINDOWS_FS="/mnt/c"
+export WINDOWS_HOME="${WINDOWS_FS}/Users/georg"
+
+# export DISPLAY=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2}'):0
+
+export VAGRANT_WSL_ENABLE_WINDOWS_ACCESS="1" # Allow share resources b/w windows and wsl
+export VAGRANT_WSL_DISABLE_VAGRANT_HOME="1" # Use WSL home
+export VAGRANT_DISABLE_RESOLV_REPLACE="1"
+export VAGRANT_WSL_WINDOWS_ACCESS_USER_HOME_PATH="/mnt/c/Users/georg/Vagrant"
+[ -d "${WINDOWS_FS}/Program Files/Oracle/VirtualBox" ] \
+  && PATH="${PATH}:${WINDOWS_FS}/Program Files/Oracle/VirtualBox"
+
+
+if [ ! -z "$ANDROID_HOME" ] && [ -z "$TMUX" ]; then
+  hash adb 2>/dev/null && adb kill-server 2> /dev/null
+  export ADB_SERVER_SOCKET=tcp:$(cat /etc/resolv.conf | grep nameserver | cut -d' ' -f2):5037
+fi

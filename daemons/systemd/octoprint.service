@@ -1,0 +1,12 @@
+[Unit]
+Description=OctoPrint
+After=network.target
+
+[Service]
+ExecStart=/home/georgio/.local/src/OctoPrint/venv/bin/octoprint serve
+Restart=always
+User=georgio
+Group=adm
+
+[Install]
+WantedBy=default.target

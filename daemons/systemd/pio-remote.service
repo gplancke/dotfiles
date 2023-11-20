@@ -1,0 +1,17 @@
+[Unit]
+Description=pio remote agent
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+# change to your user of choice
+User=georgio
+Group=georgio
+WorkingDirectory=/home/georgio/Workspace
+
+ExecStart=/home/georgio/.local/bin/platformio remote agent start
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

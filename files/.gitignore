@@ -1,0 +1,73 @@
+# TS/JS
+node_modules/
+dist/
+output/
+.nx/cache
+
+# Direnv
+.direnv
+
+# Linux files
+*~
+
+# OS X files
+._*
+.DS_Store
+.AppleDouble
+.LSOverride
+.Spotlight-V100
+.Trashes
+Icon
+
+# Windows files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.BIN/
+
+# Vim files
+*~
+*.un~
+.*.s[a-w][a-z]
+.netrwhist
+Session.vim
+
+# SublimeText project files
+*.sublime-workspace
+
+# TextMate files
+*.tmproj
+*.tmproject
+tmtags
+
+# Eclipse files (covers most of the basic stuff, you might need to add more)
+.classpath
+.project
+.settings
+
+# Intellij files
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# Emacs files
+*~
+.\#*
+\#*\#
+.elc
+/.emacs.desktop
+/.emacs.desktop.lock
+tramp
+auto-save-list
+
+# Org-mode files
+.org-id-locations
+*_archive
+
+# VSCode
+.vscode
+# Lapce
+.lapce
+# Nova
+.nova
