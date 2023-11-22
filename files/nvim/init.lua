@@ -26,9 +26,10 @@ require('lazy').setup({
   { import = 'plugins.ide' },
   { import = 'plugins.appearance' },
 }, {})
-require('options')
-require('custom.lazygit')
-require('keymaps')
+require('xtensions.lazygit')
+require('configs.options')
+require('configs.keybindings')
+require('configs.autocomplete')
 
 -- NOTE: Make sure the terminal supports this
 vim.o.termguicolors = true

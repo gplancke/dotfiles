@@ -7,7 +7,7 @@ return {
 			open_mapping = [[<c-\>]],
 			start_in_insert = true,
 			hide_numbers = true,
-			direction = "float",
+			direction = "vertical",
 			close_on_exit = true,
 			size = function(term)
 				if term.direction == "horizontal" then

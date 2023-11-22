@@ -4,14 +4,14 @@ vim.o.shiftwidth = 0
 vim.o.hlsearch = false
 -- Make those ugly ~ char disappear
 vim.opt.fillchars = {
-  vert = "│", -- -- alternatives "▕"
-  fold = " ",
-  eob = " ",  -- suppress ~ at EndOfBuffer
-  diff = "⣿", -- alternatives = ⣿ ░ ╱ ─
-  msgsep = "‾",
-  foldopen = "▾",
-  foldsep = "│",
-  foldclose = "▸",
+	vert = "│", -- -- alternatives "▕"
+	fold = " ",
+	eob = " ",  -- suppress ~ at EndOfBuffer
+	diff = "⣿", -- alternatives = ⣿ ░ ╱ ─
+	msgsep = "‾",
+	foldopen = "▾",
+	foldsep = "│",
+	foldclose = "▸",
 }
 vim.o.showbreak = '+++'
 -- Make line numbers default
@@ -35,3 +35,4 @@ vim.o.timeout = true
 vim.o.timeoutlen = 300
 -- Set completeopt to have a better completion experience
 vim.o.completeopt = 'menuone,noselect'
+
