@@ -30,9 +30,10 @@ require('xtensions.lazygit')
 require('configs.options')
 require('configs.keybindings')
 require('configs.autocomplete')
+require('configs.appearance')
 
 -- NOTE: Make sure the terminal supports this
 vim.o.termguicolors = true
 vim.o.base16colorspace = 256
 -- vim.cmd('colorscheme base16-catppuccin')
-vim.cmd('colorscheme catppuccin-macchiato')
+vim.cmd('colorscheme catppuccin-frappe')

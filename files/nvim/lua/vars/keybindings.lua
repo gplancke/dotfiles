@@ -14,6 +14,7 @@ return {
 		D = { '<cmd>lua require("telescope.builtin").lsp_workspace_diagnostics()<cr>', 'Workspace Diagnostics' },
 		g = { '<cmd>lua require("telescope.builtin").live_grep()<cr>', 'Grep' },
 		w = { '<cmd>lua require("telescope.builtin").grep_string()<cr>', 'Search Word' },
+		p = { '<cmd>lua require("telescope.builtin").resume()<cr>', 'Previous Search' },
 		-- s = { '<cmd>lua require("telescope.builtin").current_buffer_fuzzy_find()<cr>', 'Search Buffer' },
 		s = { function()
 			require('telescope.builtin').current_buffer_fuzzy_find(
@@ -30,7 +31,8 @@ return {
 		f = { '<cmd>Telescope file_browser<cr>', 'Toggle File Browser' },
 		d = { '<cmd>TroubleToggle document_diagnostics<cr>', 'Toggle Document Diagnostics' },
 		D = { '<cmd>TroubleToggle workspace_diagnostics<cr>', 'Toggle Workspace Diagnostics' },
-		g = { '<cmd>lua Lazygit_toggle()<cr>', 'Toggle Laxygit' },
+		g = { '<cmd>lua Lazygit_toggle()<cr>', 'Toggle Lazygit' },
+		b = { '<cmd>GitBlameToggle<cr>', 'Toggle Git Blame' },
 		o = {
 			function()
 				require('telescope').extensions.opener.opener({
@@ -51,7 +53,7 @@ return {
 		p = { '<cmd>lua require("harpoon.ui").nav_prev()<cr>', 'Previous Harpoon' },
 		n = { '<cmd>lua require("harpoon.ui").nav_next()<cr>', 'Next Harpoon' },
 	},
-	explain = { '<cmd>lua vim.diagnostic.open_float<cr>', '[E]xplain Diagnostic' },
+	explain = { '<cmd>lua vim.diagnostic.open_float()<cr>', '[E]xplain Diagnostic' },
 	code_actions = {
 		name = '+code',
 		a = { '<cmd>lua vim.lsp.buf.code_action()<cr>', 'Code Action' },
@@ -69,5 +71,6 @@ return {
 		D = { '<cmd>lua vim.lsp.buf.declaration()<cr>', 'Goto Declaration' },
 		i = { '<cmd>lua vim.lsp.buf.implementation()<cr>', 'Goto Implementation' },
 		r = { '<cmd>lua vim.lsp.buf.references()<cr>', 'Goto References' },
+		h = { '<cmd>lua vim.lsp.buf.hover()<cr>', 'Hover Definition' },
 	}
 }

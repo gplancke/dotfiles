@@ -4,7 +4,7 @@ return {
 	version = '*',
 	config = function ()
 		-- require('mini.move').setup()
-		require('mini.starter').setup()
+		-- require('mini.starter').setup()
 		require('mini.comment').setup()
 		require('mini.bufremove').setup()
 		require('mini.pairs').setup()

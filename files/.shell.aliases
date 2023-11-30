@@ -235,6 +235,17 @@ create_typescript_project() {
   npx eslint --init
 }
 
+################################################################################
+################################################################################
+# Utility to print tmux colors
+################################################################################
+################################################################################
+
+print_tmux_colors() {
+	for i in {0..255} ; do
+		printf "\x1b[38;5;${i}mcolour${i}\n"
+	done
+}
 
 ################################################################################
 ################################################################################
@@ -329,6 +340,7 @@ tmux_popup() {
 
 tmux_open() {
   sess=${1}
+
   if [ -z "${sess}" ]; then
     nbSession=$(tmux list-sessions | grep -v "$TMUX_POPUP_NAME" | wc -l)
 
@@ -374,6 +386,26 @@ tmux_kill() {
 
 ################################################################################
 ################################################################################
+# Quickly open a workspace
+################################################################################
+################################################################################
+
+work_on() {
+	workspace="${1:-default}"
+	project="${2:-}"
+
+	if [ -n "${project}" -a -d "${WORK_DIR:-$HOME/Workspace/Projects}/${workspace}/${project}" ]; then
+		(cd "${WORK_DIR:-$HOME/Workspace/Projects}/${workspace}/${project}" && tmux_open "${workspace}-${project}")
+	elif [ -d "$HOME/$workspace" ]; then
+		(cd "$HOME/${workspace}" && tmux_open $(basename "$HOME/$workspace"))
+	else
+		tmux_open "${workspace}"
+	fi
+}
+
+
+################################################################################
+################################################################################
 # Change theme for the whole system
 ################################################################################
 ################################################################################
@@ -399,6 +431,7 @@ alias tm='tmux_open'
 alias tmk='tmux_kill'
 alias tmls='tmux list-sessions'
 alias tmpop='tmux_popup'
+alias tmcolors='print_tmux_colors'
 
 alias c='clear'
 
@@ -420,7 +453,7 @@ hash npx 2>/dev/null && alias yarnx='npx'
 hash code-git 2>/dev/null && alias code='code-git'
 
 alias home='cd $HOME'
-alias work='cd ${WORK_DIR:-$HOME/Workspace}'
+alias work='work_on'
 
 alias pkg-list='yay -Qs'
 alias pkg-list-installed='yay -Qe'
