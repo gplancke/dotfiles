@@ -36,4 +36,4 @@ require('configs.appearance')
 vim.o.termguicolors = true
 vim.o.base16colorspace = 256
 -- vim.cmd('colorscheme base16-catppuccin')
-vim.cmd('colorscheme catppuccin-frappe')
+vim.cmd('colorscheme catppuccin-macchiato')

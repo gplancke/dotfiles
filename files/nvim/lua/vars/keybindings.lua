@@ -3,6 +3,8 @@ return {
 		['<C-e>'] = { '<cmd>Neotree toggle<cr>', 'Toggle File Explorer' },
 		['<C-q>'] = { '<cmd>lua MiniBufremove.wipeout()<cr>', 'Close Buffer' },
 		['<leader><C-q>'] = { '<cmd>bufdo lua MiniBufremove.wipeout()<cr>', 'Close All Buffers' },
+		['[h'] = { '<cmd>lua require("harpoon.ui").nav_prev()<cr>', 'Previous Harpoon' },
+		[']h'] = { '<cmd>lua require("harpoon.ui").nav_next()<cr>', 'Previous Harpoon' },
 	},
 	terminals = { '<cmd>ToggleTerm<cr>', 'Toggle Terminal' },
 	search = {
@@ -47,7 +49,7 @@ return {
 	harpoons = {
 		name = '+harpoon',
 		s = { '<cmd>lua require("harpoon.mark").add_file()<cr>', 'Set Mark' },
-		c = { '<cmd>lua require("harpoon.mark").clear_all_marks()<cr>', 'Clear All Marks' },
+		c = { '<cmd>lua require("harpoon.mark").clear_all()<cr>', 'Clear All Marks' },
 		f = { '<cmd>lua require("harpoon.ui").toggle_quick_menu()<cr>', 'Toggle Quick Menu' },
 		e = { '<cmd>Telescope harpoon marks<cr>', 'Toggle Quick Menu with Telescope' },
 		p = { '<cmd>lua require("harpoon.ui").nav_prev()<cr>', 'Previous Harpoon' },
@@ -73,10 +75,8 @@ return {
 		r = { '<cmd>lua vim.lsp.buf.references()<cr>', 'Goto References' },
 		h = { '<cmd>lua vim.lsp.buf.hover()<cr>', 'Hover Definition' },
 	},
-	move_prev = {
-		h = { '<cmd>lua require("harpoon.ui").nav_prev()<cr>', 'Previous Harpoon' },
+	noice = {
+		name = '+noice',
+		d = { '<cmd>lua require("noice").cmd("dismiss")<cr>', 'Dismiss Noice' },
 	},
-	move_next = {
-		h = { '<cmd>lua require("harpoon.ui").nav_next()<cr>', 'Previous Harpoon' },
-	}
 }

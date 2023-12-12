@@ -10,7 +10,7 @@ vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = tr
 vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
 
 -- Surround motions
-surround.setup({})
+surround.setup()
 
 -- Buffer and Files manipulation
 wk.register(keybindings.buffers, { noremap = true, silent = true })
@@ -22,4 +22,5 @@ wk.register({
 	S = keybindings.show,
 	h = keybindings.harpoons,
 	e = keybindings.explain,
+	n = keybindings.noice,
 }, { prefix = '<leader>' })
