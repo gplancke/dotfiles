@@ -10,6 +10,6 @@ return {
 		require('mini.pairs').setup()
 		require('mini.bracketed').setup()
 		-- require('mini.cursorword').setup()
-		require('mini.surround').setup()
+		-- require('mini.surround').setup()
 	end
 }

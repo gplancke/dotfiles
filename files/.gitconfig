@@ -6,14 +6,14 @@
 [pull]
   rebase = true
 [merge]
-  tool = vscode
+  tool = fugitive
   conflictstyle = diff3
 [mergetool "vscode"]
   cmd = code --wait --merge $REMOTE $LOCAL $BASE $MERGED
 [mergetool "fugitive"]
   cmd = nvim -f -c \"Gvdiffsplit!\" \"$MERGED\"
 [diff]
-  tool = vscode
+  tool = nvimdiff
   renameLimit = 10000
   algorithm = patience
 [difftool]
@@ -29,8 +29,8 @@
   process = git-lfs filter-process
   required = true
 [core]
-  # editor = nvim
-  editor = code --wait
+  editor = nvim
+	# editor = code --wait
   pager = less
   excludesfile = /Users/georgio/.config/git/.gitignore
 [push]

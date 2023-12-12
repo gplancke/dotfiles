@@ -72,5 +72,11 @@ return {
 		i = { '<cmd>lua vim.lsp.buf.implementation()<cr>', 'Goto Implementation' },
 		r = { '<cmd>lua vim.lsp.buf.references()<cr>', 'Goto References' },
 		h = { '<cmd>lua vim.lsp.buf.hover()<cr>', 'Hover Definition' },
+	},
+	move_prev = {
+		h = { '<cmd>lua require("harpoon.ui").nav_prev()<cr>', 'Previous Harpoon' },
+	},
+	move_next = {
+		h = { '<cmd>lua require("harpoon.ui").nav_next()<cr>', 'Previous Harpoon' },
 	}
 }

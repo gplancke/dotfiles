@@ -13,7 +13,7 @@ vim.opt.fillchars = {
 	foldsep = "│",
 	foldclose = "▸",
 }
-vim.o.showbreak = '+++'
+vim.o.showbreak = '___'
 -- Make line numbers default
 vim.wo.number = true
 -- Enable mouse mode
