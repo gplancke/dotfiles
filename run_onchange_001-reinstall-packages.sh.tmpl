@@ -1,0 +1,29 @@
+#!/bin/bash
+
+if [ -f $HOME/.env.nix ]; then
+	nix-env -ir -f $HOME/.env.nix
+fi
+
+{{ if eq .chezmoi.os "darwin" -}}
+
+brew bundle --no-lock --file=/dev/stdin <<EOF
+{{ range .packages.darwin.brews -}}
+brew {{ . | quote }}
+{{ end -}}
+{{ range .packages.darwin.casks -}}
+cask {{ . | quote }}
+{{ end -}}
+EOF
+
+{{ else if eq .chezmoi.os "linux" -}}
+
+brew bundle --no-lock --file=/dev/stdin <<EOF
+{{ range .packages.linux.brews -}}
+brew {{ . | quote }}
+{{ end -}}
+{{ range .packages.linux.casks -}}
+cask {{ . | quote }}
+{{ end -}}
+EOF
+
+{{ end -}}

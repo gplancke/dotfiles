@@ -1,0 +1,11 @@
+packages:
+  darwin:
+    brews:
+    - 'git'
+    casks:
+    - 'bitwarden'
+  linux:
+    brews:
+    - 'git'
+    casks:
+    - 'bitwarden'
