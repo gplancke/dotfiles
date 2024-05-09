@@ -1,5 +1,11 @@
 #!/bin/bash
 
+{{ if eq .chezmoi.os "darwin" -}}
+DISTRO="darwin"
+{{- else -}}
+DISTRO="ubuntu"
+{{- end }}
+
 #############################################
 # This function is used across the setup.sh
 # It used to detect the current distro/os
@@ -64,6 +70,8 @@ _EOF
 			cp ./result/bin/darwin-uninstaller $HOME/.local/bin
 			rm -rf ./result/bin
 	  fi
+	else
+		echo "Nix is already installed"
   fi
 }
 
@@ -94,7 +102,7 @@ function install_tmux_manager {
 #############################################
 # Install them all
 #############################################
-install_brew $(detect_distro)
-install_nix $(detect_distro)
+install_brew $DISTRO
+install_nix $DISTRO
 install_zsh_manager
 install_tmux_manager
