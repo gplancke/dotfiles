@@ -1,5 +1,9 @@
 #!/bin/bash
 
+mkdir -p $HOME/.local/{bin,share,etc,src}
+mkdir -p $HOME/.local/share/{node_modules,python_packages,gems,pnpm}
+mkdir -p $HOME/Workspace/Projects
+
 if [ -f $HOME/.env.nix ]; then
 	nix-env -ir -f $HOME/.env.nix
 fi
