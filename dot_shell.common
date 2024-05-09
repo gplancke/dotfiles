@@ -1,0 +1,104 @@
+##########################
+# Platform Specifics
+##########################
+
+if uname -r | grep -q 'microsoft' ; then
+  export WSL="1"
+  export LINUX="1"
+  [ -f "${HOME}/.shell.wsl" ] && . "${HOME}/.shell.wsl"
+elif [ "$(uname)" = "Darwin" ]; then
+  export MACOS="1"
+  [ -f "${HOME}/.shell.macos" ] && . "${HOME}/.shell.macos"
+else
+  export LINUX="1"
+  [ -f "${HOME}/.shell.linux" ] && . "${HOME}/.shell.linux"
+fi
+
+##########################
+# Secrets
+##########################
+[ -f "$HOME/.shell.secrets" ] && . "$HOME/.shell.secrets"
+
+##########################
+# Exports
+##########################
+export EDITOR=nvim
+export WORK_DIR="$HOME/Workspace/Projects"
+export NIXPKGS_ALLOW_UNFREE=1
+
+[ -z "$TMUX" ] && export TERM="xterm-256color"
+[ -z "$BASE16_SHELL" ] && export BASE16_SHELL="$HOME/.local/share/base16-manager/chriskempson/base16-shell/"
+
+# if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
+#   . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
+# fi
+
+export NIX_PATH=darwin-config="$HOME/.nixpkgs/darwin-configuration.nix:$HOME/.nix-defexpr/channels" # ${NIX_PATH:+:}$NIX_PATH
+export NIX_DIR="$HOME/.nix-profile"
+export ASDF_DIR="$HOME/.local/share/asdf"
+
+export FZF_HOME="$HOME/.fzf"
+export EMACS_HOME="$HOME/.emacs.d"
+
+export NPM_HOME="$HOME/.local/share/node_modules"   # Nodejs
+export DENO_HOME="$HOME/.deno"                      # Deno
+export PNPM_HOME="$HOME/.local/share/pnpm"          # Pnpm
+export GOPATH=$HOME/.go                             # Go
+export GEM_HOME=$HOME/.local/share/gems             # Ruby
+# export PIP_HOME="$HOME/.local/share/python_packages"  # Python
+export ANDROID_HOME="$HOME/.local/share/android"    # Android
+export FLUTTER_ROOT="$HOME/.local/share/flutter"    # Flutter
+export DIRENV_LOG_FORMAT=
+
+# Java
+[ "$LINUX" = "1" ] && [ -d "/usr/lib/jvm/java-8-openjdk" ] && export JAVA_HOME="/usr/lib/jvm/java-8-openjdk"
+
+# Tmux
+export TMUX_POWERLINE_DEFAULT_BACKGROUND_COLOR='0'
+export TMUX_POWERLINE_DEFAULT_FOREGROUND_COLOR='255'
+
+##########################
+# Path
+##########################
+[ "$LINUX" = "1" ] && [ -d "/home/linuxbrew/.linuxbrew" ] && eval $(/home/linuxbrew/.linuxbrew/bin/brew shellenv)
+[ "$MACOS" = "1" ] && [ -f "/opt/homebrew/bin/brew" ] && eval "$(/opt/homebrew/bin/brew shellenv)"
+[ "$MACOS" = "1" ] && [ ! -f "/opt/homebrew/bin/brew" ] && [ -f "/usr/local/bin/brew" ] && eval "$(/usr/local/bin/brew shellenv)"
+
+[ -d "$HOME/.local/bin" ] && PATH="$HOME/.local/bin:$PATH"
+
+[ -d "$FZF_HOME/bin" ] && PATH="${PATH}:${FZF_HOME}/bin"
+[ -d "$EMACS_HOME/bin" ] && PATH="${PATH}:${EMACS_HOME}/bin"
+
+[ -d "$GOPATH/bin" ] && PATH="${PATH}:${GOPATH}/bin"
+[ -d "$NPM_HOME/bin" ] && PATH="${PATH}:${NPM_HOME}/bin"
+[ -d "$DENO_HOME/bin" ] && PATH="${PATH}:${DENO_HOME}/bin"
+[ -d "$PNPM_HOME" ] && PATH="${PATH}:${PNPM_HOME}"
+[ -d "$GEM_HOME/bin" ] && PATH="${PATH}:${GEM_HOME}/bin"
+[ -d "$PIP_HOME/bin" ] && PATH="${PATH}:${PIP_HOME}/bin"
+[ -d "$JAVA_HOME/bin" ] && PATH="${PATH}:${JAVA_HOME}/bin"
+
+[ -d "$ANDROID_HOME/cmdline-tools/latest/bin" ] && PATH="${PATH}:${ANDROID_HOME}/cmdline-tools/latest/bin"
+[ -d "$ANDROID_HOME/platform-tools" ] && PATH="${PATH}:${ANDROID_HOME}/platform-tools"
+[ -d "$FLUTTER_ROOT/bin" ] && PATH="${PATH}:${FLUTTER_ROOT}/bin"
+
+##########################
+# Extensions
+##########################
+hash fnm 2>/dev/null && eval "$(fnm env)"                                   # source fnm
+[ -f "$NIX_DIR/etc/profile.d/nix.sh" ] && . "$NIX_DIR/etc/profile.d/nix.sh" # source nix
+[ -f "$ASDF_DIR/asdf.sh" ] && . "$ASDF_DIR/asdf.sh"                         # source asdf
+
+##########################
+# Aliases
+##########################
+[ -f "$HOME/.shell.aliases" ] && . "$HOME/.shell.aliases"
+
+##########################
+# Themes
+##########################
+[ -f "$HOME/.base16_theme" ] \
+  && [ -z "$SSH_TTY" ] \
+  && [ -z "$IN_NIX_SHELL" ] \
+  && [ "$TERM_PROGRAM" != "vscode" ] \
+  && . "$HOME/.base16_theme"
+[ -f "$HOME/.fzf.colors" ] && . "$HOME/.fzf.colors"

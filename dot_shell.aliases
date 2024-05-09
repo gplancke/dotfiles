@@ -1,0 +1,497 @@
+# vim: set filetype=sh
+#
+##########################
+# Aliases & Functions
+##########################
+TMUX_POPUP_NAME="popup-session"
+
+alias vim='nvim'
+
+################################################################################
+################################################################################
+# A command to fetch all registered subdomains
+################################################################################
+################################################################################
+
+subdomains() {
+  name="${1:=saasak.studio}"
+  url="https://subdomains.whoisxmlapi.com/api/v1?apiKey=at_5YimX3xqySyqdZc63cuTEnevrAFaR&domainName=${name}"
+  curl "${url}" | jq '.result.records[].domain'
+}
+
+################################################################################
+################################################################################
+# All the bare minimum to kickstart a coding project
+################################################################################
+################################################################################
+
+create_project() {
+  local project_name=$1
+	local cwd=$(pwd)
+
+	if [ "${project_name}" != "." ]; then
+		mkdir $project_name
+		cd $project_name
+	fi
+
+	if [ -f "./package.json" -o -f ".gitignore" -o -d ".git" ]; then
+		echo "It appears this folder is not empty"
+	else
+  	cat > .editorconfig << _EOF_
+root = true
+
+[*]
+indent_style = tab
+indent_size = 2
+end_of_line = lf
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+max_line_length = 100
+
+# Use 4 spaces for the Python files
+[*.py]
+indent_style = space
+indent_size = 4
+max_line_length = 100
+
+# The JSON files contain newlines inconsistently
+[*.json]
+insert_final_newline = false
+
+# Minified JavaScript files shouldn't be changed
+[**.min.js]
+insert_final_newline = false
+
+# Makefiles always use tabs for indentation
+[Makefile]
+indent_style = tab
+
+# Batch files use tabs for indentation
+[*.bat]
+indent_style = tab
+
+[*.md]
+trim_trailing_whitespace = false
+_EOF_
+
+		cat > shell.nix << _EOF_
+{ pkgs ? import <nixpkgs> {} }:
+with pkgs;
+mkShell {
+  buildInputs = [
+  ];
+}
+_EOF_
+
+		echo 'use nix' > .envrc
+
+		direnv allow
+		git init
+
+		cat > .gitignore << _EOF_
+node_modules/
+dist/
+output/
+
+# Linux files
+*~
+
+# OS X files
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Vim files
+.*.s[a-w][a-z]
+*.un~
+Session.vim
+.netrwhist
+*~
+
+# SublimeText project files
+*.sublime-workspace
+
+# TextMate files
+*.tmproj
+*.tmproject
+tmtags
+
+# Eclipse files (covers most of the basic stuff, you might need to add more)
+.classpath
+.project
+.settings
+
+# Intellij files
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# Emacs files
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+.elc
+auto-save-list
+tramp
+.\#*
+
+# Org-mode files
+.org-id-locations
+*_archive
+
+# VSCode
+.vscode/
+
+_EOF_
+
+	fi
+
+	cd $cwd
+}
+
+################################################################################
+################################################################################
+# All the bare minimum to kickstart a node project
+################################################################################
+################################################################################
+
+create_node_project() {
+  local project_name=$1
+	local cwd=$(pwd)
+
+
+	if [ "${project_name}" != "." ]; then
+		[ -d "$project_name" ] || mkdir -p $project_name
+		cd $project_name
+	fi
+
+	create_project .
+ 	cat > .prettierrc << _EOF_
+{
+	"semi": true,
+	"trailingComma": "es5",
+	"singleQuote": true,
+	"printWidth": 100,
+	"tabWidth": 2,
+	"plugins": [require('prettier-plugin-editorconfig')]
+}'
+_EOF_
+
+	cat > shell.nix << _EOF_
+{ pkgs ? import <nixpkgs> {} }:
+with pkgs;
+mkShell {
+  buildInputs = [
+    nodejs-16_x
+		nodejs-16_x.pkgs.pnpm
+  ];
+}
+_EOF_
+
+	cd $cwd
+}
+
+################################################################################
+################################################################################
+# All the bare minimum to kickstart a project in typescript
+################################################################################
+################################################################################
+
+create_typescript_project() {
+  local project_name=$1
+
+	if [ "${project_name}" != "." ]; then
+		[ -d "$project_name" ] || mkdir -p $project_name
+		cd $project_name
+	fi
+
+	create_node_project .
+  npm init -y
+  npm install --save-dev --no-lock-file \
+    typescript \
+    eslint \
+    @typescript-eslint/eslint-plugin \
+    @typescript-eslint/parser \
+    eslint-config-prettier \
+    eslint-plugin-prettier \
+    prettier \
+    @types/node
+
+  mkdir src
+  npx tsc --init
+  npx eslint --init
+}
+
+################################################################################
+################################################################################
+# Utility to print tmux colors
+################################################################################
+################################################################################
+
+print_tmux_colors() {
+	for i in {0..255} ; do
+		printf "\x1b[38;5;${i}mcolour${i}\n"
+	done
+}
+
+################################################################################
+################################################################################
+# Wrapper around the tree command
+################################################################################
+################################################################################
+
+show_tree() {
+  depth="${1:=1}"
+  shift;
+  tree -L $depth -I "node_modules|.git" --dirsfirst "$@"
+}
+
+################################################################################
+################################################################################
+# On linux, open nautilus with fzf
+################################################################################
+################################################################################
+
+open_nautilus() {
+  if [ -z "$1" ]; then
+    (nautilus $(find . -type d | fzf-tmux) &>/dev/null &)
+  else
+    (nautilus "$1" &>/dev/null &)
+  fi
+}
+
+################################################################################
+################################################################################
+# Open an editor quickly
+################################################################################
+################################################################################
+
+open_editor() {
+  if [ -z "$1" ]; then
+    $EDITOR $(ag -l | fzf-tmux)
+  else
+    $EDITOR "$1"
+  fi
+}
+
+################################################################################
+################################################################################
+# Failed attempt at a lighter zoxide
+################################################################################
+################################################################################
+
+move_to_dir() {
+  if [ -z "$1" ] || [ ! -d "$1" ]; then
+    cd $(find . -type d | fzf-tmux -q "$1")
+  else
+    cd "$1"
+  fi
+}
+
+################################################################################
+################################################################################
+# Floating tmux session. Does not work...
+################################################################################
+################################################################################
+
+tmux_popup() {
+	width=${1:-"80%"}
+	height=${2:-"80%"}
+	name="${TMUX_POPUP_NAME}"
+
+	if [ ! -z "$TMUX" ]; then
+		sess=$(tmux display-message -p -F "#{session_name}")
+
+		# if we are in popup session
+		if [ "${sess}" = "${name}" ]; then
+			tmux detach-client
+		else
+			# check if popup session exists
+			tmux has-session -t "${name}" &>/dev/null
+			# if yes, attach to it in a popup
+			if [ $? -eq 0 ]; then
+				tmux popup -d '#{pane_current_path}' -xC -yC -w"$width" -h"$height" -E "tmux attach-session -t ${name}"
+			# otherwise create a session in a popup
+			else
+				tmux popup -d '#{pane_current_path}' -xC -yC -w"$width" -h"$height" -E "tmux new-session -s ${name}"
+			fi
+		fi
+	fi
+}
+
+################################################################################
+################################################################################
+# Quickly open a tmux session
+################################################################################
+################################################################################
+
+tmux_open() {
+  sess=${1}
+
+  if [ -z "${sess}" ]; then
+    nbSession=$(tmux list-sessions | grep -v "$TMUX_POPUP_NAME" | wc -l)
+
+    if [ $nbSession -eq 0 ]; then
+      # if no session, create a default one named default
+      sess="default"
+    else
+      # if only one session, do not ask to select
+      [ $nbSession -eq 1 ] \
+        && sess=$(tmux list-sessions | grep -v "$TMUX_POPUP_NAME" | head -n 1 | cut -d ":" -f 1) \
+        || sess=$(tmux list-sessions | grep -v "$TMUX_POPUP_NAME" | fzf-tmux | cut -d ":" -f 1)
+    fi
+  fi
+
+  # check if we have a session with this name
+  tmux has-session -t "${sess}" &>/dev/null
+
+  # if not create a detached session with this name
+  [ $? -eq 0 ] || (TMUX= tmux -u new-session -d -s "${sess}" -n "main")
+
+  # if inside tmux switch o/w attach to newly created detached session
+  [ -z "$TMUX" ] && tmux -u attach-session -t "${sess}" || tmux -u switch-client -t "$sess"
+}
+
+################################################################################
+################################################################################
+# Quickly kill a tmux session
+################################################################################
+################################################################################
+
+tmux_kill() {
+  sess="${1}"
+  if [ -z "${sess}" ]; then
+    [ -z "$TMUX" ] \
+      && sess=$(tmux list-sessions | fzf-tmux | cut -d ":" -f 1) \
+      || sess=$(tmux display-message -p '#S')
+  fi
+
+  tmux has-session -t "${sess}" &>/dev/null
+  [ $? -eq 0 ] && (TMUX= tmux kill-session -t "${sess}")
+}
+
+
+################################################################################
+################################################################################
+# Quickly open a workspace
+################################################################################
+################################################################################
+
+work_on() {
+	workspace="${1:-default}"
+
+	if [ -d "${WORK_DIR:-$HOME/Workspace/Projects}/${workspace}" ]; then
+		(cd "${WORK_DIR:-$HOME/Workspace/Projects}/${workspace}" && tmux_open "${workspace}")
+	elif [ -d "$HOME/$workspace" ]; then
+		dir = $(dirname "$HOME/$workspace")
+		lastname=$(basename "$HOME/$workspace")
+		firstname=$(basename "$dir")
+		(cd "$HOME/${workspace}" && tmux_open "${firstname}/${lastname}")
+	else
+		tmux_open "${workspace}"
+	fi
+}
+
+
+################################################################################
+################################################################################
+# Change theme for the whole system
+################################################################################
+################################################################################
+
+chth() {
+  theme="${1:=eighties}"
+  sway="/home/georgio/.local/share/base16-manager/rkubosz/base16-sway/themes/base16-${theme}.config"
+  base16-manager set "$theme" 2>/dev/null
+  [ -f "${sway}" ] && cp "${sway}" "/home/georgio/.config/sway/colorscheme"
+}
+
+################################################################################
+################################################################################
+# Aliases
+################################################################################
+################################################################################
+
+# alias cd='move_to_dir'
+alias edit='open_editor'
+alias naut='open_nautilus'
+alias treee='show_tree'
+alias tm='tmux_open'
+alias tmk='tmux_kill'
+alias tmls='tmux list-sessions'
+alias tmpop='tmux_popup'
+alias tmcolors='print_tmux_colors'
+
+alias c='clear'
+
+alias ll='ls -l'
+alias la='ls -a'
+alias lisa='ls -lisa'
+alias ls='ls -lisa'
+
+[ -e "$HOME/.local/bin/dot.sh" ] && alias dot='$HOME/.local/bin/dot.sh'
+
+# hash podman 2>/dev/null && alias docker='podman'
+# hash podman-compose 2>/dev/null && alias docker-compose='podman-compose'
+hash bat 2>/dev/null && alias cat='bat'
+hash diff-so-fancy 2>/dev/null && alias diff='diff-so-fancy'
+# hash hub 2>/dev/null && alias git='hub'
+
+hash yarn 2>/dev/null && alias y='yarn'
+hash npx 2>/dev/null && alias yarnx='npx'
+hash code-git 2>/dev/null && alias code='code-git'
+
+alias home='cd $HOME'
+alias work='work_on'
+
+alias pkg-list='yay -Qs'
+alias pkg-list-installed='yay -Qe'
+alias pkg-list-orphans='yay -Qdt'
+
+alias pkgs-upgrade='yay -Syu'
+alias pkgs-cleanup='yay -Rns $(yay -Qtdq)'
+
+alias pkg-install='yay -Sy'
+alias pkg-update='yay -Sy'
+alias pkg-remove='yay -Rsc'
+alias pkg-search='yay -Ss'
+alias pkg-info='yay -Qii'
+
+alias nix-ls-installed='nix-env -q | fzf-tmux'
+alias nix-ls-available='nix-env -qaP | fzf-tmux'
+alias nix-ls-generations='nix-env --list-generations'
+alias nix-update='nix-channel --update'
+alias nix-rebuild='nix-env -ir -f ~/.env.nix'
+alias nix-upgrade='nix-update && nix-rebuild'
+alias nix-purge="echo \"nix-env -e '.*' to purge env\""
+alias nix-cleanup='nix-env --delete-generations +3 && nix-collect-garbage'
+alias nix-rollback='nix-env --rollback'
+alias nix-uninstall='/nix/nix-installer uninstall'
+
+alias ldok="DOCKER_HOST=$(docker context ls --format json | jq '. | select(.Current == true) | .DockerEndpoint') lazydocker"
+alias lgit='lazygit'
+
+alias find-rpi='arp -na | grep -i "dc:a6:32"'
+alias find-old-rpi='arp -na | grep -i "b8:27:eb"'
+
+alias linux-rebuild='sudo mkinitpcio -p linux'
+alias grub-rebuild='sudo grub-mkconfig -o /boot/grub/grub.cfg'
+
+alias mac-start-check='ls /Library/StartupItems && ls /Library/LaunchDaemons && ls /System/Library/LaunchDaemons && ls ~/Library/LaunchAgents && ls /Library/LaunchAgents/ && ls /System/Library/LaunchAgents/'
+
+alias tsinit='create_typescript_project'
+alias	nodeinit='create_node_project'
+alias pinit='create_project'

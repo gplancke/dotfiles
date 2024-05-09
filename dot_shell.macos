@@ -1,0 +1,2 @@
+[ -d "/Applications/Postgres.app" ] && PATH="${PATH}:/Applications/Postgres.app/Contents/Versions/latest/bin"
+[ -d "/Applications/Tailscale.app" ] && alias tailscale="/Applications/Tailscale.app/Contents/MacOS/Tailscale"
