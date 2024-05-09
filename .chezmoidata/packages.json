@@ -13,7 +13,7 @@
 			]
 		},
 		"linux": {
-			"apt": []
+			"apt": [],
 			"brews": [
 				"git",
 				"curl"
@@ -25,6 +25,5 @@
 				"visual-studio-code"
 			]
 		}
-
 	}
 }
