@@ -1,0 +1,5 @@
+prefix=/Users/georgio/.local/share/node_modules
+store-dir=~/.local/share/pnpm/store
+@Happyend:registry=https://npm.pkg.github.com
+//registry.npmjs.org/:_authToken=${NPM_PKG_SECRET}
+//npm.pkg.github.com/:_authToken=${GH_PKG_SECRET}

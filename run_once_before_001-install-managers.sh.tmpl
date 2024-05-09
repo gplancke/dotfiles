@@ -31,6 +31,8 @@ function detect_distro {
 function install_brew {
   local osType=$1
 
+	echo "Installing Homebrew if not already installed"
+
   if [ "$osType" = "darwin" ]; then
     [ -d "/opt/homebrew" ] || curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh | bash
     [ -d "/opt/homebrew" ] && eval "$(/opt/homebrew/bin/brew shellenv)"
@@ -81,10 +83,12 @@ _EOF
 #############################################
 
 function install_zsh_manager {
-  # Installing Antigen for zsh
   if [ ! -f "$HOME/.config/antigen/antigen.zsh" ]; then
+		echo "Installing zsh plugin manager (antigen)"
     mkdir -p "$HOME/.config/antigen"
     curl -L git.io/antigen > $HOME/.config/antigen/antigen.zsh
+	else
+		echo "Zsh plugin manager is already installed"
   fi
 }
 
@@ -95,8 +99,35 @@ function install_zsh_manager {
 #############################################
 
 function install_tmux_manager {
-  [ ! -d "${HOME}/.tmux/plugins/tpm" ] && \
+  if [ ! -d "${HOME}/.tmux/plugins/tpm" ]; then
+		echo "Installing tmux plugin manager"
     git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+	else
+		echo "Tmux plugin manager is already installed"
+	fi
+}
+
+#############################################
+# Install theme manager
+# Mainly base16 themes
+# However, we tend to use catpuccin as mush as we can now
+#############################################
+
+function install_theme_manager {
+  if [ ! -d "$HOME/.local/share/base16-manager" ]; then
+		echo "Installing base16 theme manager"
+    mkdir -p "$HOME/.local/share/base16-manager"
+    git clone https://github.com/base16-manager/base16-manager.git \
+      $HOME/.local/share/base16-manager && \
+      cp $HOME/.local/share/base16-manager/base16-manager $HOME/.local/bin/
+    $HOME/.local/bin/base16-manager install chriskempson/base16-shell
+    $HOME/.local/bin/base16-manager install chriskempson/base16-vim
+    $HOME/.local/bin/base16-manager install nicodebo/base16-fzf
+
+    $HOME/.local/bin/base16-manager set ocean
+	else
+		echo "Base16 theme manager is already installed"
+  fi
 }
 
 #############################################
@@ -106,3 +137,4 @@ install_brew $DISTRO
 install_nix $DISTRO
 install_zsh_manager
 install_tmux_manager
+install_theme_manager

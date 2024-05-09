@@ -1,0 +1,159 @@
+[user]
+  email = georges.plancke@gmail.com
+	name = Georges
+[init]
+  defaultBranch = main
+[pull]
+  rebase = true
+[merge]
+  tool = nvim
+  conflictstyle = diff3
+[mergetool "vscode"]
+  cmd = code --wait --merge $REMOTE $LOCAL $BASE $MERGED
+[mergetool "nvim"]
+	cmd = nvim -n -c "DiffviewOpen" "$MERGE"
+[mergetool "fugitive"]
+  cmd = nvim -f -c "Gvdiffsplit!" "$MERGED"
+[diff]
+  tool = nvimdiff
+  renameLimit = 10000
+  algorithm = patience
+[difftool]
+  tool = nvimdiff
+  prompt = false
+[difftool "vscode"]
+  cmd = code --wait --diff $LOCAL $REMOTE
+[difftool "nvimdiff"]
+  cmd =  nvim -d $LOCAL $REMOTE
+[difftool "nvimdiffview"]
+  cmd =  nvim -n -c "DiffviewOpen" $LOCAL $REMOTE
+[filter "lfs"]
+  clean = git-lfs clean -- %f
+  smudge = git-lfs smudge -- %f
+  process = git-lfs filter-process
+  required = true
+[core]
+  editor = nvim
+	# editor = code --wait
+  pager = less
+  excludesfile = /Users/georgio/.config/git/.gitignore
+[push]
+  # followTags = true
+[rerere]
+  enabled = true
+[pager]
+  branch = false
+  diff = false
+[color]
+  ui = true
+[color "diff-highlight"]
+  oldNormal = red bold
+  oldHighlight = red bold 52
+  newNormal = green bold
+  newHighlight = green bold 22
+[color "diff"]
+  meta = yellow
+  frag = magenta bold
+  commit = yellow bold
+  old = red bold
+  new = green bold
+  whitespace = red reverse
+[alias]
+	d = diff-exclude
+  l = log --oneline
+  st = status
+  ss = status -s
+  co = checkout
+  ci = commit
+  cim = commit-with-style
+
+  steal = get-from-branch
+  stage = add
+  unstage = restore --staged
+  undo = restore
+  resolve = mergetool
+
+  create = new-branch
+  publish = publish-branch
+  switch = checkout
+  report = status
+  save = commit-and-push
+  changes = diff-changes-currently
+  compare = diff-changes-in-branches
+  pupull = update-branch-and-tags
+  pupush = push-code-and-tags
+  deploy = merge-clean-ff
+  cleanup = cleanup-orig
+
+  #######################
+  #######################
+  #######################
+
+	diff-exclude = diff -- ':!package-lock.json' ':!yarn.lock' ':!pnpm-lock.yaml'
+  get-from-branch = "!f() { a=${1:-main}; b=${2}; [ ! -z $b ] && git checkout $a -- $b; }; f"
+
+  fetch-and-clean = !git fetch --prune --no-tags &>/dev/null
+
+  new-branch = checkout -b
+  print-current-branch = rev-parse --abbrev-ref HEAD
+
+  checkout-branch ="!f() { git branch | fzf-tmux | xargs -I {} git checkout {}; }; f"
+  checkout-remote-branch = "!f() { git branch -r | fzf-tmux | xargs -I {} git checkout --track {}; }; f"
+
+  ls-conflicts = diff --name-only --diff-filter=U
+  ls-untracked = "!f() { git status --porcelain | grep '^??' | cut -d ' ' -f2; }; f"
+  ls-changes = "!f() { a=${1:-origin/develop}; b=${2:-HEAD}; git diff --name-only $(git merge-base $b $a)...$b; }; f"
+  ls-stats = "!f() { a=${1:-origin/develop}; b=${2:-HEAD}; git diff --stat $(git merge-base $b $a)...$b; }; f"
+  ls-orig = "!f() { find . -name '*.orig' -type f; }; f"
+  ls-branches = branch
+  ls-remote-branches = branch -r
+  ls-commits = log --pretty='tformat:%Cblue%<(20)%an%Creset %Cred%<(22)%ar%Creset %h %d %Cgreen%f%Creset '
+
+  graph = log --pretty='tformat:%h %d %Cgreen%f%Creset %Cblue%an%Creset %Cred%ar%Creset ' --graph
+  graph-all = graph --all
+  graph-diff = "!f() { a=${1:-origin/develop}; b=${2:-HEAD}; echo ''; git --no-pager graph --left-right --cherry-pick $b...$a; echo ''; }; f"
+  graph-new = "!f() { a=${1:-origin/develop}; b=${2:-HEAD}; echo ''; git --no-pager graph --left-right --cherry-pick $(git merge-base $b $a)...$b; echo ''; }; f"
+  graph-merges = graph --all --merges --grep='Merge pull request'
+  graph-branches = graph --all --simplify-by-decoration --dense --simplify-merges
+
+  commit-with-style = "!f() { hash gitmoji &>/dev/null && gitmoji -c || git commit; }; f"
+  commit-and-push = "!f() { message=${1:-SAVE}; git commit -m \"$message\" && git pull --rebase && git push; }; f"
+
+  diff-changes-in-branches = "!f() { a=${1:-origin/develop}; b=${2:-HEAD}; git diff $(git merge-base $b $a)...$b; }; f"
+  diff-changes-currently = diff HEAD
+
+  update-branch = pull --rebase
+  update-tags = pull --tags
+  update-branch-and-tags = pull --rebase --tags
+
+  remove-branch = "!f() { git branch | fzf-tmux | xargs -I {} git branch -d {}; }; f"
+  remove-current-branch = "!f() { CB=$(git print-current-branch); git checkout - ; git branch -d $CB; }; f"
+
+  publish-branch = "!f() { CB=$(git print-current-branch); git push -u origin $CB; }; f"
+
+  push-tags = push --tags
+  push-code = "!f() { git pull --rebase && git push; }; f"
+  push-code-and-tags = "!f() { git pull --rebase && git push && git push --tags; }; f"
+
+  merge-clean-ff = "!f() { f=${1:-main}; CB=$(git print-current-branch); git update-branch-and-tags; git push-code-and-tags; git checkout $f; git update-branch-and-tags && git merge --ff-only $CB && git push-code-and-tags && git co $CB; }; f"
+
+  cleanup-orig = "!f() { git ls-orig | xargs -I {} rm -f {}; }; f"
+
+
+  cwb = print-current-branch
+  lsch = ls-changes
+  lsbr = ls-branches
+  lsbrr = ls-remote-branches
+  log = ls-commits
+  g = graph
+  ga = graph-all
+  gdiff = graph-diff
+  gnew = graph-new
+  gpr = graph-merges
+  gbr = graph-branches
+  cobr = checkout-branch
+  cobrr = checkout-remote-branch
+  rmbr = remove-branch
+  rmbrc = remove-current-branch
+[http]
+  sslVerify = true
