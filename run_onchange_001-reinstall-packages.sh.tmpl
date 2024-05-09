@@ -26,4 +26,8 @@ cask {{ . | quote }}
 {{ end -}}
 EOF
 
+{{ range .packages.linux.apt -}}
+sudo apt install -y {{ . | quote }}
+{{ end -}}
+
 {{ end -}}

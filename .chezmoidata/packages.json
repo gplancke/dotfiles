@@ -1,0 +1,30 @@
+{
+	"packages": {
+		"darwin": {
+			"brews": [
+				"git",
+				"curl"
+			],
+			"casks": [
+				"bitwarden",
+				"raycast",
+				"setapp",
+				"visual-studio-code"
+			]
+		},
+		"linux": {
+			"apt": []
+			"brews": [
+				"git",
+				"curl"
+			],
+			"casks": [
+				"bitwarden",
+				"raycast",
+				"setapp",
+				"visual-studio-code"
+			]
+		}
+
+	}
+}
