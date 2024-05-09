@@ -60,6 +60,8 @@ let
       pinned.unzip
 			# Swiss army knife for TCP sockets
       pinned.socat
+			# easy encryption tool
+			pinned.age
 
 			##### NEW COMMON TOOLS
 			# Parse and decode json
