@@ -19,6 +19,8 @@ cask {{ . | quote }}
 {{ end -}}
 EOF
 
+exit 0
+
 {{ else if eq .chezmoi.os "linux" -}}
 
 brew bundle --no-lock --file=/dev/stdin <<EOF
@@ -33,5 +35,7 @@ EOF
 {{ range .packages.linux.apt -}}
 sudo apt install -y {{ . | quote }}
 {{ end -}}
+
+exit 0
 
 {{ end -}}
