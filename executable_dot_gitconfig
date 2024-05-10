@@ -156,4 +156,4 @@
   rmbr = remove-branch
   rmbrc = remove-current-branch
 [http]
-  sslVerify = true
+	sslVerify = true
