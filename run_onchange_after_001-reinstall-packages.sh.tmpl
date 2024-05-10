@@ -1,14 +1,17 @@
 #!/bin/bash
 
-mkdir -p $HOME/.local/{bin,share,etc,src}
-mkdir -p $HOME/.local/share/{node_modules,python_packages,gems,pnpm}
-mkdir -p $HOME/Workspace/Projects
-
-if [ -f $HOME/.env.nix ]; then
-	nix-env -ir -f $HOME/.env.nix
-fi
+function install_bins() {
+	if [ -f $HOME/.env.nix ]; then
+		echo "Installing nix environment"
+		nix-env -ir -f $HOME/.env.nix
+	else
+		echo "No nix environment found"
+	fi
+}
 
 {{ if eq .chezmoi.os "darwin" -}}
+
+install_bins
 
 brew bundle --no-lock --file=/dev/stdin <<EOF
 {{ range .packages.darwin.brews -}}
@@ -22,6 +25,8 @@ EOF
 exit 0
 
 {{ else if eq .chezmoi.os "linux" -}}
+
+install_bins
 
 brew bundle --no-lock --file=/dev/stdin <<EOF
 {{ range .packages.linux.brews -}}

@@ -7,22 +7,6 @@ DISTRO="ubuntu"
 {{- end }}
 
 #############################################
-# This function is used across the setup.sh
-# It used to detect the current distro/os
-# and return it as a string
-#############################################
-
-function detect_distro {
-  if [[ $OSTYPE == darwin* ]]; then
-    echo "darwin"
-  elif [[ $OSTYPE == linux-gnu* ]]; then
-    echo "ubuntu"
-  else
-    echo "ubuntu"
-  fi
-}
-
-#############################################
 # Installs homebrew on darwin and linux
 # On linux it installs linuxbrew
 # We tend to use nix instead
@@ -50,7 +34,7 @@ function install_brew {
 }
 
 #############################################
-# Install ni on darwin and linux
+# Install nix on darwin and linux
 # On darwin, we add the nix-darwin util
 #############################################
 
@@ -136,10 +120,57 @@ function install_theme_manager {
 }
 
 #############################################
+# Install essential tooling
+#############################################
+
+function install_essentials() {
+  local distro="$1"
+
+  # On Mac we must disable tls check for git temporarily
+  hash git 2>/dev/null && git config --global http.sslVerify false
+
+	# Creating needed directories
+  mkdir -p $HOME/.local/{bin,share,etc,src}
+  mkdir -p $HOME/.local/share/{node_modules,python_packages,gems,pnpm}
+  mkdir -p $HOME/Workspace/Projects
+
+	# Install brew and Nix
+  case $distro in
+    "ubuntu" | "debian")
+      sudo apt update -y
+      sudo apt upgrade -y
+      sudo apt install -y build-essential curl git zsh fonts-hack-ttf
+
+      brew install docker
+      ;;
+    "darwin")
+      brew install zsh openssl
+      brew tap homebrew/cask-fonts
+      brew install font-hack-nerd-font
+      brew install docker docker-compose
+
+      # Install a working version of cocoapods
+      brew uninstall --force ruby
+      arch -x86_64 gem install ffi
+      arch -x86_64 gem install cocoapods
+      ;;
+    *)
+      echo "Not supported right now"
+      ;;
+  esac
+
+  hash git 2>/dev/null && git config --global http.sslVerify true
+  echo "Done installing. You should login and logout again"
+}
+
+#############################################
 # Install them all
 #############################################
 install_brew $DISTRO
 install_nix $DISTRO
+
+install_essentials $DISTRO
+
 install_zsh_manager
 install_tmux_manager
 install_theme_manager
