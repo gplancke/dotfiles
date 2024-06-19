@@ -16,100 +16,101 @@ let
       # pinned.nix
       pinned.cacert
       pinned.nix-diff
+			pinned.devbox
 
 			##### SHELLS
       pinned.bash
-			# Apply a script upon entering a directory
-      pinned.direnv
-      pinned.nix-direnv
-			# Awesome prompt
-      pinned.starship
+			## Apply a script upon entering a directory
+      # pinned.direnv
+      # pinned.nix-direnv
+			## Awesome prompt
+      # pinned.starship
 
 			##### VCS
-      pinned.git
-			# An alternative to git
-      pinned.fossil
-			# A git client
-			pinned.lazygit
-			pinned.lazydocker
+      # pinned.git
+			## An alternative to git
+      # pinned.fossil
+			## A git client
+			# pinned.lazygit
+			# pinned.lazydocker
 
 			##### CONTAINERS
-			# Emulator
-			unpinned.qemu
-			# Container runner
-			unpinned.colima
-			# Docker cli
-			unpinned.docker
-			# Share tty
-			unpinned.ttyd
+			## Emulator
+			# unpinned.qemu
+			## Container runner
+			#unpinned.colima
+			## Docker cli
+			#unpinned.docker
+			## Share tty
+			# unpinned.ttyd
 
 			##### LANGUAGES
-			pinned.nodejs-18_x
-			pinned.nodejs-18_x.pkgs.pnpm
-      pinned.openjdk
-			pinned.python3Full
-      pinned.cargo
-      pinned.go
-			pinned.luajit
-			pinned.luajitPackages.luarocks
+			# pinned.nodejs_20
+			# pinned.nodejs_20.pkgs.pnpm
+      # pinned.openjdk
+			# pinned.python3Full
+      # pinned.cargo
+      # pinned.go
+			# pinned.luajit
+			# pinned.luajitPackages.luarocks
 			# Sync local files to Gscripts directory
-      unpinned.google-clasp
+      # unpinned.google-clasp
 
 			###### COMMONS
-      pinned.less
-      pinned.tree
-      pinned.unzip
-			# Swiss army knife for TCP sockets
-      pinned.socat
-			# easy encryption tool
-			pinned.age
+      # pinned.less
+      # pinned.tree
+      # pinned.unzip
+			## Swiss army knife for TCP sockets
+      # pinned.socat
+			## easy encryption tool
+			# pinned.age
 
 			##### NEW COMMON TOOLS
-			# Parse and decode json
-      pinned.jq
-			# File search better than grep
-      pinned.ripgrep
-			# Another file search better than grep
-      pinned.silver-searcher
-			# List fuzzy finder
-      pinned.fzf
-			# Change directory on steroid
-      unpinned.zoxide
-			# Monitoring
-      pinned.htop
-			# Better term diff
-      unpinned.diff-so-fancy
+			## Parse and decode json
+      # pinned.jq
+			## File search better than grep
+      # pinned.ripgrep
+			## Another file search better than grep
+      # pinned.silver-searcher
+			## List fuzzy finder
+      # pinned.fzf
+			## Change directory on steroid
+      # unpinned.zoxide
+			## Monitoring
+      # pinned.htop
+			## Better term diff
+      # unpinned.diff-so-fancy
 			# Nice network scan utils
-      unpinned.nmap
-			# Better terminal cat
-      unpinned.bat
-			# Like htop, but better ?
-      unpinned.gtop
-			# Wrap commands to output json instead of text
-      unpinned.jc
-			# Generate valid local self-signed certificates
-			unpinned.mkcert
+      # unpinned.nmap
+			## Better terminal cat
+      # unpinned.bat
+			## Like htop, but better ?
+      # unpinned.gtop
+			## Wrap commands to output json instead of text
+      # unpinned.jc
+			## Generate valid local self-signed certificates
+			# unpinned.mkcert
 
 			##### CODING
-			# Best editor with vscode
-      pinned.neovim
-			# Preconfigure tmux panes and windows
-      pinned.tmuxinator
-			# Terminal based file browser
-      unpinned.nnn
-			# Another terminal based file browser
-			unpinned.ranger
-			# Terminal multiplexor. Zellij seems to be a good improvement though
-      unpinned.tmux
-			# Git client which is github aware
-      unpinned.hub
-			# A client for github
-			unpinned.gh
-			# Git commit with style
-      unpinned.nodePackages.gitmoji-cli
-			# Non-free local tunnel
-      unpinned.ngrok
-			# Bitwarden cli
+			## Best editor with vscode
+      # pinned.neovim
+			## Preconfigure tmux panes and windows
+      # pinned.tmuxinator
+			## Terminal based file browser
+      # unpinned.nnn
+			## Another terminal based file browser
+			# unpinned.ranger
+			## Terminal multiplexor. Zellij seems to be a good improvement though
+      # unpinned.tmux
+			## Git client which is github aware
+      # unpinned.hub
+			## A client for github
+			# unpinned.gh
+			## Git commit with style
+      # unpinned.nodePackages.gitmoji-cli
+			## Non-free local tunnel
+      # unpinned.ngrok
+			## Bitwarden cli
 			# unpinned.bitwarden-cli
 
 			##### CLOUD TOOLS
@@ -119,11 +120,11 @@ let
 			/* unpinned.consul */
 			/* unpinned.terraform */
 			/* unpinned.pulumi */
-			unpinned.nodePackages.vercel
+			# unpinned.nodePackages.vercel
 			# unpinned.flyctl
-			unpinned.heroku
-			unpinned.google-cloud-sdk
-			unpinned.python310Packages.cloudflare
+			# unpinned.heroku
+			# unpinned.google-cloud-sdk
+			# unpinned.python310Packages.cloudflare
 
 			##### GUI
 			# unpinned.bruno

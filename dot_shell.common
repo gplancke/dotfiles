@@ -92,6 +92,7 @@ hash fnm 2>/dev/null && eval "$(fnm env)"                                   # so
 	&& . /nix/var/nix/profiles/default/etc/profile.d/nix.sh
 [ -f "/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh" ] \
 	&& . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+hash devbox 2>/dev/null && eval "$(devbox global shellenv)"
 
 ##########################
 # Aliases
