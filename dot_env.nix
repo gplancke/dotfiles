@@ -6,7 +6,7 @@ let
 
   # Pinned nixpkgs version to make our env truely reproducible
   pinned = import (fetchTarball {
-    url = https://github.com/NixOS/nixpkgs/archive/refs/tags/22.11.tar.gz;
+    url = https://github.com/NixOS/nixpkgs/archive/refs/tags/24.05.tar.gz;
   }) {};
 
   # The list of packages to be installed
@@ -45,6 +45,7 @@ let
 
 			##### LANGUAGES
 			pinned.nodejs-18_x
+			pinned.nodejs-18_x.pkgs.pnpm
       pinned.openjdk
 			pinned.python3Full
       pinned.cargo
@@ -90,6 +91,8 @@ let
 			unpinned.mkcert
 
 			##### CODING
+			# Best editor with vscode
+      pinned.neovim
 			# Preconfigure tmux panes and windows
       pinned.tmuxinator
 			# Terminal based file browser
@@ -98,8 +101,6 @@ let
 			unpinned.ranger
 			# Terminal multiplexor. Zellij seems to be a good improvement though
       unpinned.tmux
-			# Best editor with vscode
-      unpinned.neovim
 			# Git client which is github aware
       unpinned.hub
 			# A client for github
@@ -108,8 +109,8 @@ let
       unpinned.nodePackages.gitmoji-cli
 			# Non-free local tunnel
       unpinned.ngrok
-			# Bitwrden cli
-			unpinned.bitwarden-cli
+			# Bitwarden cli
+			# unpinned.bitwarden-cli
 
 			##### CLOUD TOOLS
 			/* unpinned.vagrant */
@@ -119,7 +120,8 @@ let
 			/* unpinned.terraform */
 			/* unpinned.pulumi */
 			unpinned.nodePackages.vercel
-			unpinned.flyctl
+			# unpinned.flyctl
+			unpinned.heroku
 			unpinned.google-cloud-sdk
 			unpinned.python310Packages.cloudflare
 

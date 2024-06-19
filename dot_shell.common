@@ -85,8 +85,8 @@ export TMUX_POWERLINE_DEFAULT_FOREGROUND_COLOR='255'
 # Extensions
 ##########################
 hash fnm 2>/dev/null && eval "$(fnm env)"                                   # source fnm
-[ -f "$NIX_DIR/etc/profile.d/nix.sh" ] && . "$NIX_DIR/etc/profile.d/nix.sh" # source nix
 [ -f "$ASDF_DIR/asdf.sh" ] && . "$ASDF_DIR/asdf.sh"                         # source asdf
+[ -f "$NIX_DIR/etc/profile.d/nix.sh" ] && . "$NIX_DIR/etc/profile.d/nix.sh" # source nix
 
 ##########################
 # Aliases
