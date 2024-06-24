@@ -1486,6 +1486,71 @@
         }
       }
     },
+    "ruby@latest": {
+      "last_modified": "2024-05-22T06:18:38Z",
+      "plugin_version": "0.0.2",
+      "resolved": "github:NixOS/nixpkgs/3f316d2a50699a78afe5e77ca486ad553169061e#ruby_3_3",
+      "source": "devbox-search",
+      "version": "3.3.1",
+      "systems": {
+        "aarch64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/pkp3jxxrv5k2q30d7dlrhi3iavf7yx30-ruby-3.3.1",
+              "default": true
+            },
+            {
+              "name": "devdoc",
+              "path": "/nix/store/kd1jzkciy029zvr9z93flqvj5jv3p4fg-ruby-3.3.1-devdoc"
+            }
+          ],
+          "store_path": "/nix/store/pkp3jxxrv5k2q30d7dlrhi3iavf7yx30-ruby-3.3.1"
+        },
+        "aarch64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/nz9ad6vkijjqb4a472d9wdsnr2v8zpzk-ruby-3.3.1",
+              "default": true
+            },
+            {
+              "name": "devdoc",
+              "path": "/nix/store/fdg456ic2642jzhrc2xx77930xw2zml0-ruby-3.3.1-devdoc"
+            }
+          ],
+          "store_path": "/nix/store/nz9ad6vkijjqb4a472d9wdsnr2v8zpzk-ruby-3.3.1"
+        },
+        "x86_64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/52f08h8gxjd0i0kf321ka6iyyfv17cyw-ruby-3.3.1",
+              "default": true
+            },
+            {
+              "name": "devdoc",
+              "path": "/nix/store/bj3s7wngp91256scm3x6x7jivncgynrx-ruby-3.3.1-devdoc"
+            }
+          ],
+          "store_path": "/nix/store/52f08h8gxjd0i0kf321ka6iyyfv17cyw-ruby-3.3.1"
+        },
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/nwbbnrwrzhk552p11lcxkxjfxi7z69sx-ruby-3.3.1",
+              "default": true
+            },
+            {
+              "name": "devdoc",
+              "path": "/nix/store/iqrnl5h2rfczsrkiqpskg9m86r5l51gl-ruby-3.3.1-devdoc"
+            }
+          ],
+          "store_path": "/nix/store/nwbbnrwrzhk552p11lcxkxjfxi7z69sx-ruby-3.3.1"
+        }
+      }
+    },
     "silver-searcher@latest": {
       "last_modified": "2024-05-22T06:18:38Z",
       "resolved": "github:NixOS/nixpkgs/3f316d2a50699a78afe5e77ca486ad553169061e#silver-searcher",

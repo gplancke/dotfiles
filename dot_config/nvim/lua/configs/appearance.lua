@@ -10,7 +10,7 @@ local zenmode = require('zen-mode')
 
 -- NOTE: Make sure the terminal supports this
 vim.o.termguicolors = true
-vim.o.base16colorspace = 256
+-- vim.o.base16colorspace = 256
 
 catpuccin.setup({
 	flavour = 'frappe',

@@ -34,7 +34,8 @@
     "hub@latest",
     "gh@latest",
     "neovim@latest",
-    "heroku@latest"
+    "heroku@latest",
+    "ruby@latest"
   ],
   "shell": {
     "init_hook": [
