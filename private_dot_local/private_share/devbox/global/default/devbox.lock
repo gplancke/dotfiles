@@ -145,6 +145,54 @@
         }
       }
     },
+    "deno@latest": {
+      "last_modified": "2024-07-17T09:45:27Z",
+      "resolved": "github:NixOS/nixpkgs/5e73714b16ca222dcb2fc3ea2618fd7ba698da65#deno",
+      "source": "devbox-search",
+      "version": "1.45.2",
+      "systems": {
+        "aarch64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/xiz264k79b2419vp0b82v15k552whcgp-deno-1.45.2",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/xiz264k79b2419vp0b82v15k552whcgp-deno-1.45.2"
+        },
+        "aarch64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/46h8dy8lxy38jvan1f302p0fdm36fpis-deno-1.45.2",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/46h8dy8lxy38jvan1f302p0fdm36fpis-deno-1.45.2"
+        },
+        "x86_64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/cc48lbwz40k39q0nfkiccsd6gm4b0s2k-deno-1.45.2",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/cc48lbwz40k39q0nfkiccsd6gm4b0s2k-deno-1.45.2"
+        },
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/4dlxmw2q7fg7z567nmdwy86fndkazrwg-deno-1.45.2",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/4dlxmw2q7fg7z567nmdwy86fndkazrwg-deno-1.45.2"
+        }
+      }
+    },
     "diff-so-fancy@latest": {
       "last_modified": "2024-05-22T06:18:38Z",
       "resolved": "github:NixOS/nixpkgs/3f316d2a50699a78afe5e77ca486ad553169061e#diff-so-fancy",
@@ -238,6 +286,54 @@
             }
           ],
           "store_path": "/nix/store/81cqmrlp1x77139nsx0s5jjqk6jxxxxw-direnv-2.34.0"
+        }
+      }
+    },
+    "docker-buildx@latest": {
+      "last_modified": "2024-06-12T20:55:33Z",
+      "resolved": "github:NixOS/nixpkgs/a9858885e197f984d92d7fe64e9fff6b2e488d40#docker-buildx",
+      "source": "devbox-search",
+      "version": "0.14.1",
+      "systems": {
+        "aarch64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/l538xyz59ps09gy31jjgg82rvmpbqxnx-docker-buildx-0.14.1",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/l538xyz59ps09gy31jjgg82rvmpbqxnx-docker-buildx-0.14.1"
+        },
+        "aarch64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/40pg72657d03gkhpijkqa64ihnp1jp9v-docker-buildx-0.14.1",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/40pg72657d03gkhpijkqa64ihnp1jp9v-docker-buildx-0.14.1"
+        },
+        "x86_64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/7f6xr7vh6sf726ql7y00pccbfx5b1q3i-docker-buildx-0.14.1",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/7f6xr7vh6sf726ql7y00pccbfx5b1q3i-docker-buildx-0.14.1"
+        },
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/ncwpnnwq4wpnpsd92x793n31va866198-docker-buildx-0.14.1",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/ncwpnnwq4wpnpsd92x793n31va866198-docker-buildx-0.14.1"
         }
       }
     },

@@ -35,7 +35,9 @@
     "gh@latest",
     "neovim@latest",
     "heroku@latest",
-    "ruby@latest"
+    "ruby@latest",
+    "docker-buildx@latest",
+    "deno@latest"
   ],
   "shell": {
     "init_hook": [
