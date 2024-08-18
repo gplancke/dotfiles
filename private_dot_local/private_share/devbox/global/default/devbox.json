@@ -37,7 +37,11 @@
     "heroku@latest",
     "ruby@latest",
     "docker-buildx@latest",
-    "deno@latest"
+    "deno@latest",
+    "gcc@13.3.0",
+    "fd@latest",
+    "luarocks@latest",
+    "python@latest"
   ],
   "shell": {
     "init_hook": [

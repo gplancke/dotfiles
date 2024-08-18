@@ -1,4 +1,4 @@
 return {
-  "jiaoshijie/undotree",
-  dependencies = "nvim-lua/plenary.nvim",
+  -- "jiaoshijie/undotree",
+  -- dependencies = "nvim-lua/plenary.nvim",
 }

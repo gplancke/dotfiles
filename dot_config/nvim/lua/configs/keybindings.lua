@@ -13,15 +13,11 @@ vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = tr
 surround.setup()
 
 -- Buffer and Files manipulation
-wk.register(keybindings.buffers, { noremap = true, silent = true })
-
--- Search and Show
-wk.register({
-	u = keybindings.undo,
-	s = keybindings.search,
-	S = keybindings.show,
-	h = keybindings.harpoons,
-	e = keybindings.explain,
-	n = keybindings.noice,
-	-- t = keybindings.terminals,
-}, { prefix = '<leader>' })
+wk.add(keybindings.buffers, { noremap = true, silent = true })
+wk.add(keybindings.search)
+wk.add(keybindings.show)
+wk.add(keybindings.harpoons)
+wk.add(keybindings.explain)
+wk.add(keybindings.noice)
+-- wk.add(keybindings.undo)
+-- wk.add(keybindings.terminals)

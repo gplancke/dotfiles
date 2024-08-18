@@ -5,22 +5,24 @@ return {
 		"nvim-lua/plenary.nvim",
 		"nvim-tree/nvim-web-devicons",
 		"MunifTanjim/nui.nvim",
-		{
-			"s1n7ax/nvim-window-picker",
-			config = function ()
-				require'window-picker'.setup({
-					autoselect_one = true,
-					include_current = false,
-					filter_rules = {
-						bo = {
-							filetype = { 'neo-tree', "neo-tree-popup", "notify" },
-							buftype = { 'terminal', "quickfix" },
-						},
-					},
-					-- other_win_hl_color = '#e35e4f',
-				})
-			end
-		}
+		-- {
+		-- 	"s1n7ax/nvim-window-picker",
+		-- 	event = 'VeryLazy',
+		-- 	version = '2.*',
+		-- 	config = function ()
+		-- 		require'window-picker'.setup({
+		-- 			filter_rules = {
+		-- 				include_current_win = false,
+		-- 				autoselect_one = true,
+		-- 				bo = {
+		-- 					filetype = { 'neo-tree', "neo-tree-popup", "notify" },
+		-- 					buftype = { 'terminal', "quickfix" },
+		-- 				},
+		-- 			},
+		-- 			-- other_win_hl_color = '#e35e4f',
+		-- 		})
+		-- 	end
+		-- }
 	},
 	config = function ()
 		vim.cmd([[ let g:neo_tree_remove_legacy_commands = 1 ]])
@@ -31,11 +33,11 @@ return {
 			close_if_last_window = true,
 			window = {
 				width = 30,
-				mappings = {
-					["S"] = "split_with_window_picker",
-          ["s"] = "vsplit_with_window_picker",
-          ["<cr>"] = "open_with_window_picker",
-				}
+				-- mappings = {
+				-- 	["S"] = "split_with_window_picker",
+				--       ["s"] = "vsplit_with_window_picker",
+				--       ["<cr>"] = "open_with_window_picker",
+				-- }
 			},
 			filesystem = {
 				-- hijack_netrw_behavior = "disabled",

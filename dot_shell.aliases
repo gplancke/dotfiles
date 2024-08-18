@@ -484,6 +484,8 @@ alias nix-uninstall='/nix/nix-installer uninstall'
 alias ldok="DOCKER_HOST=$(docker context ls --format json | jq '. | select(.Current == true) | .DockerEndpoint') lazydocker"
 alias lgit='lazygit'
 
+alias myip='dig +short txt ch whoami.cloudflare @1.0.0.1 | tr -d "\""'
+
 alias find-rpi='arp -na | grep -i "dc:a6:32"'
 alias find-old-rpi='arp -na | grep -i "b8:27:eb"'
 

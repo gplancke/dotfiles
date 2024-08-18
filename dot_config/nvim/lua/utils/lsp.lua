@@ -2,6 +2,26 @@ local keybindings = require('vars.keybindings')
 local wk = require('which-key')
 local navic = require('nvim-navic')
 
+local function update_buffer_in_code_actions(code_actions, bufnb)
+	local new_code_actions = {}
+
+	for _, action in ipairs(code_actions) do
+		-- Create a new copy of the action table
+		local new_action = {}
+		for key, value in pairs(action) do
+			new_action[key] = value
+		end
+
+		-- Update the buffer value in the new action table
+		new_action.buffer = bufnb
+
+		-- Insert the new action into the new_code_actions table
+		table.insert(new_code_actions, new_action)
+	end
+
+	return new_code_actions
+end
+
 local Module = {}
 
 function Module.setLSPAppearance(config)
@@ -25,11 +45,15 @@ function Module.setLSPAppearance(config)
 end
 
 function Module.setLSPKeyMaps(bufnr)
-	wk.register({
-		c = keybindings.code_actions,
-		r = keybindings.replace,
-		g = keybindings.goto,
-	}, { prefix = '<leader>', buffer = bufnr })
+	wk.add(
+		update_buffer_in_code_actions(keybindings.code_actions, bufnr)
+	)
+	wk.add(
+		update_buffer_in_code_actions(keybindings.replace, bufnr)
+	)
+	wk.add(
+		update_buffer_in_code_actions(keybindings.goto, bufnr)
+	)
 
 	-- Create a command `:Format` local to the LSP buffer
 	vim.api.nvim_buf_create_user_command(bufnr, 'Format', function(_)

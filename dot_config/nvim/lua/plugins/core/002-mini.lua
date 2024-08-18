@@ -1,10 +1,11 @@
 return {
 	-- pack of niceties
 	'echasnovski/mini.nvim',
-	version = '*',
+	version = false,
 	config = function ()
 		-- require('mini.move').setup()
 		-- require('mini.starter').setup()
+		require('mini.icons').setup()
 		require('mini.comment').setup()
 		require('mini.bufremove').setup()
 		require('mini.pairs').setup()
