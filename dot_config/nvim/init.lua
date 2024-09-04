@@ -24,7 +24,9 @@ require('lazy').setup({
   { import = 'plugins.ide' },
   { import = 'plugins.appearance' },
 }, {})
+
 require('configs.options')
+require('configs.core')
 require('configs.keybindings')
 require('configs.autocomplete')
 require('configs.appearance')

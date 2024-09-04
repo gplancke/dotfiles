@@ -10,13 +10,13 @@ module.exports = {
         // font family with optional fallbacks
         fontFamily: '"Hack Nerd Font Mono", Menlo, "DejaVu Sans Mono", Consolas, "Lucida Console", monospace',
         // default font size in pixels for all tabs
-        fontSize: 13,
+        fontSize: 12,
         // default font weight: 'normal' or 'bold'
         fontWeight: 'bold',
         // font weight for bold characters: 'normal' or 'bold'
         fontWeightBold: 'bold',
         // line height as a relative unit
-        lineHeight: 1,
+        lineHeight: 1.2,
         // letter spacing as a relative unit
         letterSpacing: 0,
         // `'BEAM'` for |, `'UNDERLINE'` for _, `'BLOCK'` for █

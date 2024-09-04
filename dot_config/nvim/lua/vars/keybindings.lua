@@ -1,8 +1,8 @@
 return {
 	buffers = {
+    { "<C-q>", "<cmd>lua MiniBufremove.wipeout()<cr>", desc = "Close Buffer", remap = false },
     { "<C-e>", "<cmd>Neotree toggle<cr>", desc = "Toggle File Explorer", remap = false },
     { "<leader><C-e>", "<cmd>Neotree reveal<cr>", desc = "Reveal File Explorer", remap = false },
-    { "<C-q>", "<cmd>lua MiniBufremove.wipeout()<cr>", desc = "Close Buffer", remap = false, buffer = 0 },
     { "<leader><C-q>", "<cmd>bufdo lua MiniBufremove.wipeout()<cr>", desc = "Close All Buffers", remap = false },
     { "[h", '<cmd>lua require("harpoon.ui").nav_prev()<cr>', desc = "Previous Harpoon", remap = false },
     { "]h", '<cmd>lua require("harpoon.ui").nav_next()<cr>', desc = "Previous Harpoon", remap = false },
