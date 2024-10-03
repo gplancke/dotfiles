@@ -41,7 +41,9 @@
     "gcc@13.3.0",
     "fd@latest",
     "luarocks@latest",
-    "python@latest"
+    "python@latest",
+    "zellij@latest",
+    "helix@latest"
   ],
   "shell": {
     "init_hook": [

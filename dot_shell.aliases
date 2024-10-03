@@ -21,222 +21,6 @@ subdomains() {
 
 ################################################################################
 ################################################################################
-# All the bare minimum to kickstart a coding project
-################################################################################
-################################################################################
-
-create_project() {
-  local project_name=$1
-	local cwd=$(pwd)
-
-	if [ "${project_name}" != "." ]; then
-		mkdir $project_name
-		cd $project_name
-	fi
-
-	if [ -f "./package.json" -o -f ".gitignore" -o -d ".git" ]; then
-		echo "It appears this folder is not empty"
-	else
-  	cat > .editorconfig << _EOF_
-root = true
-
-[*]
-indent_style = tab
-indent_size = 2
-end_of_line = lf
-charset = utf-8
-trim_trailing_whitespace = true
-insert_final_newline = true
-max_line_length = 100
-
-# Use 4 spaces for the Python files
-[*.py]
-indent_style = space
-indent_size = 4
-max_line_length = 100
-
-# The JSON files contain newlines inconsistently
-[*.json]
-insert_final_newline = false
-
-# Minified JavaScript files shouldn't be changed
-[**.min.js]
-insert_final_newline = false
-
-# Makefiles always use tabs for indentation
-[Makefile]
-indent_style = tab
-
-# Batch files use tabs for indentation
-[*.bat]
-indent_style = tab
-
-[*.md]
-trim_trailing_whitespace = false
-_EOF_
-
-		cat > shell.nix << _EOF_
-{ pkgs ? import <nixpkgs> {} }:
-with pkgs;
-mkShell {
-  buildInputs = [
-  ];
-}
-_EOF_
-
-		echo 'use nix' > .envrc
-
-		direnv allow
-		git init
-
-		cat > .gitignore << _EOF_
-node_modules/
-dist/
-output/
-
-# Linux files
-*~
-
-# OS X files
-.DS_Store
-.AppleDouble
-.LSOverride
-Icon
-._*
-.Spotlight-V100
-.Trashes
-
-# Windows files
-Thumbs.db
-ehthumbs.db
-Desktop.ini
-$RECYCLE.BIN/
-
-# Vim files
-.*.s[a-w][a-z]
-*.un~
-Session.vim
-.netrwhist
-*~
-
-# SublimeText project files
-*.sublime-workspace
-
-# TextMate files
-*.tmproj
-*.tmproject
-tmtags
-
-# Eclipse files (covers most of the basic stuff, you might need to add more)
-.classpath
-.project
-.settings
-
-# Intellij files
-*.iml
-*.ipr
-*.iws
-.idea/
-
-# Emacs files
-*~
-\#*\#
-/.emacs.desktop
-/.emacs.desktop.lock
-.elc
-auto-save-list
-tramp
-.\#*
-
-# Org-mode files
-.org-id-locations
-*_archive
-
-# VSCode
-.vscode/
-
-_EOF_
-
-	fi
-
-	cd $cwd
-}
-
-################################################################################
-################################################################################
-# All the bare minimum to kickstart a node project
-################################################################################
-################################################################################
-
-create_node_project() {
-  local project_name=$1
-	local cwd=$(pwd)
-
-
-	if [ "${project_name}" != "." ]; then
-		[ -d "$project_name" ] || mkdir -p $project_name
-		cd $project_name
-	fi
-
-	create_project .
- 	cat > .prettierrc << _EOF_
-{
-	"semi": true,
-	"trailingComma": "es5",
-	"singleQuote": true,
-	"printWidth": 100,
-	"tabWidth": 2,
-	"plugins": [require('prettier-plugin-editorconfig')]
-}'
-_EOF_
-
-	cat > shell.nix << _EOF_
-{ pkgs ? import <nixpkgs> {} }:
-with pkgs;
-mkShell {
-  buildInputs = [
-    nodejs-16_x
-		nodejs-16_x.pkgs.pnpm
-  ];
-}
-_EOF_
-
-	cd $cwd
-}
-
-################################################################################
-################################################################################
-# All the bare minimum to kickstart a project in typescript
-################################################################################
-################################################################################
-
-create_typescript_project() {
-  local project_name=$1
-
-	if [ "${project_name}" != "." ]; then
-		[ -d "$project_name" ] || mkdir -p $project_name
-		cd $project_name
-	fi
-
-	create_node_project .
-  npm init -y
-  npm install --save-dev --no-lock-file \
-    typescript \
-    eslint \
-    @typescript-eslint/eslint-plugin \
-    @typescript-eslint/parser \
-    eslint-config-prettier \
-    eslint-plugin-prettier \
-    prettier \
-    @types/node
-
-  mkdir src
-  npx tsc --init
-  npx eslint --init
-}
-
-################################################################################
-################################################################################
 # Utility to print tmux colors
 ################################################################################
 ################################################################################
@@ -265,11 +49,17 @@ show_tree() {
 ################################################################################
 ################################################################################
 
-open_nautilus() {
-  if [ -z "$1" ]; then
-    (nautilus $(find . -type d | fzf-tmux) &>/dev/null &)
+finder() {
+	if hash nautilus 2>/dev/null; then
+    finder_cmd="nautilus"
   else
-    (nautilus "$1" &>/dev/null &)
+    finder_cmd="open"
+  fi
+
+  if [ -z "$1" ]; then
+    ("${finder_cmd}" $(find . -type d | fzf-tmux) &>/dev/null &)
+  else
+    ("${finder_cmd}" "$1" &>/dev/null &)
   fi
 }
 
@@ -408,6 +198,18 @@ work_on() {
 
 ################################################################################
 ################################################################################
+# Quickly kill a process on a port
+################################################################################
+################################################################################
+
+__kill_port() {
+	local port="${1:=3000}"
+	lsof -ti:$port | xargs -I {} kill -9 {} 2>/dev/null
+}
+
+
+################################################################################
+################################################################################
 # Change theme for the whole system
 ################################################################################
 ################################################################################
@@ -425,16 +227,6 @@ chth() {
 ################################################################################
 ################################################################################
 
-# alias cd='move_to_dir'
-alias edit='open_editor'
-alias naut='open_nautilus'
-alias treee='show_tree'
-alias tm='tmux_open'
-alias tmk='tmux_kill'
-alias tmls='tmux list-sessions'
-alias tmpop='tmux_popup'
-alias tmcolors='print_tmux_colors'
-
 alias c='clear'
 
 alias ll='ls -l'
@@ -442,33 +234,45 @@ alias la='ls -a'
 alias lisa='ls -lisa'
 alias ls='ls -lisa'
 
-[ -e "$HOME/.local/bin/dot.sh" ] && alias dot='$HOME/.local/bin/dot.sh'
-
-# hash podman 2>/dev/null && alias docker='podman'
-# hash podman-compose 2>/dev/null && alias docker-compose='podman-compose'
-hash bat 2>/dev/null && alias cat='bat'
-hash diff-so-fancy 2>/dev/null && alias diff='diff-so-fancy'
-# hash hub 2>/dev/null && alias git='hub'
-
-hash yarn 2>/dev/null && alias y='yarn'
-hash npx 2>/dev/null && alias yarnx='npx'
-hash code-git 2>/dev/null && alias code='code-git'
+alias mvd='move_to_dir'
+alias edit='open_editor'
+alias op='finder'
+alias treee='show_tree'
 
 alias home='cd $HOME'
 alias work='work_on'
 
-alias pkg-list='yay -Qs'
-alias pkg-list-installed='yay -Qe'
-alias pkg-list-orphans='yay -Qdt'
+#################
+# Tmux
+#################
 
-alias pkgs-upgrade='yay -Syu'
-alias pkgs-cleanup='yay -Rns $(yay -Qtdq)'
+alias tm='tmux_open'
+alias tmk='tmux_kill'
+alias tmls='tmux list-sessions'
+alias tmpop='tmux_popup'
+alias tmcolors='print_tmux_colors'
 
-alias pkg-install='yay -Sy'
-alias pkg-update='yay -Sy'
-alias pkg-remove='yay -Rsc'
-alias pkg-search='yay -Ss'
-alias pkg-info='yay -Qii'
+#################
+# Custom bins
+#################
+
+[ -e "$HOME/.local/bin/dot.sh" ] && alias dot='$HOME/.local/bin/dot.sh'
+
+#################
+# Remaps
+#################
+
+# hash podman 2>/dev/null && alias docker='podman'
+# hash podman-compose 2>/dev/null && alias docker-compose='podman-compose'
+
+hash bat 2>/dev/null && alias cat='bat'
+hash diff-so-fancy 2>/dev/null && alias diff='diff-so-fancy'
+hash hub 2>/dev/null && alias git='hub'
+hash code-git 2>/dev/null && alias code='code-git'
+
+#################
+# Nix
+#################
 
 alias nix-ls-installed='nix-env -q | fzf-tmux'
 alias nix-ls-available='nix-env -qaP | fzf-tmux'
@@ -481,19 +285,18 @@ alias nix-cleanup='nix-env --delete-generations +3 && nix-collect-garbage'
 alias nix-rollback='nix-env --rollback'
 alias nix-uninstall='/nix/nix-installer uninstall'
 
+#################
+# TUI
+#################
+
 alias ldok="DOCKER_HOST=$(docker context ls --format json | jq '. | select(.Current == true) | .DockerEndpoint') lazydocker"
 alias lgit='lazygit'
 
-alias myip='dig +short txt ch whoami.cloudflare @1.0.0.1 | tr -d "\""'
+#################
+# Network
+#################
 
+alias kport='__kill_port'
+alias myip='dig +short txt ch whoami.cloudflare @1.0.0.1 | tr -d "\""'
 alias find-rpi='arp -na | grep -i "dc:a6:32"'
 alias find-old-rpi='arp -na | grep -i "b8:27:eb"'
-
-alias linux-rebuild='sudo mkinitpcio -p linux'
-alias grub-rebuild='sudo grub-mkconfig -o /boot/grub/grub.cfg'
-
-alias mac-start-check='ls /Library/StartupItems && ls /Library/LaunchDaemons && ls /System/Library/LaunchDaemons && ls ~/Library/LaunchAgents && ls /Library/LaunchAgents/ && ls /System/Library/LaunchAgents/'
-
-alias tsinit='create_typescript_project'
-alias	nodeinit='create_node_project'
-alias pinit='create_project'

@@ -32,7 +32,8 @@ return {
 		tree.setup({
 			close_if_last_window = true,
 			window = {
-				width = 30,
+				width = 40,
+				position = "right",
 				-- mappings = {
 				-- 	["S"] = "split_with_window_picker",
 				--       ["s"] = "vsplit_with_window_picker",

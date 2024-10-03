@@ -1,2 +1,23 @@
 # For snap and flatpak apps to appear in gnome ubuntu
 [ -f "/etc/profile.d/app-bin-path.sh" ] && emulate sh -c 'source /etc/profile.d/apps-bin-path.sh'
+
+################################################################################
+#  LINUX
+################################################################################
+
+alias pkg-list='yay -Qs'
+alias pkg-list-installed='yay -Qe'
+alias pkg-list-orphans='yay -Qdt'
+
+alias pkgs-upgrade='yay -Syu'
+alias pkgs-cleanup='yay -Rns $(yay -Qtdq)'
+
+alias pkg-install='yay -Sy'
+alias pkg-update='yay -Sy'
+alias pkg-remove='yay -Rsc'
+alias pkg-search='yay -Ss'
+alias pkg-info='yay -Qii'
+
+alias linux-rebuild='sudo mkinitpcio -p linux'
+alias grub-rebuild='sudo grub-mkconfig -o /boot/grub/grub.cfg'
+
