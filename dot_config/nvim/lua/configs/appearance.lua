@@ -4,9 +4,9 @@ local git_blame = require('gitblame')
 local indentation = require('ibl')
 local noice = require('noice')
 local catpuccin = require("catppuccin")
-local frappe = require("catppuccin.palettes").get_palette("frappe")
-local bufferline = require('bufferline')
 local zenmode = require('zen-mode')
+-- local frappe = require("catppuccin.palettes").get_palette("frappe")
+-- local bufferline = require('bufferline')
 
 -- NOTE: Make sure the terminal supports this
 vim.o.termguicolors = true
@@ -54,28 +54,28 @@ catpuccin.setup({
 
 vim.cmd.colorscheme "catppuccin"
 
-bufferline.setup({
-	highlights = require("catppuccin.groups.integrations.bufferline").get {
-		custom = {
-			all = {
-				fill = { bg = frappe.base, fg = frappe.base },
-				separator = { bg = frappe.none, fg = frappe.base },
-				separator_selected = { bg = frappe.none, fg = frappe.base },
-			},
-		},
-	},
-	options = {
-		separator_style = "slant",
-		offsets = {
-			{
-				filetype = "neo-tree",
-				highlight = "Directory",
-				separator = true
-			},
-		}
-	}
-})
-
+-- bufferline.setup({
+-- 	highlights = require("catppuccin.groups.integrations.bufferline").get {
+-- 		custom = {
+-- 			all = {
+-- 				fill = { bg = frappe.base, fg = frappe.base },
+-- 				separator = { bg = frappe.none, fg = frappe.base },
+-- 				separator_selected = { bg = frappe.none, fg = frappe.base },
+-- 			},
+-- 		},
+-- 	},
+-- 	options = {
+-- 		separator_style = "slant",
+-- 		offsets = {
+-- 			{
+-- 				filetype = "neo-tree",
+-- 				highlight = "Directory",
+-- 				separator = true
+-- 			},
+-- 		}
+-- 	}
+-- })
+--
 indentation.setup({
 	scope = {
 		enabled = false,

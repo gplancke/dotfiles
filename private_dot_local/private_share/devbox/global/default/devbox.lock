@@ -98,50 +98,50 @@
       }
     },
     "colima@latest": {
-      "last_modified": "2024-06-03T07:19:07Z",
-      "resolved": "github:NixOS/nixpkgs/4a4ecb0ab415c9fccfb005567a215e6a9564cdf5#colima",
+      "last_modified": "2024-11-03T14:18:04Z",
+      "resolved": "github:NixOS/nixpkgs/4ae2e647537bcdbb82265469442713d066675275#colima",
       "source": "devbox-search",
-      "version": "0.6.9",
+      "version": "0.7.6",
       "systems": {
         "aarch64-darwin": {
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/9hzrw2wrvajmj1shfbnyfkf0gvgbx1rx-colima-0.6.9",
+              "path": "/nix/store/dmx03dfcaxpwcv0y23q337fq726zf9pg-colima-0.7.6",
               "default": true
             }
           ],
-          "store_path": "/nix/store/9hzrw2wrvajmj1shfbnyfkf0gvgbx1rx-colima-0.6.9"
+          "store_path": "/nix/store/dmx03dfcaxpwcv0y23q337fq726zf9pg-colima-0.7.6"
         },
         "aarch64-linux": {
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/b0f4bhfi8ligg2zc00cnnsdxzz24bvc0-colima-0.6.9",
+              "path": "/nix/store/9yh1amdirsjyzsy9g86cc97hlgz4ypx3-colima-0.7.6",
               "default": true
             }
           ],
-          "store_path": "/nix/store/b0f4bhfi8ligg2zc00cnnsdxzz24bvc0-colima-0.6.9"
+          "store_path": "/nix/store/9yh1amdirsjyzsy9g86cc97hlgz4ypx3-colima-0.7.6"
         },
         "x86_64-darwin": {
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/8nrzr9vlfsifs68bm6vpb0y13wzk22k0-colima-0.6.9",
+              "path": "/nix/store/h9942xb540v2vxdl3qkdgyksmidsqzg4-colima-0.7.6",
               "default": true
             }
           ],
-          "store_path": "/nix/store/8nrzr9vlfsifs68bm6vpb0y13wzk22k0-colima-0.6.9"
+          "store_path": "/nix/store/h9942xb540v2vxdl3qkdgyksmidsqzg4-colima-0.7.6"
         },
         "x86_64-linux": {
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/9m2hjv9hq4p90sfakj1bcj6b3sfaq789-colima-0.6.9",
+              "path": "/nix/store/c8v533w822ym35crsksjybp6wmv752jj-colima-0.7.6",
               "default": true
             }
           ],
-          "store_path": "/nix/store/9m2hjv9hq4p90sfakj1bcj6b3sfaq789-colima-0.6.9"
+          "store_path": "/nix/store/c8v533w822ym35crsksjybp6wmv752jj-colima-0.7.6"
         }
       }
     },
@@ -750,6 +750,54 @@
             }
           ],
           "store_path": "/nix/store/jxjzgz1p0hdqsg8k17ivw5mgcd6ffx9c-git-2.44.1"
+        }
+      }
+    },
+    "go@latest": {
+      "last_modified": "2024-10-13T23:44:06Z",
+      "resolved": "github:NixOS/nixpkgs/d4f247e89f6e10120f911e2e2d2254a050d0f732#go",
+      "source": "devbox-search",
+      "version": "1.23.2",
+      "systems": {
+        "aarch64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/35jikx2wg5r0qj47sic0p99bqnmwi6cn-go-1.23.2",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/35jikx2wg5r0qj47sic0p99bqnmwi6cn-go-1.23.2"
+        },
+        "aarch64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/6bx6d90kpy537yab22wja70ibpp4gkww-go-1.23.2",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/6bx6d90kpy537yab22wja70ibpp4gkww-go-1.23.2"
+        },
+        "x86_64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/yi89mimkmw48qhzrll1aaibxbvllpsjv-go-1.23.2",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/yi89mimkmw48qhzrll1aaibxbvllpsjv-go-1.23.2"
+        },
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/klw1ipjsqx1np7pkk833x7sad7f3ivv9-go-1.23.2",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/klw1ipjsqx1np7pkk833x7sad7f3ivv9-go-1.23.2"
         }
       }
     },

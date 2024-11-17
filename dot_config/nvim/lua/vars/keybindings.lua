@@ -83,4 +83,10 @@ return {
     { "<leader>n", group = "noice" },
     { "<leader>nd", '<cmd>lua require("noice").cmd("dismiss")<cr>', desc = "Dismiss Noice" },
 	},
+	aichat = {
+		{ "<leader>i", group = "aichat" },
+		{ "<leader>ia", '<cmd>lua require("avante.api").ask()<cr>', desc = "Show AI Chat" },
+		{ "<leader>ie", '<cmd>lua require("avante.api").edit()<cr>', desc = "Edit AI Chat" },
+		{ "<leader>ir", '<cmd>lua require("avante.api").refresh()<cr>', desc = "Refresh AI Chat" }
+	}
 }

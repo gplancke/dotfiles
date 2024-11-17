@@ -43,7 +43,8 @@
     "luarocks@latest",
     "python@latest",
     "zellij@latest",
-    "helix@latest"
+    "helix@latest",
+    "go@latest"
   ],
   "shell": {
     "init_hook": [
