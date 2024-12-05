@@ -20,5 +20,5 @@ wk.add(keybindings.harpoons)
 wk.add(keybindings.explain)
 wk.add(keybindings.noice)
 wk.add(keybindings.undo)
-wk.add(keybindings.aichat)
+-- wk.add(keybindings.aichat) -- Done in plugin config
 -- wk.add(keybindings.terminals)

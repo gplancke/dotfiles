@@ -50,17 +50,26 @@ show_tree() {
 ################################################################################
 
 finder() {
-	if hash nautilus 2>/dev/null; then
-    finder_cmd="nautilus"
-  else
-    finder_cmd="open"
-  fi
+    # Determine the system's file manager command
+    if [ "$(uname)" = "Darwin" ]; then
+        open_cmd="open"
+    elif [ -n "$WAYLAND_DISPLAY" ] || [ -n "$DISPLAY" ]; then
+        open_cmd="xdg-open"
+    else
+        echo "No suitable file manager found"
+        return 1
+    fi
 
-  if [ -z "$1" ]; then
-    ("${finder_cmd}" $(find . -type d | fzf-tmux) &>/dev/null &)
-  else
-    ("${finder_cmd}" "$1" &>/dev/null &)
-  fi
+    if [ -f "$1" ] || [ -d "$1" ]; then
+        ("$open_cmd" "$1" &>/dev/null &)
+    else
+        dir=$(find . -type d | fzf-tmux -q "${1:-}")
+        if [ -n "$dir" ] && [ -d "$dir" ]; then
+            ("$open_cmd" "$dir" &>/dev/null &)
+        else
+            ("$open_cmd" . &>/dev/null &)
+        fi
+    fi
 }
 
 ################################################################################
@@ -71,7 +80,11 @@ finder() {
 
 open_editor() {
   if [ -z "$1" ]; then
-    $EDITOR $(ag -l | fzf-tmux)
+    file=$(ag --nofollow -l | fzf-tmux)
+
+		[ -z "$file" ] \
+			&& echo "No file selected" \
+			|| $EDITOR "$file"
   else
     $EDITOR "$1"
   fi
@@ -130,6 +143,9 @@ tmux_popup() {
 
 tmux_open() {
   sess=${1}
+	directory=${2}
+
+	[ -z "${directory}" ] && directory="${pwd}"
 
   if [ -z "${sess}" ]; then
     nbSession=$(tmux list-sessions | grep -v "$TMUX_POPUP_NAME" | wc -l)
@@ -149,7 +165,7 @@ tmux_open() {
   tmux has-session -t "${sess}" &>/dev/null
 
   # if not create a detached session with this name
-  [ $? -eq 0 ] || (TMUX= tmux -u new-session -d -s "${sess}" -n "main")
+  [ $? -eq 0 ] || (TMUX= tmux -u new-session -d -s "${sess}" -c "${directory}")
 
   # if inside tmux switch o/w attach to newly created detached session
   [ -z "$TMUX" ] && tmux -u attach-session -t "${sess}" || tmux -u switch-client -t "$sess"
@@ -163,16 +179,40 @@ tmux_open() {
 
 tmux_kill() {
   sess="${1}"
+
   if [ -z "${sess}" ]; then
-    [ -z "$TMUX" ] \
-      && sess=$(tmux list-sessions | fzf-tmux | cut -d ":" -f 1) \
-      || sess=$(tmux display-message -p '#S')
+		if [ -z "$TMUX" ]; then
+			nbSession=$(tmux list-sessions | grep -v "$TMUX_POPUP_NAME" | wc -l)
+			if [ $nbSession -eq 0 ]; then
+				sess=""
+			else
+				# if only one session, do not ask to select
+				[ $nbSession -eq 1 ] \
+					&& sess=$(tmux list-sessions | grep -v "$TMUX_POPUP_NAME" | head -n 1 | cut -d ":" -f 1) \
+					|| sess=$(tmux list-sessions | grep -v "$TMUX_POPUP_NAME" | fzf-tmux | cut -d ":" -f 1)
+			fi
+
+		# if inside tmux
+		else
+			seed=$(tmux display-message -p '#S') # kill current session
+			sess=$(TMUX= tmux list-sessions | grep -v "$TMUX_POPUP_NAME" | fzf-tmux -q "${seed:-}" | cut -d ":" -f 1)
+		fi
   fi
 
   tmux has-session -t "${sess}" &>/dev/null
   [ $? -eq 0 ] && (TMUX= tmux kill-session -t "${sess}")
 }
 
+tmux_kill_all() {
+  # Get all sessions except popup
+  sessions=$(tmux list-sessions | cut -d ":" -f 1)
+
+	if [ ! -z "$sessions" ]; then
+		echo "$sessions" | while read sess; do
+			TMUX= tmux kill-session -t "$sess"
+		done
+	fi
+}
 
 ################################################################################
 ################################################################################
@@ -181,17 +221,14 @@ tmux_kill() {
 ################################################################################
 
 work_on() {
-	workspace="${1:-default}"
+	workspace=$(find ~/Workspace/Projects -mindepth 1 -maxdepth 3 -type d -name ".git" -exec dirname {} \; | fzf)
 
-	if [ -d "${WORK_DIR:-$HOME/Workspace/Projects}/${workspace}" ]; then
-		(cd "${WORK_DIR:-$HOME/Workspace/Projects}/${workspace}" && tmux_open "${workspace}")
-	elif [ -d "$HOME/$workspace" ]; then
-		dir = $(dirname "$HOME/$workspace")
-		lastname=$(basename "$HOME/$workspace")
-		firstname=$(basename "$dir")
-		(cd "$HOME/${workspace}" && tmux_open "${firstname}/${lastname}")
+	if [ ! -z "$workspace" ]; then
+		lastname=$(basename "$workspace")
+		firstname=$(basename $(dirname "$workspace"))
+		tmux_open "${firstname}/${lastname}" "$workspace"
 	else
-		tmux_open "${workspace}"
+		echo "No workspace selected"
 	fi
 }
 
@@ -202,9 +239,26 @@ work_on() {
 ################################################################################
 ################################################################################
 
+__kill_ports() {
+    if [ $# -eq 0 ]; then
+        echo "Usage: __kill_ports port1 [port2 port3 ...]"
+        return 1
+    fi
+
+    for port in "$@"; do
+        echo "Killing processes on port $port..."
+        lsof -ti:$port | xargs -I {} kill -9 {} 2>/dev/null
+        if [ $? -eq 0 ]; then
+            echo "✓ Killed process(es) on port $port"
+        else
+            echo "✗ No process found on port $port"
+        fi
+    done
+}
+
+# Keep the old function for backward compatibility
 __kill_port() {
-	local port="${1:=3000}"
-	lsof -ti:$port | xargs -I {} kill -9 {} 2>/dev/null
+    __kill_ports "$1"
 }
 
 
@@ -248,6 +302,7 @@ alias work='work_on'
 
 alias tm='tmux_open'
 alias tmk='tmux_kill'
+alias tmka='tmux_kill_all'
 alias tmls='tmux list-sessions'
 alias tmpop='tmux_popup'
 alias tmcolors='print_tmux_colors'
@@ -297,6 +352,7 @@ alias lgit='lazygit'
 #################
 
 alias kport='__kill_port'
+alias kports='__kill_ports'
 alias myip='dig +short txt ch whoami.cloudflare @1.0.0.1 | tr -d "\""'
 alias find-rpi='arp -na | grep -i "dc:a6:32"'
 alias find-old-rpi='arp -na | grep -i "b8:27:eb"'
