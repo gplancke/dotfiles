@@ -8,6 +8,7 @@ if uname -r | grep -q 'microsoft' ; then
   [ -f "${HOME}/.shell.wsl" ] && . "${HOME}/.shell.wsl"
 elif [ "$(uname)" = "Darwin" ]; then
   export MACOS="1"
+
   [ -f "${HOME}/.shell.macos" ] && . "${HOME}/.shell.macos"
 else
   export LINUX="1"
@@ -33,13 +34,14 @@ export NIXPKGS_ALLOW_UNFREE=1
 #   . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
 # fi
 
-[ "$MACOS" = "1" ] && export NIX_PATH=darwin-config="$HOME/.nixpkgs/darwin-configuration.nix:$HOME/.nix-defexpr/channels" # ${NIX_PATH:+:}$NIX_PATH
+export NIX_PATH=darwin-config="$HOME/.nixpkgs/darwin-configuration.nix:$HOME/.nix-defexpr/channels" # ${NIX_PATH:+:}$NIX_PATH
 export NIX_DIR="$HOME/.nix-profile"
 export ASDF_DIR="$HOME/.local/share/asdf"
 
 export FZF_HOME="$HOME/.fzf"
 export EMACS_HOME="$HOME/.emacs.d"
 
+export RUST_HOME="$HOME/.cargo"									# Rust
 export NPM_HOME="$HOME/.local/share/node_modules"   # Nodejs
 export DENO_HOME="$HOME/.deno"                      # Deno
 export PNPM_HOME="$HOME/.local/share/pnpm"          # Pnpm
@@ -80,6 +82,9 @@ export TMUX_POWERLINE_DEFAULT_FOREGROUND_COLOR='255'
 [ -d "$ANDROID_HOME/cmdline-tools/latest/bin" ] && PATH="${PATH}:${ANDROID_HOME}/cmdline-tools/latest/bin"
 [ -d "$ANDROID_HOME/platform-tools" ] && PATH="${PATH}:${ANDROID_HOME}/platform-tools"
 [ -d "$FLUTTER_ROOT/bin" ] && PATH="${PATH}:${FLUTTER_ROOT}/bin"
+
+[ -d "$RUST_HOME/bin" ] && PATH="${PATH}:${RUST_HOME}/bin"
+[ -f "$RUST_HOME/env" ] && source "$RUST_HOME/env"
 
 ##########################
 # Extensions

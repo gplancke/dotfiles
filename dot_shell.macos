@@ -1,3 +1,7 @@
+export SDKROOT=$(xcrun --show-sdk-path)
+
+# [ -d "/opt/homebrew/opt/libiconv/lib" ] && export LDFLAGS="-L/opt/homebrew/opt/libiconv/lib"
+
 [ -d "/Applications/Postgres.app" ] && PATH="${PATH}:/Applications/Postgres.app/Contents/Versions/latest/bin"
 [ -d "/Applications/Tailscale.app" ] && alias tailscale="/Applications/Tailscale.app/Contents/MacOS/Tailscale"
 
