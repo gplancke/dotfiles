@@ -1,3 +1,5 @@
+local ut = require('utils.common')
+--
 -- NOTE: Make sure the terminal supports this
 vim.o.termguicolors = true
 -- vim.o.base16colorspace = 256
@@ -11,8 +13,8 @@ vim.o.termguicolors = true
 -- -----------------------------------------------------------
 
 -- local frappe = require("catppuccin.palettes").get_palette("frappe")
-local catpuccin = require("catppuccin")
-catpuccin.setup({
+local catpuccin = ut.prequire("catppuccin")
+local catpuccin_config = {
 	flavour = 'frappe',
 	integrations = {
 		cmp = true,
@@ -50,9 +52,27 @@ catpuccin.setup({
 		},
 		which_key = true,
 	}
-})
+}
 
-vim.cmd.colorscheme "catppuccin"
+if catpuccin then
+	catpuccin.setup(catpuccin_config)
+	vim.cmd.colorscheme "catppuccin"
+end
+
+
+-- -----------------------------------------------------------
+-- -----------------------------------------------------------
+-- -----------------------------------------------------------
+-- Icons
+-- -----------------------------------------------------------
+-- -----------------------------------------------------------
+-- -----------------------------------------------------------
+
+local mini_icons = ut.prequire('mini.icons')
+local web_icons = ut.prequire('nvim-web-devicons')
+
+if mini_icons then mini_icons.setup() end
+if web_icons then web_icons.setup() end
 
 -- -----------------------------------------------------------
 -- -----------------------------------------------------------
@@ -62,29 +82,52 @@ vim.cmd.colorscheme "catppuccin"
 -- -----------------------------------------------------------
 -- -----------------------------------------------------------
 
--- local bufferline = require('bufferline')
--- bufferline.setup({
--- 	highlights = require("catppuccin.groups.integrations.bufferline").get {
--- 		custom = {
--- 			all = {
--- 				fill = { bg = frappe.base, fg = frappe.base },
--- 				separator = { bg = frappe.none, fg = frappe.base },
--- 				separator_selected = { bg = frappe.none, fg = frappe.base },
--- 			},
--- 		},
--- 	},
--- 	options = {
--- 		separator_style = "slant",
--- 		offsets = {
--- 			{
--- 				filetype = "neo-tree",
--- 				highlight = "Directory",
--- 				separator = true
--- 			},
--- 		}
--- 	}
--- })
---
+local palettes = ut.prequire("catppuccin.palettes")
+local bufferline = ut.prequire('bufferline')
+local bufferline_config = {}
+
+if palettes then
+	local frappe = palettes.get_palette("frappe")
+	bufferline_config = {
+		highlights = require("catppuccin.groups.integrations.bufferline").get {
+			custom = {
+				all = {
+					fill = { bg = frappe.base, fg = frappe.base },
+					separator = { bg = frappe.none, fg = frappe.base },
+					separator_selected = { bg = frappe.none, fg = frappe.base },
+				},
+			},
+		},
+		options = {
+			separator_style = "slant",
+			offsets = {
+				{
+					filetype = "neo-tree",
+					highlight = "Directory",
+					separator = true
+				},
+			}
+		}
+	}
+else
+	bufferline_config = {
+		options = {
+			separator_style = "slant",
+			offsets = {
+				{
+					filetype = "neo-tree",
+					highlight = "Directory",
+					separator = true
+				},
+			}
+		}
+	}
+end
+
+if bufferline then
+	bufferline.setup(bufferline_config)
+end
+
 
 -- -----------------------------------------------------------
 -- -----------------------------------------------------------
@@ -94,9 +137,8 @@ vim.cmd.colorscheme "catppuccin"
 -- -----------------------------------------------------------
 -- -----------------------------------------------------------
 
-local indentation = require('ibl')
-
-indentation.setup({
+local ibl = ut.prequire('ibl')
+local indent_config = {
 	scope = {
 		enabled = false,
 	},
@@ -111,7 +153,11 @@ indentation.setup({
 			'neo-tree-popup'
 		},
 	}
-})
+}
+
+if ibl then
+	ibl.setup(indent_config)
+end
 
 
 -- -----------------------------------------------------------
@@ -122,8 +168,8 @@ indentation.setup({
 -- -----------------------------------------------------------
 -- -----------------------------------------------------------
 
-local builtin = require("statuscol.builtin")
-local statuscol = require("statuscol")
+local builtin = ut.prequire("statuscol.builtin")
+local statuscol = ut.prequire("statuscol")
 local statuscol_cfg = {
 	-- Builtin line number string options for ScLn() segment
 	thousands = false,   -- or line number thousands separator string ("." / ",")
@@ -142,7 +188,11 @@ local statuscol_cfg = {
 			click = "v:lua.ScLa",
 		}
 	},
-	clickhandlers = {
+	clickhandlers = {}
+}
+
+if builtin then
+	statuscol_cfg.clickhandlers = {
 		Lnum                   = builtin.lnum_click,
 		FoldClose              = builtin.foldclose_click,
 		FoldOpen               = builtin.foldopen_click,
@@ -161,9 +211,11 @@ local statuscol_cfg = {
 		GitSignsChangedelete   = builtin.gitsigns_click,
 		GitSignsDelete         = builtin.gitsigns_click,
 	}
-}
+end
 
-statuscol.setup(statuscol_cfg)
+if statuscol then
+	statuscol.setup(statuscol_cfg)
+end
 
 -- -----------------------------------------------------------
 -- -----------------------------------------------------------
@@ -175,8 +227,8 @@ statuscol.setup(statuscol_cfg)
 
 local git_blame = require('gitblame')
 local navic = require('nvim-navic')
-local lualine = require('lualine')
-lualine.setup({
+local lualine = ut.prequire('lualine')
+local lualine_config = {
 	options = {
 		icons_enabled = true,
 		theme = 'catppuccin',
@@ -214,7 +266,11 @@ lualine.setup({
 		lualine_y = {},
 		lualine_z = {}
 	},
-})
+}
+
+if lualine then
+	lualine.setup(lualine_config)
+end
 
 
 -- -----------------------------------------------------------
@@ -225,8 +281,8 @@ lualine.setup({
 -- -----------------------------------------------------------
 -- -----------------------------------------------------------
 
-local winbar = require('winbar')
-winbar.setup({
+local winbar = ut.prequire('winbar')
+local winbar_config = {
 	enabled = true,
 	show_file_path = true,
 	show_symbols = true,
@@ -260,7 +316,11 @@ winbar.setup({
 		'terminal',
 		'qf',
 	}
-})
+}
+
+if winbar then
+	winbar.setup(winbar_config)
+end
 
 -- -----------------------------------------------------------
 -- -----------------------------------------------------------
@@ -270,8 +330,8 @@ winbar.setup({
 -- -----------------------------------------------------------
 -- -----------------------------------------------------------
 
-local noice = require('noice')
-noice.setup({
+local noice = ut.prequire('noice')
+local noice_config = {
   lsp = {
     -- override markdown rendering so that **cmp** and other plugins use **Treesitter**
     override = {
@@ -288,7 +348,11 @@ noice.setup({
     inc_rename = false, -- enables an input dialog for inc-rename.nvim
     lsp_doc_border = false, -- add a border to hover docs and signature help
   },
-})
+}
+
+if noice then
+	noice.setup(noice_config)
+end
 
 -- -----------------------------------------------------------
 -- -----------------------------------------------------------
@@ -298,8 +362,8 @@ noice.setup({
 -- -----------------------------------------------------------
 -- -----------------------------------------------------------
 
-local zenmode = require('zen-mode')
-zenmode.setup({
+local zenmode = ut.prequire('zen-mode')
+local zenmode_config = {
 	window = {
     backdrop = 0.8,
     width = 160,
@@ -308,4 +372,8 @@ zenmode.setup({
 	plugins = {
 		tmux = { enabled = true },
 	}
-})
+}
+
+if zenmode then
+	zenmode.setup(zenmode_config)
+end

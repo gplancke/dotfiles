@@ -49,7 +49,7 @@ return {
 			end,
 			desc = 'Open Project',
 		},
-    { "<leader>Sz", '<cmd>lua require("zen-mode").toggle()<cr>', desc = "Toggle ZenMode" },
+    { "<leader>Sz", '<cmd>lua require("snacks").zen()<cr>', desc = "Toggle ZenMode" },
 	},
 	harpoons = {
     { "<leader>h", group = "harpoon" },

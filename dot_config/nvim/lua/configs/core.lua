@@ -1,3 +1,44 @@
+local ut = require('utils.common')
+
+-- -----------------------------------------------------------
+-- -----------------------------------------------------------
+-- -----------------------------------------------------------
+-- Snacks Plugins
+-- -----------------------------------------------------------
+-- -----------------------------------------------------------
+-- -----------------------------------------------------------
+require('snacks').setup({
+	bigfile = { enabled = true },
+	dashboard = { enabled = true },
+	indent = { enabled = false },
+	input = { enabled = false },
+	lazygit = { enabled = true },
+	notifier = { enabled = false },
+	quickfile = { enabled = true },
+	scroll = { enabled = true },
+	statuscolumn = { enabled = false },
+	words = { enabled = true },
+	zenmode = { enabled = true },
+})
+
+-- -----------------------------------------------------------
+-- -----------------------------------------------------------
+-- -----------------------------------------------------------
+-- Mini Plugins
+-- -----------------------------------------------------------
+-- -----------------------------------------------------------
+-- -----------------------------------------------------------
+
+require('mini.ai').setup()
+require('mini.icons').setup()
+require('mini.comment').setup()
+require('mini.bufremove').setup()
+require('mini.pairs').setup()
+require('mini.bracketed').setup()
+-- require('mini.move').setup()
+-- require('mini.starter').setup()
+-- require('mini.cursorword').setup()
+
 -- -----------------------------------------------------------
 -- -----------------------------------------------------------
 -- -----------------------------------------------------------
@@ -6,7 +47,9 @@
 -- -----------------------------------------------------------
 -- -----------------------------------------------------------
 
-require'nvim-tmux-navigation'.setup {
+local tm_nav = ut.prequire('nvim-tmux-navigation')
+
+local tmux_nav_config = {
 	disable_when_zoomed = false, -- defaults to false
 	keybindings = {
 		left = "<C-h>",
@@ -18,24 +61,10 @@ require'nvim-tmux-navigation'.setup {
 	}
 }
 
+if tm_nav then
+	tm_nav.setup(tmux_nav_config)
+end
 
--- -----------------------------------------------------------
--- -----------------------------------------------------------
--- -----------------------------------------------------------
--- Mini Plugins
--- -----------------------------------------------------------
--- -----------------------------------------------------------
--- -----------------------------------------------------------
-
-require('mini.icons').setup()
-require('mini.comment').setup()
-require('mini.bufremove').setup()
-require('mini.pairs').setup()
-require('mini.bracketed').setup()
--- require('mini.move').setup()
--- require('mini.starter').setup()
--- require('mini.cursorword').setup()
--- require('mini.surround').setup()
 
 -- -----------------------------------------------------------
 -- -----------------------------------------------------------
@@ -45,7 +74,7 @@ require('mini.bracketed').setup()
 -- -----------------------------------------------------------
 -- -----------------------------------------------------------
 
-local telescope = require('telescope')
+local telescope = ut.prequire('telescope')
 local actions = require('telescope.actions')
 
 local telescope_config = {
@@ -76,10 +105,12 @@ local telescope_config = {
 }
 
 
-telescope.setup(telescope_config)
-pcall(telescope.load_extension, 'fzf')
-pcall(telescope.load_extension, 'harpoon')
-pcall(telescope.load_extension, 'file_browser')
+if telescope then
+	telescope.setup(telescope_config)
+	telescope.load_extension('fzf')
+	telescope.load_extension('harpoon')
+	telescope.load_extension('file_browser')
+end
 
 
 -- -----------------------------------------------------------
@@ -90,11 +121,9 @@ pcall(telescope.load_extension, 'file_browser')
 -- -----------------------------------------------------------
 -- -----------------------------------------------------------
 --
-vim.cmd([[ let g:neo_tree_remove_legacy_commands = 1 ]])
 
-local tree = require('neo-tree')
-
-tree.setup({
+local tree = ut.prequire('neo-tree')
+local tree_config = {
 	close_if_last_window = true,
 	window = {
 		width = 40,
@@ -112,7 +141,13 @@ tree.setup({
 			},
 		},
 	},
-})
+
+}
+
+if tree then
+	vim.cmd([[ let g:neo_tree_remove_legacy_commands = 1 ]])
+	tree.setup(tree_config)
+end
 
 -- -----------------------------------------------------------
 -- -----------------------------------------------------------
@@ -122,7 +157,8 @@ tree.setup({
 -- -----------------------------------------------------------
 -- -----------------------------------------------------------
 
-require('flatten').setup({
+local flatten = ut.prequire('flatten')
+local flatten_config = {
 	callbacks = {
 		pre_open = function()
 			-- Close toggleterm when an external open request is received
@@ -159,7 +195,11 @@ require('flatten').setup({
 			require("toggleterm").toggle(0)
 		end
 	}
-})
+}
+
+if flatten then
+	flatten.setup(flatten_config)
+end
 
 -- -----------------------------------------------------------
 -- -----------------------------------------------------------
@@ -169,17 +209,12 @@ require('flatten').setup({
 -- -----------------------------------------------------------
 -- -----------------------------------------------------------
 
-local undotree = require('undotree')
-
-if not undotree then
-	return
-end
-
-undotree.setup({
-  float_diff = true,
-  layout = "left_bottom",
-  position = "left",
-  ignore_filetype = {
+local undotree = ut.prequire('undotree')
+local undotree_config = {
+	float_diff = true,
+	layout = "left_bottom",
+	position = "left",
+	ignore_filetype = {
 		'qf',
 		'undotree',
 		'undotreeDiff',
@@ -191,7 +226,12 @@ undotree.setup({
 		'dashboard',
 		'Term'
 	},
-  window = {
-    winblend = 30,
-  },
-})
+	window = {
+		winblend = 30,
+	},
+}
+
+if undotree then
+	undotree.setup(undotree_config)
+end
+

@@ -1,4 +1,6 @@
 return {}
+
+-- Don't like it so much
 -- return {
 -- 	'akinsho/bufferline.nvim',
 -- 	version = "*",

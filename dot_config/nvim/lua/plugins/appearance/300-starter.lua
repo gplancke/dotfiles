@@ -1,4 +1,6 @@
 return {}
+
+-- Superseeded by snacks dashboard
 -- return {
 --   'nvimdev/dashboard-nvim',
 --   event = 'VimEnter',
