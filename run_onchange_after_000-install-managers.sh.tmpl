@@ -84,7 +84,6 @@ function install_zsh_manager {
 #############################################
 # Install tmux plugin manager (tpm)
 # We want to replace this with a nix flake
-# We also want to get rid of tmux
 #############################################
 
 function install_tmux_manager {
@@ -93,6 +92,21 @@ function install_tmux_manager {
     git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 	else
 		echo "Tmux plugin manager is already installed"
+	fi
+}
+
+#############################################
+# Install rust
+# The reason we install it with a standalone script
+# and not with nix is because it needs to be linked to the system
+# especially in Macos where it needs to find the Xcode tools
+# With nix, it can cause problems as the libraries might be siloed
+#############################################
+
+function install_rust {
+	if [ ! -d "$HOME/.cargo" ]; then
+		curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
+			| sh -s -- --defaults-toolchain nightly -y
 	fi
 }
 
@@ -141,10 +155,10 @@ function install_essentials() {
       sudo apt upgrade -y
       sudo apt install -y build-essential curl git zsh fonts-hack-ttf
 
-      brew install docker
+      brew install docker nushell
       ;;
     "darwin")
-      brew install zsh openssl
+      brew install openssl zsh nushell
       brew tap homebrew/cask-fonts
       brew install font-hack-nerd-font
       brew install docker docker-compose
@@ -171,6 +185,7 @@ install_nix $DISTRO
 
 install_essentials $DISTRO
 
+install_rust
 install_zsh_manager
 install_tmux_manager
 install_theme_manager

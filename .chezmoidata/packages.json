@@ -3,13 +3,12 @@
 		"darwin": {
 			"brews": [
 				"git",
-				"curl"
+				"curl",
+				"libiconv"
 			],
 			"casks": [
 				"bitwarden",
-				"raycast",
-				"setapp",
-				"visual-studio-code"
+				"raycast"
 			]
 		},
 		"linux": {
@@ -20,9 +19,7 @@
 			],
 			"casks": [
 				"bitwarden",
-				"raycast",
-				"setapp",
-				"visual-studio-code"
+				"raycast"
 			]
 		}
 	}
