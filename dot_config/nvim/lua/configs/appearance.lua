@@ -1,17 +1,17 @@
-local lualine = require('lualine')
-local navic = require('nvim-navic')
-local git_blame = require('gitblame')
-local indentation = require('ibl')
-local noice = require('noice')
-local catpuccin = require("catppuccin")
-local zenmode = require('zen-mode')
--- local frappe = require("catppuccin.palettes").get_palette("frappe")
--- local bufferline = require('bufferline')
-
 -- NOTE: Make sure the terminal supports this
 vim.o.termguicolors = true
 -- vim.o.base16colorspace = 256
 
+-- -----------------------------------------------------------
+-- -----------------------------------------------------------
+-- -----------------------------------------------------------
+-- ColorScheme
+-- -----------------------------------------------------------
+-- -----------------------------------------------------------
+-- -----------------------------------------------------------
+
+-- local frappe = require("catppuccin.palettes").get_palette("frappe")
+local catpuccin = require("catppuccin")
 catpuccin.setup({
 	flavour = 'frappe',
 	integrations = {
@@ -54,6 +54,15 @@ catpuccin.setup({
 
 vim.cmd.colorscheme "catppuccin"
 
+-- -----------------------------------------------------------
+-- -----------------------------------------------------------
+-- -----------------------------------------------------------
+-- BufferLine
+-- -----------------------------------------------------------
+-- -----------------------------------------------------------
+-- -----------------------------------------------------------
+
+-- local bufferline = require('bufferline')
 -- bufferline.setup({
 -- 	highlights = require("catppuccin.groups.integrations.bufferline").get {
 -- 		custom = {
@@ -76,6 +85,17 @@ vim.cmd.colorscheme "catppuccin"
 -- 	}
 -- })
 --
+
+-- -----------------------------------------------------------
+-- -----------------------------------------------------------
+-- -----------------------------------------------------------
+-- Indentation lines
+-- -----------------------------------------------------------
+-- -----------------------------------------------------------
+-- -----------------------------------------------------------
+
+local indentation = require('ibl')
+
 indentation.setup({
 	scope = {
 		enabled = false,
@@ -93,25 +113,69 @@ indentation.setup({
 	}
 })
 
-vim.g.gitblame_enabled = 1
-vim.g.gitblame_display_virtual_text = 0
-vim.g.gitblame_message_template = '<summary> • <date> • <author>'
-vim.g.gitblame_date_format = '%c'
-vim.g.gitblame_message_when_not_committed = 'Not committed yet'
-vim.g.gitblame_highlight_group = 'Comment'
-vim.g.gitblame_delay = 0
-vim.g.gitblame_ignored_filetypes = {
-	'help',
-	'gitcommit',
-	'gitrebase',
-	'minimap',
-	'dashboard',
-	'NvimTree',
-	'neo-tree-preview',
-	'neo-tree',
-	'neo-tree-popup'
+
+-- -----------------------------------------------------------
+-- -----------------------------------------------------------
+-- -----------------------------------------------------------
+-- StatusColumn
+-- -----------------------------------------------------------
+-- -----------------------------------------------------------
+-- -----------------------------------------------------------
+
+local builtin = require("statuscol.builtin")
+local statuscol = require("statuscol")
+local statuscol_cfg = {
+	-- Builtin line number string options for ScLn() segment
+	thousands = false,   -- or line number thousands separator string ("." / ",")
+	relculright = false, -- whether to right-align the cursor line number with 'relativenumber' set
+	-- Builtin 'statuscolumn' options
+	setopt = true,       -- whether to set the 'statuscolumn', providing builtin click actions
+	ft_ignore = nil,     -- lua table with filetypes for which 'statuscolumn' will be unset
+	bt_ignore = nil,     -- lua table with 'buftype' values for which 'statuscolumn' will be unset
+	-- Default segments (fold -> sign -> line number + separator)
+	segments = {
+		{ text = { "%C" }, click = "v:lua.ScFa" },
+		{ text = { "%s" }, click = "v:lua.ScSa" },
+		{
+			text = { builtin.lnumfunc, "  " },
+			condition = { true, true },
+			click = "v:lua.ScLa",
+		}
+	},
+	clickhandlers = {
+		Lnum                   = builtin.lnum_click,
+		FoldClose              = builtin.foldclose_click,
+		FoldOpen               = builtin.foldopen_click,
+		FoldOther              = builtin.foldother_click,
+		DapBreakpointRejected  = builtin.toggle_breakpoint,
+		DapBreakpoint          = builtin.toggle_breakpoint,
+		DapBreakpointCondition = builtin.toggle_breakpoint,
+		DiagnosticSignError    = builtin.diagnostic_click,
+		DiagnosticSignHint     = builtin.diagnostic_click,
+		DiagnosticSignInfo     = builtin.diagnostic_click,
+		DiagnosticSignWarn     = builtin.diagnostic_click,
+		GitSignsTopdelete      = builtin.gitsigns_click,
+		GitSignsUntracked      = builtin.gitsigns_click,
+		GitSignsAdd            = builtin.gitsigns_click,
+		GitSignsChange         = builtin.gitsigns_click,
+		GitSignsChangedelete   = builtin.gitsigns_click,
+		GitSignsDelete         = builtin.gitsigns_click,
+	}
 }
 
+statuscol.setup(statuscol_cfg)
+
+-- -----------------------------------------------------------
+-- -----------------------------------------------------------
+-- -----------------------------------------------------------
+-- StatusLine
+-- -----------------------------------------------------------
+-- -----------------------------------------------------------
+-- -----------------------------------------------------------
+
+local git_blame = require('gitblame')
+local navic = require('nvim-navic')
+local lualine = require('lualine')
 lualine.setup({
 	options = {
 		icons_enabled = true,
@@ -152,6 +216,61 @@ lualine.setup({
 	},
 })
 
+
+-- -----------------------------------------------------------
+-- -----------------------------------------------------------
+-- -----------------------------------------------------------
+-- Top Bar
+-- -----------------------------------------------------------
+-- -----------------------------------------------------------
+-- -----------------------------------------------------------
+
+local winbar = require('winbar')
+winbar.setup({
+	enabled = true,
+	show_file_path = true,
+	show_symbols = true,
+	colors = {
+		path = '', -- You can customize colors like #c946fd
+		file_name = '',
+		symbols = '',
+	},
+	icons = {
+		file_icon_default = '',
+		seperator = '>',
+		editor_state = '●',
+		lock_icon = '',
+	},
+	exclude_filetype = {
+		'help',
+		'startify',
+		'dashboard',
+		'packer',
+		'neogitstatus',
+		'NvimTree',
+		'neo-tree',
+		'neo-tree-popup',
+		'notify',
+		'Trouble',
+		'alpha',
+		'lir',
+		'Outline',
+		'spectre_panel',
+		'toggleterm',
+		'terminal',
+		'qf',
+	}
+})
+
+-- -----------------------------------------------------------
+-- -----------------------------------------------------------
+-- -----------------------------------------------------------
+-- Windows and Command Palette
+-- -----------------------------------------------------------
+-- -----------------------------------------------------------
+-- -----------------------------------------------------------
+
+local noice = require('noice')
 noice.setup({
   lsp = {
     -- override markdown rendering so that **cmp** and other plugins use **Treesitter**
@@ -171,6 +290,15 @@ noice.setup({
   },
 })
 
+-- -----------------------------------------------------------
+-- -----------------------------------------------------------
+-- -----------------------------------------------------------
+-- Zen Mode
+-- -----------------------------------------------------------
+-- -----------------------------------------------------------
+-- -----------------------------------------------------------
+
+local zenmode = require('zen-mode')
 zenmode.setup({
 	window = {
     backdrop = 0.8,

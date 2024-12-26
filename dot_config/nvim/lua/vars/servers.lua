@@ -2,7 +2,7 @@ return {
 	servers = {
 		ansiblels = {},
 		clangd = {},
-		tsserver = {},
+		ts_ls = {},
 		svelte = {},
 		cssls = {},
 		vuels = {},

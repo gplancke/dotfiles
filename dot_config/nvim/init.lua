@@ -28,6 +28,6 @@ require('lazy').setup({
 require('configs.options')
 require('configs.core')
 require('configs.keybindings')
-require('configs.autocomplete')
+require('configs.ide')
 require('configs.appearance')
 
