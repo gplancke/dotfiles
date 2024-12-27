@@ -98,6 +98,6 @@ return {
 		{ "<leader>di", "<cmd>lua require('dap').step_into()<cr>", desc = "Step Into" },
 		{ "<leader>do", "<cmd>lua require('dap').step_out()<cr>", desc = "Step Out" },
 		{ "<leader>dt", "<cmd>lua require('dapui').toggle()<cr>", desc = "Toggle UI" },
-		{ "<leader>dh", "<cmd>lua require('dapui').eval()<cr>", desc = "Hover Debug Info" },
+		-- { "<leader>dh", "<cmd>lua require('dapui').eval()<cr>", desc = "Hover Debug Info" },
 	}
 }

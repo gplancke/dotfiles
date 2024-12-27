@@ -2103,8 +2103,8 @@
       }
     },
     "ttyd@latest": {
-      "last_modified": "2024-05-22T06:18:38Z",
-      "resolved": "github:NixOS/nixpkgs/3f316d2a50699a78afe5e77ca486ad553169061e#ttyd",
+      "last_modified": "2024-12-03T12:40:06Z",
+      "resolved": "github:NixOS/nixpkgs/566e53c2ad750c84f6d31f9ccb9d00f823165550#ttyd",
       "source": "devbox-search",
       "version": "1.7.7",
       "systems": {
@@ -2112,61 +2112,61 @@
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/9syr3a2vmm7ki8mcivlcjpmdhj4m4zfv-ttyd-1.7.7",
+              "path": "/nix/store/p3sggayd7nwxvlsbilbyg8n1056vh9pr-ttyd-1.7.7",
               "default": true
             },
             {
               "name": "man",
-              "path": "/nix/store/daxs4immc0w8lk9wb3nyyv8pagsfwf5z-ttyd-1.7.7-man",
+              "path": "/nix/store/3z3lc58iwqcmlkmbrqx76dd8818q2c98-ttyd-1.7.7-man",
               "default": true
             }
           ],
-          "store_path": "/nix/store/9syr3a2vmm7ki8mcivlcjpmdhj4m4zfv-ttyd-1.7.7"
+          "store_path": "/nix/store/p3sggayd7nwxvlsbilbyg8n1056vh9pr-ttyd-1.7.7"
         },
         "aarch64-linux": {
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/igr5azd46yhmwd75z5prg4qp6vx4b72v-ttyd-1.7.7",
+              "path": "/nix/store/vyh6qrzzwl6azksa21i2hl1fsbv1kxva-ttyd-1.7.7",
               "default": true
             },
             {
               "name": "man",
-              "path": "/nix/store/whm4x4wyip3j3i49vkszq8dgdgm2pb2d-ttyd-1.7.7-man",
+              "path": "/nix/store/9zh5blhva9cy5wxr4qs2fv12j6fw6mqr-ttyd-1.7.7-man",
               "default": true
             }
           ],
-          "store_path": "/nix/store/igr5azd46yhmwd75z5prg4qp6vx4b72v-ttyd-1.7.7"
+          "store_path": "/nix/store/vyh6qrzzwl6azksa21i2hl1fsbv1kxva-ttyd-1.7.7"
         },
         "x86_64-darwin": {
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/zgk8qsidwlysr9nsgqvhx71q6mi9jyaf-ttyd-1.7.7",
+              "path": "/nix/store/bd5vb1zknpbr0q23i4463kpx3xy9smyk-ttyd-1.7.7",
               "default": true
             },
             {
               "name": "man",
-              "path": "/nix/store/w70lfva07bslcha3jf8q808bx8sg74nd-ttyd-1.7.7-man",
+              "path": "/nix/store/xsc72s4fn69sdxyw46h30yw1syjg7ydb-ttyd-1.7.7-man",
               "default": true
             }
           ],
-          "store_path": "/nix/store/zgk8qsidwlysr9nsgqvhx71q6mi9jyaf-ttyd-1.7.7"
+          "store_path": "/nix/store/bd5vb1zknpbr0q23i4463kpx3xy9smyk-ttyd-1.7.7"
         },
         "x86_64-linux": {
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/3qnh8w7cyd86k44fhn5hizl35dwsgbhy-ttyd-1.7.7",
+              "path": "/nix/store/w53fjiln9aya36lf6qsnkv6aqhwbiqrv-ttyd-1.7.7",
               "default": true
             },
             {
               "name": "man",
-              "path": "/nix/store/li4dfm56habs2p25gdm6p9yc28m5m6zd-ttyd-1.7.7-man",
+              "path": "/nix/store/p142xqpf3719pn7gkca7z5xmw1x4v2g8-ttyd-1.7.7-man",
               "default": true
             }
           ],
-          "store_path": "/nix/store/3qnh8w7cyd86k44fhn5hizl35dwsgbhy-ttyd-1.7.7"
+          "store_path": "/nix/store/w53fjiln9aya36lf6qsnkv6aqhwbiqrv-ttyd-1.7.7"
         }
       }
     },

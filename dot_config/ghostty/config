@@ -1,5 +1,7 @@
 font-family = FiraCode Nerd Font Mono
+font-style = Bold
 font-size = 12
 font-thicken
 window-decoration = false
 quit-after-last-window-closed = true
+theme = catppuccin-frappe

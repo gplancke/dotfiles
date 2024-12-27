@@ -273,7 +273,12 @@ local lualine_config = {
 			'neo-tree-preview',
 			'neo-tree',
 			'neo-tree-popup',
-			'dapui*',
+			'dapui_hover',
+			'dapui_scopes',
+			'dapui_stacks',
+			'dapui_watches',
+			'dapui_breakpoints',
+			'dapui_console',
 			'dap-repl'
 		},
 	},
