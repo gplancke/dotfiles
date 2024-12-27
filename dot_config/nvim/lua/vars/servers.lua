@@ -31,6 +31,7 @@ return {
 		delve = {},
 		["node-debug2-adapter"] = {},
 		["chrome-debug-adapter"] = {},
-		["bash-debug-adapter"] = {}
+		["bash-debug-adapter"] = {},
+		["js-debug-adapter"] = {}
 	}
 }

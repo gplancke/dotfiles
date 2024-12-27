@@ -16,12 +16,13 @@ return {
 			dependencies = {
 				"nvim-neotest/nvim-nio",
 				"rcarriga/nvim-dap-ui",
+				"theHamsta/nvim-dap-virtual-text",
 				"mxsdev/nvim-dap-vscode-js",
 				-- lazy spec to build "microsoft/vscode-js-debug" from source
 				{
 					"microsoft/vscode-js-debug",
 					version = "1.x",
-					build = "npm i && npm run compile vsDebugServerBundle && mv dist out"
+					build = "npm i --force && npm run compile vsDebugServerBundle && mv dist out"
 				}
 			}
 		},

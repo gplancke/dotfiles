@@ -24,6 +24,7 @@ if wk then
 	wk.add(keybindings.explain)
 	wk.add(keybindings.noice)
 	wk.add(keybindings.undo)
+	wk.add(keybindings.debug)
 	-- wk.add(keybindings.aichat) -- Done in plugin config
 	-- wk.add(keybindings.terminals)
 end

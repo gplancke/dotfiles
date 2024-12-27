@@ -88,5 +88,14 @@ return {
 		{ "<leader>ia", '<cmd>lua require("avante.api").ask()<cr>', desc = "Show AI Chat" },
 		{ "<leader>ie", '<cmd>lua require("avante.api").edit()<cr>', desc = "Edit AI Chat" },
 		{ "<leader>ir", '<cmd>lua require("avante.api").refresh()<cr>', desc = "Refresh AI Chat" }
+	},
+	debug = {
+		{ "<leader>d", group = "debug" },
+		{ "<leader>db", "<cmd>lua require('dap').toggle_breakpoint()<cr>", desc = "Toggle Breakpoint" },
+		{ "<leader>dc", "<cmd>lua require('dap').continue()<cr>", desc = "Continue" },
+		{ "<leader>dd", "<cmd>lua require('dap').disconnect()<cr>", desc = "Disconnect" },
+		{ "<leader>da", "<cmd>lua require('dap').step_over()<cr>", desc = "Step Over" },
+		{ "<leader>di", "<cmd>lua require('dap').step_into()<cr>", desc = "Step Into" },
+		{ "<leader>do", "<cmd>lua require('dap').step_out()<cr>", desc = "Step Out" },
 	}
 }
