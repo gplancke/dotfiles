@@ -1,1 +1,10 @@
 key.txt.age
+
+node_modules
+*/node_modules
+
+.git
+*/.git
+
+.DS_Store
+*/.DS_Store
