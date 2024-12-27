@@ -248,18 +248,6 @@ local copilot = ut.prequire('copilot')
 local copilot_cfg = {
 	panel = {
     enabled = false,
-    auto_refresh = false,
-    keymap = {
-      jump_prev = "[[",
-      jump_next = "]]",
-      accept = "<CR>",
-      refresh = "gr",
-      open = "<M-CR>"
-    },
-    layout = {
-      position = "bottom",
-      ratio = 0.4
-    },
   },
   suggestion = {
     enabled = true,
@@ -274,20 +262,7 @@ local copilot_cfg = {
       prev = "<M-[>",
       dismiss = "<C-]>",
     },
-  },
-  filetypes = {
-    yaml = false,
-    markdown = false,
-    help = false,
-    gitcommit = false,
-    gitrebase = false,
-    hgcommit = false,
-    svn = false,
-    cvs = false,
-    ["."] = false,
-  },
-  copilot_node_command = 'node',
-  server_opts_overrides = {},
+  }
 }
 
 if copilot then copilot.setup(copilot_cfg) end
