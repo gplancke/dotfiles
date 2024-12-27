@@ -12,9 +12,9 @@ return {
 	terminals = { "<leader>t", '<cmd>ToggleTerm<cr>', desc = 'Toggle Terminal' },
 	search = {
     { "<leader>s", group = "search" },
-    { "<leader>sD", '<cmd>lua require("telescope.builtin").lsp_workspace_diagnostics()<cr>', desc = "Workspace Diagnostics" },
+    { "<leader>sD", '<cmd>lua require("telescope.builtin").diagnostics()<cr>', desc = "Workspace Diagnostics" },
     { "<leader>sb", '<cmd>lua require("telescope.builtin").buffers()<cr>', desc = "Buffers" },
-    { "<leader>sd", '<cmd>lua require("telescope.builtin").lsp_document_diagnostics()<cr>', desc = "Document Diagnostics" },
+    { "<leader>sd", '<cmd>lua require("telescope.builtin").diagnostics({ bufnr = 0 })<cr>', desc = "Document Diagnostics" },
     { "<leader>sf", '<cmd>lua require("telescope.builtin").find_files()<cr>', desc = "Find File" },
     { "<leader>sh", "<cmd>Telescope harpoon marks<cr>", desc = "Toggle Quick Menu with Telescope" },
     { "<leader>so", '<cmd>lua require("telescope.builtin").live_grep({grep_open_files=true})<cr>', desc = "String in Open Buffers" },
@@ -97,5 +97,7 @@ return {
 		{ "<leader>da", "<cmd>lua require('dap').step_over()<cr>", desc = "Step Over" },
 		{ "<leader>di", "<cmd>lua require('dap').step_into()<cr>", desc = "Step Into" },
 		{ "<leader>do", "<cmd>lua require('dap').step_out()<cr>", desc = "Step Out" },
+		{ "<leader>dt", "<cmd>lua require('dapui').toggle()<cr>", desc = "Toggle UI" },
+		{ "<leader>dh", "<cmd>lua require('dapui').eval()<cr>", desc = "Hover Debug Info" },
 	}
 }

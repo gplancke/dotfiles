@@ -36,7 +36,7 @@ function Module.setLSPAppearance(config)
 		vim.cmd [[autocmd CursorHold,CursorHoldI * lua vim.diagnostic.open_float(nil, {focus=false})]]
 	end
 
-	local signs = { Error = "", Warning = "", Hint = "", Information = " " }
+	local signs = { Error = "", Warning = "", Hint = "󱧣", Information = "" }
 	for type, icon in pairs(signs) do
 		local hl = "DiagnosticSign" .. type
 		local numhl = "DiagnosticDefault" .. type

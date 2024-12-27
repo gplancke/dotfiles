@@ -44,6 +44,7 @@ local catpuccin_config = {
 				background = true,
 			},
 		},
+		snacks = true,
 		-- nvim_cmp = true,
 		-- nvim_dap = true,
 		-- nvim_dap_signs = true,
@@ -73,6 +74,43 @@ local web_icons = ut.prequire('nvim-web-devicons')
 
 if mini_icons then mini_icons.setup() end
 if web_icons then web_icons.setup() end
+
+local trouble = ut.prequire('trouble')
+local trouble_cfg = {}
+
+if trouble then trouble.setup(trouble_cfg) end
+
+local gitsigns = ut.prequire('gitsigns')
+local gitsigns_cfg = {
+	sign_column = true,
+	signs = {
+		add = { text = '' },
+		change = { text = '' },
+		delete = { text = '' },
+		topdelete = { text = '󰘣' },
+		changedelete = { text = '' },
+	},
+	signs_staged = {
+		add = { text = '' },
+		change = { text = '' },
+		delete = { text = '' },
+		topdelete = { text = '󰘣' },
+		changedelete = { text = '' },
+    untracked    = { text = "" },
+	}
+}
+
+if gitsigns then gitsigns.setup(gitsigns_cfg) end
+
+local lspUtils = ut.prequire('utils.lsp')
+local lsp_cfg = {
+	virtual_text = true,
+	signs = true,
+	underline = true,
+	update_in_insert = false,
+}
+
+if lspUtils then lspUtils.setLSPAppearance(lsp_cfg) end
 
 -- -----------------------------------------------------------
 -- -----------------------------------------------------------
@@ -183,16 +221,12 @@ local statuscol_cfg = {
 		{ text = { "%C" }, click = "v:lua.ScFa" },
 		{ text = { "%s" }, click = "v:lua.ScSa" },
 		{
-			text = { builtin.lnumfunc, "  " },
+			text = builtin and { builtin.lnumfunc, "  " } or nil,
 			condition = { true, true },
 			click = "v:lua.ScLa",
 		}
 	},
-	clickhandlers = {}
-}
-
-if builtin then
-	statuscol_cfg.clickhandlers = {
+	clickhandlers = builtin and {
 		Lnum                   = builtin.lnum_click,
 		FoldClose              = builtin.foldclose_click,
 		FoldOpen               = builtin.foldopen_click,
@@ -210,8 +244,8 @@ if builtin then
 		GitSignsChange         = builtin.gitsigns_click,
 		GitSignsChangedelete   = builtin.gitsigns_click,
 		GitSignsDelete         = builtin.gitsigns_click,
-	}
-end
+	} or nil,
+}
 
 if statuscol then
 	statuscol.setup(statuscol_cfg)
@@ -238,7 +272,9 @@ local lualine_config = {
 			'dashboard',
 			'neo-tree-preview',
 			'neo-tree',
-			'neo-tree-popup'
+			'neo-tree-popup',
+			'dapui*',
+			'dap-repl'
 		},
 	},
 	sections = {
@@ -295,7 +331,7 @@ local winbar_config = {
 		file_icon_default = '',
 		seperator = '>',
 		editor_state = '●',
-		lock_icon = '',
+		lock_icon = '',
 	},
 	exclude_filetype = {
 		'help',
@@ -315,6 +351,8 @@ local winbar_config = {
 		'toggleterm',
 		'terminal',
 		'qf',
+		'dapui*',
+		'dap-repl'
 	}
 }
 

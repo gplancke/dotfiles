@@ -10,13 +10,13 @@ local ut = require('utils.common')
 require('snacks').setup({
 	bigfile = { enabled = true },
 	dashboard = { enabled = true },
-	indent = { enabled = false },
+	indent = { enabled = true },
 	input = { enabled = false },
 	lazygit = { enabled = true },
 	notifier = { enabled = false },
 	quickfile = { enabled = true },
 	scroll = { enabled = true },
-	statuscolumn = { enabled = false },
+	statuscolumn = { enabled = true },
 	words = { enabled = true },
 	zenmode = { enabled = true },
 })
@@ -125,6 +125,8 @@ end
 local tree = ut.prequire('neo-tree')
 local tree_config = {
 	close_if_last_window = true,
+	enable_git_status = true,
+	enable_diagnostics = true,
 	window = {
 		width = 40,
 		position = "left",
@@ -141,7 +143,23 @@ local tree_config = {
 			},
 		},
 	},
-
+	default_component_configs = {
+		git_status = {
+			symbols = {
+				-- Change type
+				added     = "✚",
+				modified  = "",
+				deleted   = "✖",
+				renamed   = "󰁕",
+				-- Status type
+				untracked = "󱀶",
+				ignored   = "",
+				unstaged  = "",
+				staged    = "",
+				conflict  = "",
+			}
+		},
+	}
 }
 
 if tree then

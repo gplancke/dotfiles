@@ -22,7 +22,7 @@ return {
 				{
 					"microsoft/vscode-js-debug",
 					version = "1.x",
-					build = "npm i --force && npm run compile vsDebugServerBundle && mv dist out"
+					build = "npm i --force && npm run compile dapDebugServer"
 				}
 			}
 		},

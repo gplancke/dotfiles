@@ -1,4 +1,6 @@
-return {
-	-- StatusColumn
-	"luukvbaal/statuscol.nvim"
-}
+return {}
+-- Superseded by folke/snacks
+-- return {
+-- 	-- StatusColumn
+-- 	"luukvbaal/statuscol.nvim"
+-- }
