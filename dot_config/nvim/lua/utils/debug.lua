@@ -2,13 +2,29 @@ local ut = require("utils.common")
 
 local Module = {}
 
+local function get_js_debugger()
+	-- Try to get js-debugger from mason
+	-- Then from a vscode-js-debug packages
+	local jsDebug = vim.fn.stdpath("data") .. "/mason/packages/js-debug-adapter/js-debug/src/dapDebugServer.js"
+	local jsDebugVsCode = vim.fn.stdpath("data") .. "/lazy/vscode-js-debug/dist/src/dapDebugServer.js"
+
+	return vim.fn.filereadable(jsDebugVsCode) == 1
+		and jsDebugVsCode
+		or (vim.fn.filereadable(jsDebug) and jsDebug or "")
+end
+
 function Module.setup_debugger()
 	local dap = ut.prequire("dap")
 	local dapui = ut.prequire("dapui")
 	local dapVirt = ut.prequire("nvim-dap-virtual-text")
-	-- local dapVsCode = ut.prequire("dap-vscode-js")
+	local jsDebug = get_js_debugger()
 
 	if not dap or not dapui then
+		return
+	end
+
+	if jsDebug == "" then
+		print("No js-debugger found")
 		return
 	end
 
@@ -25,7 +41,7 @@ function Module.setup_debugger()
 		executable = {
 			command = "node",
 			args = {
-				vim.fn.stdpath("data") .. "/lazy/vscode-js-debug/dist/src/dapDebugServer.js",
+				jsDebug,
 				"${port}",
 			},
 		},
@@ -38,7 +54,7 @@ function Module.setup_debugger()
 		executable = {
 			command = "node",
 			args = {
-				vim.fn.stdpath("data") .. "/lazy/vscode-js-debug/dist/src/dapDebugServer.js",
+				jsDebug,
 				"${port}",
 			},
 		},
