@@ -13,10 +13,9 @@ local function get_js_debugger()
 		or (vim.fn.filereadable(jsDebug) and jsDebug or "")
 end
 
-function Module.setup_debugger()
+function Module.setup()
 	local dap = ut.prequire("dap")
 	local dapui = ut.prequire("dapui")
-	local dapVirt = ut.prequire("nvim-dap-virtual-text")
 	local jsDebug = get_js_debugger()
 
 	if not dap or not dapui then
@@ -28,37 +27,17 @@ function Module.setup_debugger()
 		return
 	end
 
-	dapui.setup()
-
-	if dapVirt then
-		dapVirt.setup()
+	for _, adapter in ipairs({ "pwa-chrome", "pwa-node" }) do
+		dap.adapters[adapter] = {
+			type = "server",
+			host = "localhost",
+			port = "${port}",
+			executable = {
+				command = "node",
+				args = { jsDebug, "${port}" },
+			}
+		}
 	end
-
-	dap.adapters["pwa-chrome"] = {
-		type = "server",
-		host = "localhost",
-		port = "${port}",
-		executable = {
-			command = "node",
-			args = {
-				jsDebug,
-				"${port}",
-			},
-		},
-	}
-
-	dap.adapters["pwa-node"] = {
-		type = "server",
-		host = "localhost",
-		port = "${port}",
-		executable = {
-			command = "node",
-			args = {
-				jsDebug,
-				"${port}",
-			},
-		},
-	}
 
 	-- Setup dap for JavaScript and TypeScript
 	for _, language in ipairs({ "typescript", "javascript", "svelte", "vue", "typescriptreact" }) do

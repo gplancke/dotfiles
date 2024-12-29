@@ -233,8 +233,13 @@ lspMason.setup_handlers {
 -- ----------------------------------------
 -- ----------------------------------------
 
+local dapui = ut.prequire("dapui")
+local dapVirt = ut.prequire("nvim-dap-virtual-text")
 local dapUtils = ut.prequire('utils.debug')
-if dapUtils then dapUtils.setup_debugger() end
+
+if dapui then dapui.setup() end
+if dapVirt then dapVirt.setup() end
+if dapUtils then dapUtils.setup() end
 
 -- ----------------------------------------
 -- ----------------------------------------
