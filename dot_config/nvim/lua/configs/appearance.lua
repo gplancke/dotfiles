@@ -81,26 +81,26 @@ local trouble_cfg = {}
 if trouble then trouble.setup(trouble_cfg) end
 
 local gitsigns = ut.prequire('gitsigns')
-local gitsigns_cfg = {
-	sign_column = true,
-	signs = {
-		add = { text = '' },
-		change = { text = '' },
-		delete = { text = '' },
-		topdelete = { text = '󰘣' },
-		changedelete = { text = '' },
-	},
-	signs_staged = {
-		add = { text = '' },
-		change = { text = '' },
-		delete = { text = '' },
-		topdelete = { text = '󰘣' },
-		changedelete = { text = '' },
-    untracked    = { text = "" },
-	}
-}
 
-if gitsigns then gitsigns.setup(gitsigns_cfg) end
+if gitsigns then
+	gitsigns.setup({
+		signs = {
+			add = { text = '' },
+			change = { text = '' },
+			delete = { text = '' },
+			topdelete = { text = '󰘣' },
+			changedelete = { text = '' },
+		},
+		signs_staged = {
+			add = { text = '' },
+			change = { text = '' },
+			delete = { text = '' },
+			topdelete = { text = '󰘣' },
+			changedelete = { text = '' },
+			untracked    = { text = "" },
+		}
+	})
+end
 
 local lspUtils = ut.prequire('utils.lsp')
 local lsp_cfg = {
@@ -260,9 +260,16 @@ end
 -- -----------------------------------------------------------
 -- -----------------------------------------------------------
 
-local git_blame = require('gitblame')
-local navic = require('nvim-navic')
+local git_blame = ut.prequire('gitblame')
+local navic = ut.prequire('nvim-navic')
 local lualine = ut.prequire('lualine')
+
+local function breadcrumbs()
+	if navic then
+		return navic.get_location()
+	end
+end
+
 local lualine_config = {
 	options = {
 		icons_enabled = true,
@@ -270,6 +277,7 @@ local lualine_config = {
 		component_separators = '|',
 		section_separators = '',
 		disabled_filetypes = {
+			'snacks_dashboard',
 			'dashboard',
 			'neo-tree-preview',
 			'neo-tree',
@@ -287,10 +295,8 @@ local lualine_config = {
 	sections = {
 		lualine_a = { 'mode' },
 		lualine_b = { 'branch' },
-		-- lualine_c = { { 'filename', color = {} } },
 		lualine_c = {
-			{ navic.get_location, cond = navic.is_available },
-			{ git_blame.get_current_blame_text, cond = git_blame.is_blame_text_available }
+			{ git_blame and git_blame.get_current_blame_text, cond = git_blame and git_blame.is_blame_text_available }
 		},
 		lualine_x = { 'filetype' },
 		lualine_y = {
@@ -309,62 +315,59 @@ local lualine_config = {
 		lualine_y = {},
 		lualine_z = {}
 	},
+	winbar = {
+		lualine_a = {},
+		lualine_b = {},
+		lualine_c = {
+			{
+				'filename',
+				path = 1,
+				file_status = true,
+				newfile_status = false,
+				draw_empty = false,
+				symbols = {
+					modified = '  ',
+					readonly = '  ',
+					unnamed = '[ No Name ]',
+					newfile = '',
+				},
+			}
+		},
+		lualine_x = {
+			{ breadcrumbs, cond = navic and navic.is_available },
+		},
+		lualine_y = {},
+		lualine_z = {}
+	},
+	inactive_winbar = {
+		lualine_a = {},
+		lualine_b = {},
+		lualine_c = {
+			{
+				'filename',
+				path = 4,
+				newfile_status = false,
+				draw_empty = false,
+				symbols = {
+					modified = '  ',
+					readonly = '  ',
+					unnamed = '[ No Name ]',
+					newfile = '',
+				},
+			}
+		},
+		lualine_x = {},
+		lualine_y = {},
+		lualine_z = {}
+	},
 }
+
+if navic then
+	navic.setup()
+end
 
 if lualine then
 	lualine.setup(lualine_config)
-end
-
-
--- -----------------------------------------------------------
--- -----------------------------------------------------------
--- -----------------------------------------------------------
--- Top Bar
--- -----------------------------------------------------------
--- -----------------------------------------------------------
--- -----------------------------------------------------------
-
-local winbar = ut.prequire('winbar')
-local winbar_config = {
-	enabled = true,
-	show_file_path = true,
-	show_symbols = true,
-	colors = {
-		path = '', -- You can customize colors like #c946fd
-		file_name = '',
-		symbols = '',
-	},
-	icons = {
-		file_icon_default = '',
-		seperator = '>',
-		editor_state = '●',
-		lock_icon = '',
-	},
-	exclude_filetype = {
-		'help',
-		'startify',
-		'dashboard',
-		'packer',
-		'neogitstatus',
-		'NvimTree',
-		'neo-tree',
-		'neo-tree-popup',
-		'notify',
-		'Trouble',
-		'alpha',
-		'lir',
-		'Outline',
-		'spectre_panel',
-		'toggleterm',
-		'terminal',
-		'qf',
-		'dapui*',
-		'dap-repl'
-	}
-}
-
-if winbar then
-	winbar.setup(winbar_config)
 end
 
 -- -----------------------------------------------------------

@@ -16,6 +16,7 @@ return {
     { "<leader>sb", '<cmd>lua require("telescope.builtin").buffers()<cr>', desc = "Buffers" },
     { "<leader>sd", '<cmd>lua require("telescope.builtin").diagnostics({ bufnr = 0 })<cr>', desc = "Document Diagnostics" },
     { "<leader>sf", '<cmd>lua require("telescope.builtin").find_files()<cr>', desc = "Find File" },
+    { "<leader>sF", "<cmd>Telescope file_browser<cr>", desc = "Toggle File Browser" },
     { "<leader>sh", "<cmd>Telescope harpoon marks<cr>", desc = "Toggle Quick Menu with Telescope" },
     { "<leader>so", '<cmd>lua require("telescope.builtin").live_grep({grep_open_files=true})<cr>', desc = "String in Open Buffers" },
     { "<leader>sp", '<cmd>lua require("telescope.builtin").resume()<cr>', desc = "Previous Search" },
@@ -37,8 +38,8 @@ return {
     { "<leader>S", group = "Show" },
     { "<leader>Sb", "<cmd>GitBlameToggle<cr>", desc = "Toggle Git Blame" },
     { "<leader>Sd", "<cmd>Trouble diagnostics<cr>", desc = "Toggle Document Diagnostics" },
-    { "<leader>Sf", "<cmd>Telescope file_browser<cr>", desc = "Toggle File Browser" },
-    { "<leader>Sg", '<cmd>lua require("snacks").lazygit()<cr>', desc = "Toggle Lazygit" },
+    { "<leader>Se", "<cmd>Neotree toggle<cr>", desc = "Toggle File Explorer" },
+    { "<leader>Sg", '<cmd>lua require("snacks").lazygit()<cr>', desc = "Toggle File Explorer" },
     { "<leader>Sz", '<cmd>lua require("snacks").zen()<cr>', desc = "Toggle ZenMode" },
 	},
 	harpoons = {

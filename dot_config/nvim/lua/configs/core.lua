@@ -128,7 +128,7 @@ local tree_config = {
 	enable_git_status = true,
 	enable_diagnostics = true,
 	window = {
-		width = 40,
+		width = 35,
 		position = "left",
 	},
 	filesystem = {
@@ -176,11 +176,14 @@ end
 -- -----------------------------------------------------------
 
 local flatten = ut.prequire('flatten')
+local toggleterm = ut.prequire('toggleterm')
 local flatten_config = {
 	callbacks = {
 		pre_open = function()
 			-- Close toggleterm when an external open request is received
-			require("toggleterm").toggle(0)
+			if toggleterm then
+				toggleterm.toggle(0)
+			end
 		end,
 		post_open = function(bufnr, winnr, ft)
 			local close = function() vim.api.nvim_buf_delete(bufnr, {}) end
@@ -210,7 +213,9 @@ local flatten_config = {
 		end,
 		block_end = function()
 			-- After blocking ends (for a git commit, etc), reopen the terminal
-			require("toggleterm").toggle(0)
+			if toggleterm then
+				toggleterm.toggle(0)
+			end
 		end
 	}
 }
