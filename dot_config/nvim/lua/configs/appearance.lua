@@ -188,7 +188,8 @@ local indent_config = {
 			'NvimTree',
 			'neo-tree-preview',
 			'neo-tree',
-			'neo-tree-popup'
+			'neo-tree-popup',
+			'Avante'
 		},
 	}
 }
@@ -279,7 +280,8 @@ local lualine_config = {
 			'dapui_watches',
 			'dapui_breakpoints',
 			'dapui_console',
-			'dap-repl'
+			'dap-repl',
+			'Avante'
 		},
 	},
 	sections = {

@@ -2,21 +2,28 @@ return {
 	servers = {
 		ansiblels = {},
 		clangd = {},
-		ts_ls = {},
+		ts_ls = {
+			root_dir = require('lspconfig').util.root_pattern("tsconfig.json", "jsconfig.json", "package.json"),
+			single_file_support = false
+		},
 		svelte = {},
 		cssls = {},
 		vuels = {},
 		prismals = {},
+		denols = {
+			root_dir = require('lspconfig').util.root_pattern("deno.json", "deno.jsonc")
+		},
 		-- tailwindcss = {},
 		-- gopls = {},
-		-- pyright = {},
-		-- rust_analyzer = {},
-
+		pyright = {},
+		rust_analyzer = {},
 		lua_ls = {
-			Lua = {
-				workspace = { checkThirdParty = false },
-				telemetry = { enable = false },
-			},
+			settings = {
+				Lua = {
+					workspace = { checkThirdParty = false },
+					telemetry = { enable = false },
+				},
+			}
 		},
 	},
 

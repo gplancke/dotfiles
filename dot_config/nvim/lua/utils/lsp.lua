@@ -37,6 +37,7 @@ function Module.setLSPAppearance(config)
 	end
 
 	local signs = { Error = "", Warning = "", Hint = "󱧣", Information = "" }
+
 	for type, icon in pairs(signs) do
 		local hl = "DiagnosticSign" .. type
 		local numhl = "DiagnosticDefault" .. type

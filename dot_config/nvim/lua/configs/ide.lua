@@ -214,14 +214,14 @@ local lspServers = require('vars.servers')
 
 lspMason.setup_handlers {
 	function(server_name)
-		lsp[server_name].setup {
-			capabilities = lspCmp.default_capabilities(capabilities),
-			on_attach = function(client, bufnr)
-				lspUtils.setLSPKeyMaps(bufnr)
-				lspUtils.setNavicWithLSP(client, bufnr)
-			end,
-			settings = lspServers.servers[server_name],
-		}
+		local setup_config = lspServers.servers[server_name] or {}
+		setup_config.capabilities = lspCmp.default_capabilities(capabilities)
+		setup_config.on_attach = function(client, bufnr)
+			lspUtils.setLSPKeyMaps(bufnr)
+			lspUtils.setNavicWithLSP(client, bufnr)
+		end
+
+		lsp[server_name].setup(setup_config)
 	end,
 }
 
@@ -244,31 +244,69 @@ if dapUtils then dapUtils.setup() end
 -- ----------------------------------------
 -- ----------------------------------------
 -- ----------------------------------------
--- Debuggers Configuration
+-- Copilot Configuration
 -- ----------------------------------------
 -- ----------------------------------------
 -- ----------------------------------------
 
 local copilot = ut.prequire('copilot')
-local copilot_cfg = {
-	panel = {
-    enabled = false,
-  },
-  suggestion = {
-    enabled = true,
-    auto_trigger = true,
-    hide_during_completion = true,
-    debounce = 75,
-    keymap = {
-      accept = false,
-      accept_word = false,
-      accept_line = false,
-      next = "<M-]>",
-      prev = "<M-[>",
-      dismiss = "<C-]>",
-    },
-  }
-}
 
-if copilot then copilot.setup(copilot_cfg) end
+if copilot then
+	copilot.setup({
+		panel = {
+			enabled = false,
+		},
+		suggestion = {
+			enabled = true,
+			auto_trigger = true,
+			hide_during_completion = true,
+			debounce = 75,
+			keymap = {
+				accept = false,
+				accept_word = false,
+				accept_line = false,
+				next = "<M-]>",
+				prev = "<M-[>",
+				dismiss = "<C-]>",
+			},
+		}
+	})
+end
+
+-- Cursor like engine
+
+local avante = ut.prequire('avante')
+if avante then
+	avante.setup({
+		provider = "claude",
+		mappings = {
+      ask = "<leader>ia", -- ask
+      edit = "<leader>ie", -- edit
+      refresh = "<leader>ir", -- refresh
+    },
+	})
+
+	local img_clip = ut.prequire('img-clip')
+	local img_clip_cfg = {
+		-- recommended settings
+		default = {
+			embed_image_as_base64 = false,
+			prompt_for_file_name = false,
+			drag_and_drop = {
+				insert_mode = true,
+			},
+			-- required for Windows users
+			use_absolute_path = true,
+		},
+	}
+	if img_clip then img_clip.setup(img_clip_cfg) end
+
+	local render_md = ut.prequire('render-markdown')
+	if render_md then
+		render_md.setup({
+			file_types = { "markdown", "Avante" },
+			ft = { "markdown", "Avante" },
+		})
+	end
+end
 

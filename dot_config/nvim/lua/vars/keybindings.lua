@@ -35,20 +35,10 @@ return {
 	},
 	show = {
     { "<leader>S", group = "Show" },
-    { "<leader>SD", "<cmd>TroubleToggle workspace_diagnostics<cr>", desc = "Toggle Workspace Diagnostics" },
     { "<leader>Sb", "<cmd>GitBlameToggle<cr>", desc = "Toggle Git Blame" },
-    { "<leader>Sd", "<cmd>TroubleToggle document_diagnostics<cr>", desc = "Toggle Document Diagnostics" },
+    { "<leader>Sd", "<cmd>Trouble diagnostics<cr>", desc = "Toggle Document Diagnostics" },
     { "<leader>Sf", "<cmd>Telescope file_browser<cr>", desc = "Toggle File Browser" },
-		{ "<leader>So",
-			function()
-				require('telescope').extensions.opener.opener({
-					hidden=false,
-					respect_gitignore=true,
-					root_dir="~",
-				})
-			end,
-			desc = 'Open Project',
-		},
+    { "<leader>Sg", '<cmd>lua require("snacks").lazygit()<cr>', desc = "Toggle Lazygit" },
     { "<leader>Sz", '<cmd>lua require("snacks").zen()<cr>', desc = "Toggle ZenMode" },
 	},
 	harpoons = {
