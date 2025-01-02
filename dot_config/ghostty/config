@@ -1,6 +1,6 @@
 font-family = FiraCode Nerd Font Mono
-font-style = Bold
-font-size = 12
+font-style = Regular
+font-size = 13
 font-thicken
 window-decoration = false
 quit-after-last-window-closed = true

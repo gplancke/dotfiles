@@ -801,6 +801,70 @@
         }
       }
     },
+    "harlequin@1.25.0": {
+      "last_modified": "2024-11-16T04:25:12Z",
+      "resolved": "github:NixOS/nixpkgs/34a626458d686f1b58139620a8b2793e9e123bba#harlequin",
+      "source": "devbox-search",
+      "version": "1.25.0",
+      "systems": {
+        "aarch64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/yf1jdxrdgw6ih7nf9zx84rask7hw085a-harlequin-1.25.0",
+              "default": true
+            },
+            {
+              "name": "dist",
+              "path": "/nix/store/g3l9qffylnpaxv5j7ya7djwgzngf582k-harlequin-1.25.0-dist"
+            }
+          ],
+          "store_path": "/nix/store/yf1jdxrdgw6ih7nf9zx84rask7hw085a-harlequin-1.25.0"
+        },
+        "aarch64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/5sr2fwr0n572jhl75m56kgpnc4ys44nj-harlequin-1.25.0",
+              "default": true
+            },
+            {
+              "name": "dist",
+              "path": "/nix/store/4s6kk8hkadxpm704fhxqx02rm6i17h2r-harlequin-1.25.0-dist"
+            }
+          ],
+          "store_path": "/nix/store/5sr2fwr0n572jhl75m56kgpnc4ys44nj-harlequin-1.25.0"
+        },
+        "x86_64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/m94c33g1gmnyl73jh92n0130f69c9fja-harlequin-1.25.0",
+              "default": true
+            },
+            {
+              "name": "dist",
+              "path": "/nix/store/gdigsdjvj1rbsmg6qsyxwig46fbk6aq6-harlequin-1.25.0-dist"
+            }
+          ],
+          "store_path": "/nix/store/m94c33g1gmnyl73jh92n0130f69c9fja-harlequin-1.25.0"
+        },
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/ph29cx7gjy7y3q8hxnbvvhh7kkz2kwm7-harlequin-1.25.0",
+              "default": true
+            },
+            {
+              "name": "dist",
+              "path": "/nix/store/yxhnl0yp918yqyysfi94ars6qcyr4648-harlequin-1.25.0-dist"
+            }
+          ],
+          "store_path": "/nix/store/ph29cx7gjy7y3q8hxnbvvhh7kkz2kwm7-harlequin-1.25.0"
+        }
+      }
+    },
     "helix@latest": {
       "last_modified": "2024-09-10T15:01:03Z",
       "resolved": "github:NixOS/nixpkgs/5ed627539ac84809c78b2dd6d26a5cebeb5ae269#helix",

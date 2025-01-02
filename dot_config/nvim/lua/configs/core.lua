@@ -29,12 +29,12 @@ require('snacks').setup({
 -- -----------------------------------------------------------
 -- -----------------------------------------------------------
 
-require('mini.ai').setup()
 require('mini.icons').setup()
 require('mini.comment').setup()
 require('mini.bufremove').setup()
 require('mini.pairs').setup()
 require('mini.bracketed').setup()
+-- require('mini.ai').setup()
 -- require('mini.move').setup()
 -- require('mini.starter').setup()
 -- require('mini.cursorword').setup()
