@@ -98,50 +98,50 @@
       }
     },
     "colima@latest": {
-      "last_modified": "2024-11-03T14:18:04Z",
-      "resolved": "github:NixOS/nixpkgs/4ae2e647537bcdbb82265469442713d066675275#colima",
+      "last_modified": "2024-12-28T05:01:57Z",
+      "resolved": "github:NixOS/nixpkgs/9e09ce2d47c7700b877becef99ce7e27f15604dc#colima",
       "source": "devbox-search",
-      "version": "0.7.6",
+      "version": "0.8.1",
       "systems": {
         "aarch64-darwin": {
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/dmx03dfcaxpwcv0y23q337fq726zf9pg-colima-0.7.6",
+              "path": "/nix/store/9f3hl5wzgbfrjlna094yc3xc4p8694nl-colima-0.8.1",
               "default": true
             }
           ],
-          "store_path": "/nix/store/dmx03dfcaxpwcv0y23q337fq726zf9pg-colima-0.7.6"
+          "store_path": "/nix/store/9f3hl5wzgbfrjlna094yc3xc4p8694nl-colima-0.8.1"
         },
         "aarch64-linux": {
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/9yh1amdirsjyzsy9g86cc97hlgz4ypx3-colima-0.7.6",
+              "path": "/nix/store/9j7m452y6pjjq8754wngkbv8zqawv6zc-colima-0.8.1",
               "default": true
             }
           ],
-          "store_path": "/nix/store/9yh1amdirsjyzsy9g86cc97hlgz4ypx3-colima-0.7.6"
+          "store_path": "/nix/store/9j7m452y6pjjq8754wngkbv8zqawv6zc-colima-0.8.1"
         },
         "x86_64-darwin": {
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/h9942xb540v2vxdl3qkdgyksmidsqzg4-colima-0.7.6",
+              "path": "/nix/store/kya8mz2syx5wlp9p51xnlqal76vq1gdq-colima-0.8.1",
               "default": true
             }
           ],
-          "store_path": "/nix/store/h9942xb540v2vxdl3qkdgyksmidsqzg4-colima-0.7.6"
+          "store_path": "/nix/store/kya8mz2syx5wlp9p51xnlqal76vq1gdq-colima-0.8.1"
         },
         "x86_64-linux": {
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/c8v533w822ym35crsksjybp6wmv752jj-colima-0.7.6",
+              "path": "/nix/store/6glhrlqazvych9gj92k99biaw25r1xay-colima-0.8.1",
               "default": true
             }
           ],
-          "store_path": "/nix/store/c8v533w822ym35crsksjybp6wmv752jj-colima-0.7.6"
+          "store_path": "/nix/store/6glhrlqazvych9gj92k99biaw25r1xay-colima-0.8.1"
         }
       }
     },
@@ -382,6 +382,74 @@
             }
           ],
           "store_path": "/nix/store/h510207kpiac47vjvrpqn6lwvqsj397c-docker-24.0.9"
+        }
+      }
+    },
+    "exa@latest": {
+      "last_modified": "2023-09-06T20:35:33Z",
+      "resolved": "github:NixOS/nixpkgs/efd23a1c9ae8c574e2ca923c2b2dc336797f4cc4#exa",
+      "source": "devbox-search",
+      "version": "2023-03-01",
+      "systems": {
+        "aarch64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/b8gn0ypb3wd82673iahqk099ifriflyq-exa-unstable-2023-03-01",
+              "default": true
+            },
+            {
+              "name": "man",
+              "path": "/nix/store/6zrm41sxcdv8dz8hbfv7pzn0mkyhs719-exa-unstable-2023-03-01-man",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/b8gn0ypb3wd82673iahqk099ifriflyq-exa-unstable-2023-03-01"
+        },
+        "aarch64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/baaa6q31c6y8nc88h0grvj6357lq01gj-exa-unstable-2023-03-01",
+              "default": true
+            },
+            {
+              "name": "man",
+              "path": "/nix/store/ppm5fkisj17cjlfcbffxkvxkmk2ziw7k-exa-unstable-2023-03-01-man",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/baaa6q31c6y8nc88h0grvj6357lq01gj-exa-unstable-2023-03-01"
+        },
+        "x86_64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/sdqspvbzvs1d1kvfkwj4yngwywdc1s8r-exa-unstable-2023-03-01",
+              "default": true
+            },
+            {
+              "name": "man",
+              "path": "/nix/store/vnrzjf30j81jxj3hifni82q9wshyv08b-exa-unstable-2023-03-01-man",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/sdqspvbzvs1d1kvfkwj4yngwywdc1s8r-exa-unstable-2023-03-01"
+        },
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/9rcc6z61paivss0g7d96izw7zqmg21gx-exa-unstable-2023-03-01",
+              "default": true
+            },
+            {
+              "name": "man",
+              "path": "/nix/store/irlqy66p5rw7vhfj82frv9szi97kji3k-exa-unstable-2023-03-01-man",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/9rcc6z61paivss0g7d96izw7zqmg21gx-exa-unstable-2023-03-01"
         }
       }
     },

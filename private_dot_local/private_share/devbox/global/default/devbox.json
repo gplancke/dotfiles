@@ -45,7 +45,8 @@
     "zellij@latest",
     "helix@latest",
     "tree@latest",
-    "harlequin@1.25.0"
+    "harlequin@1.25.0",
+    "exa@latest"
   ],
   "shell": {
     "init_hook": [
