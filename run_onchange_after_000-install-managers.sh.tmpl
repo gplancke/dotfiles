@@ -111,6 +111,79 @@ function install_rust {
 }
 
 #############################################
+# Install flutter
+#############################################
+
+install_flutter() {
+  # Parameters: $1 = "linux" or "macos"
+  local os="$1"
+
+  # Define the installation directory
+  local install_dir="$HOME/.local/share/flutter"
+
+  # Check if the OS parameter is valid
+  if [[ "$os" != "linux" && "$os" != "darwin" ]]; then
+    echo "Invalid OS specified. Use 'linux' or 'darwin'."
+    return 1
+  fi
+
+  # Determine system architecture
+  local arch
+  case "$(uname -m)" in
+    x86_64) arch="x64" ;;
+    arm64 | aarch64) arch="arm64" ;;
+    *)
+      echo "Unsupported architecture: $(uname -m)"
+      return 1
+      ;;
+  esac
+
+	if [ -d "$install_dir/bin" ]; then
+		echo "Flutter is already installed"
+		return 0
+	fi
+
+  # Set Flutter download URL based on OS and architecture
+  local base_url="https://storage.googleapis.com/flutter_infra_release/releases/stable"
+  local flutter_url
+  if [[ "$os" == "linux" ]]; then
+    flutter_url="$base_url/linux/flutter_linux_${arch}_stable.tar.xz"
+  else
+    flutter_url="$base_url/macos/flutter_macos_${arch}_stable.zip"
+  fi
+
+  # Create the installation directory if it doesn't exist
+  mkdir -p "$install_dir"
+
+  # Download Flutter
+  echo "Downloading Flutter SDK for $os ($arch)..."
+  curl -L -o flutter_archive "$flutter_url" || {
+    echo "Failed to download Flutter SDK."
+    return 1
+  }
+
+  # Extract Flutter
+  echo "Extracting Flutter SDK..."
+  if [[ "$os" == "linux" ]]; then
+    tar -xf flutter_archive -C "$install_dir" --strip-components=1 || {
+      echo "Failed to extract Flutter SDK."
+      return 1
+    }
+  else
+    unzip -q flutter_archive -d "$install_dir" || {
+      echo "Failed to extract Flutter SDK."
+      return 1
+    }
+  fi
+
+  # Clean up
+  rm flutter_archive
+
+  echo "Flutter installed successfully in $install_dir."
+}
+
+
+#############################################
 # Install theme manager
 # Mainly base16 themes
 # However, we tend to use catpuccin as mush as we can now
@@ -186,6 +259,7 @@ install_nix $DISTRO
 install_essentials $DISTRO
 
 install_rust
+install_flutter $DISTRO
 install_zsh_manager
 install_tmux_manager
 install_theme_manager
