@@ -57,3 +57,8 @@ if [ -f '/Users/georgio/.local/share/google-cloud-sdk/path.zsh.inc' ]; then . '/
 
 # The next line enables shell command completion for gcloud.
 if [ -f '/Users/georgio/.local/share/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/georgio/.local/share/google-cloud-sdk/completion.zsh.inc'; fi
+
+# ##############################
+# Launch nushell...
+# ##############################
+# nu

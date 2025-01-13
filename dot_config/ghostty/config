@@ -6,4 +6,5 @@ adjust-cell-width = -8%
 adjust-cell-height = 10%
 window-decoration = false
 theme = catppuccin-frappe
+confirm-close-surface = false
 quit-after-last-window-closed = true
