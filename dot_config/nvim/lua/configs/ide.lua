@@ -57,7 +57,7 @@ local tst_configs = require('nvim-treesitter.configs')
 local tst_context = require('treesitter-context')
 
 pcall(tst_install.update { with_sync = true })
-tst_install.compilers = { "gcc-13" }
+tst_install.compilers = { "gcc-14" }
 tst_context.setup{
 	enable = true, -- Enable this plugin (Can be enabled/disabled later via commands)
 	max_lines = 0, -- How many lines the window should span. Values <= 0 mean no limit.
@@ -79,6 +79,7 @@ tst_configs.setup {
 	-- Add languages to be installed here that you want installed for treesitter
 	ensure_installed = {
 		'c',
+		'dart',
 		'go',
 		'lua',
 		'python',
@@ -210,7 +211,6 @@ cmp.setup.cmdline(':', {
 
 cmp_git.setup()
 
-
 -- ----------------------------------------
 -- ----------------------------------------
 -- ----------------------------------------
@@ -229,18 +229,23 @@ local lspCmp = require('cmp_nvim_lsp')
 local lspMason = require('mason-lspconfig')
 local lspServers = require('vars.servers')
 
-lspMason.setup_handlers {
-	function(server_name)
-		local setup_config = lspServers.servers[server_name] or {}
-		setup_config.capabilities = lspCmp.default_capabilities(capabilities)
-		setup_config.on_attach = function(client, bufnr)
-			lspUtils.setLSPKeyMaps(bufnr)
-			lspUtils.setNavicWithLSP(client, bufnr)
-		end
+local function setup_server(server_name)
+	local setup_config = lspServers.servers[server_name] or {}
+	setup_config.capabilities = lspCmp.default_capabilities(capabilities)
+	setup_config.on_attach = function(client, bufnr)
+		lspUtils.setLSPKeyMaps(bufnr)
+		lspUtils.setNavicWithLSP(client, bufnr)
+	end
 
-		lsp[server_name].setup(setup_config)
-	end,
-}
+	lsp[server_name].setup(setup_config)
+end
+
+lspMason.setup_handlers({ setup_server })
+-- Not handled by mason
+local others = { 'dartls' }
+for _, server_name in ipairs(others) do
+	setup_server(server_name)
+end
 
 -- ----------------------------------------
 -- ----------------------------------------
@@ -327,3 +332,15 @@ if avante then
 	end
 end
 
+-- ----------------------------------------
+-- ----------------------------------------
+-- ----------------------------------------
+-- Flutter needs its own setup...
+-- ----------------------------------------
+-- ----------------------------------------
+-- ----------------------------------------
+local flutter = ut.prequire('flutter-tools')
+
+if flutter then
+	flutter.setup()
+end

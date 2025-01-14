@@ -140,7 +140,11 @@ return {
 				ft = { "markdown", "Avante" },
 			},
 		},
-	}
+	},
+	-- {
+	-- 	-- Dart and Flutter
+	-- 	"nvim-flutter/flutter-tools.nvim"
+	-- }
 	-- {
 	--	-- Superseded by folke/snacks.nvim
 	-- 	-- Indent guides

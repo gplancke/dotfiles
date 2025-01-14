@@ -1,22 +1,5 @@
 return {
 	servers = {
-		ansiblels = {},
-		clangd = {},
-		ts_ls = {
-			root_dir = require('lspconfig').util.root_pattern("tsconfig.json", "jsconfig.json", "package.json"),
-			single_file_support = false
-		},
-		svelte = {},
-		cssls = {},
-		vuels = {},
-		prismals = {},
-		denols = {
-			root_dir = require('lspconfig').util.root_pattern("deno.json", "deno.jsonc")
-		},
-		-- tailwindcss = {},
-		-- gopls = {},
-		pyright = {},
-		rust_analyzer = {},
 		lua_ls = {
 			settings = {
 				Lua = {
@@ -25,6 +8,42 @@ return {
 				},
 			}
 		},
+		ts_ls = {
+			root_dir = require('lspconfig').util.root_pattern("tsconfig.json", "jsconfig.json", "package.json"),
+			single_file_support = false
+		},
+		denols = {
+			root_dir = require('lspconfig').util.root_pattern("deno.json", "deno.jsonc")
+		},
+		svelte = {},
+		cssls = {},
+		vuels = {},
+		prismals = {},
+		-- tailwindcss = {},
+		gopls = {},
+		dartls = {
+			-- root_dir = require('lspconfig').util.root_pattern("pubspec.yaml"),
+			cmd = { "dart", "language-server", "--protocol=lsp" },
+			filetypes = { "dart" },
+			init_options = {
+				closingLabels = true,
+				flutterOutline = true,
+				onlyAnalyzeProjectsWithOpenFiles = true,
+				outline = true,
+				suggestFromUnimportedLibraries = true,
+			},
+			settings = {
+				dart = {
+					completeFunctionCalls = true,
+					showTodos = true,
+				},
+			},
+
+		},
+		ansiblels = {},
+		clangd = {},
+		pyright = {},
+		rust_analyzer = {},
 	},
 
 	nullServers = {

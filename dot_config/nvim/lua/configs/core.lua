@@ -19,7 +19,10 @@ mason.setup()
 null_ls.setup()
 mason_lspconfig.setup {
 	automatic_installation = true,
-	ensure_installed = vim.tbl_keys(allServers.servers)
+	ensure_installed = vim.tbl_filter(
+		function(server) return server ~= "dartls" end,
+		vim.tbl_keys(allServers.servers)
+	)
 }
 mason_null_ls.setup({
 	ensure_installed = vim.tbl_keys(allServers.nullServers),
