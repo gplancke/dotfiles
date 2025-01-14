@@ -110,12 +110,28 @@ function install_rust {
 	fi
 }
 
+function install_cocoa_pods {
+  local os="$1"
+
+	if [ "$os" != "darwin" ]; then
+		echo "CocoaPods is only available on MacOS"
+		return 1
+	fi
+
+  if ! which cocoapods >/dev/null; then
+    echo "Installing CocoaPods"
+    brew install cocoapods
+    echo "CocoaPods installed successfully"
+  else
+    echo "Skipped installing CocoaPods, it is already installed"
+  fi
+}
 #############################################
 # Install flutter
 #############################################
 
-install_flutter() {
-  # Parameters: $1 = "linux" or "macos"
+function install_flutter {
+  # Parameters: $1 = "linux" or "darwin"
   local os="$1"
 
   # Define the installation directory
@@ -259,6 +275,7 @@ install_nix $DISTRO
 install_essentials $DISTRO
 
 install_rust
+install_cocoa_pods $DISTRO
 install_flutter $DISTRO
 install_zsh_manager
 install_tmux_manager

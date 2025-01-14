@@ -50,6 +50,7 @@ export GEM_HOME=$HOME/.local/share/gems             # Ruby
 # export PIP_HOME="$HOME/.local/share/python_packages"  # Python
 export ANDROID_HOME="$HOME/.local/share/android"    # Android
 export FLUTTER_ROOT="$HOME/.local/share/flutter"    # Flutter
+export DART_HOME="$HOME/.pub-cache"                 # Dart
 export DIRENV_LOG_FORMAT=
 
 # Java
@@ -82,6 +83,7 @@ export TMUX_POWERLINE_DEFAULT_FOREGROUND_COLOR='255'
 [ -d "$ANDROID_HOME/cmdline-tools/latest/bin" ] && PATH="${PATH}:${ANDROID_HOME}/cmdline-tools/latest/bin"
 [ -d "$ANDROID_HOME/platform-tools" ] && PATH="${PATH}:${ANDROID_HOME}/platform-tools"
 [ -d "$FLUTTER_ROOT/bin" ] && PATH="${PATH}:${FLUTTER_ROOT}/bin"
+[ -d "$DART_HOME/bin" ] && PATH="${PATH}:${DART_HOME}/bin"
 
 [ -d "$RUST_HOME/bin" ] && PATH="${PATH}:${RUST_HOME}/bin"
 [ -f "$RUST_HOME/env" ] && source "$RUST_HOME/env"
