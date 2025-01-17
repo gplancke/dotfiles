@@ -46,13 +46,14 @@ export DENO_HOME="$HOME/.deno"                      # Deno
 export PNPM_HOME="$HOME/.local/share/pnpm"          # Pnpm
 export GOPATH=$HOME/.go                             # Go
 export GEM_HOME=$HOME/.local/share/gems             # Ruby
-# export PIP_HOME="$HOME/.local/share/python_packages"  # Python
-export ANDROID_HOME="$HOME/.local/share/android"    # Android
-export FLUTTER_ROOT="$HOME/.local/share/flutter"    # Flutter
-export DART_HOME="$HOME/.pub-cache"                 # Dart
+export PIP_HOME="$HOME/.local/share/python_packages"  # Python
 export DIRENV_LOG_FORMAT=
 
-# Java
+# Android and Java
+export FLUTTER_ROOT="$HOME/.local/share/flutter"    # Flutter
+export DART_HOME="$HOME/.pub-cache"                 # Dart
+[ "$LINUX" = "1" ] && [ -d "$HOME/Android/Sdk" ] && export ANDROID_HOME="$HOME/Android/Sdk"
+[ "$MACOS" = "1" ] && [ -d "$HOME/Library/Android/sdk" ] && export ANDROID_HOME="$HOME/Library/Android/sdk"
 [ "$LINUX" = "1" ] && [ -d "/usr/lib/jvm/java-8-openjdk" ] && export JAVA_HOME="/usr/lib/jvm/java-8-openjdk"
 
 # Tmux
@@ -77,16 +78,16 @@ export TMUX_POWERLINE_DEFAULT_FOREGROUND_COLOR='255'
 [ -d "$PNPM_HOME" ] && PATH="${PATH}:${PNPM_HOME}"
 [ -d "$GEM_HOME/bin" ] && PATH="${PATH}:${GEM_HOME}/bin"
 [ -d "$PIP_HOME/bin" ] && PATH="${PATH}:${PIP_HOME}/bin"
-[ -d "$JAVA_HOME/bin" ] && PATH="${PATH}:${JAVA_HOME}/bin"
 
+[ -d "$JAVA_HOME/bin" ] && PATH="${PATH}:${JAVA_HOME}/bin"
 [ -d "$ANDROID_HOME/cmdline-tools/latest/bin" ] && PATH="${PATH}:${ANDROID_HOME}/cmdline-tools/latest/bin"
 [ -d "$ANDROID_HOME/platform-tools" ] && PATH="${PATH}:${ANDROID_HOME}/platform-tools"
+[ -d "$ANDROID_HOME/bin" ] && PATH="${PATH}:${ANDROID_HOME}/bin"
 [ -d "$FLUTTER_ROOT/bin" ] && PATH="${PATH}:${FLUTTER_ROOT}/bin"
 [ -d "$DART_HOME/bin" ] && PATH="${PATH}:${DART_HOME}/bin"
 
 [ -d "$RUST_HOME/bin" ] && PATH="${PATH}:${RUST_HOME}/bin"
 [ -f "$RUST_HOME/env" ] && source "$RUST_HOME/env"
-
 
 ##########################
 # Themes
@@ -116,6 +117,25 @@ hash fnm 2>/dev/null && eval "$(fnm env)"                                   # so
 	&& . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
 
 hash devbox 2>/dev/null && eval "$(devbox global shellenv)"									# source devbox
+
+##########################
+# Links
+##########################
+function setup_link() {
+	local cli_plugins="$HOME/.docker/cli-plugins"
+	local bin="$1"
+
+	if which $bin >/dev/null 2>&1 && [ ! -L "$cli_plugins/$bin" ]; then
+		local bin_path=$(which $bin)
+		ln -sf $(which "$bin") "$cli_plugins/$bin"
+	fi
+}
+
+for bin in docker-buildx docker-compose; do
+	if [ "$MACOS" = "1" ] || [ "$LINUX" = "1" ]; then
+		setup_link $bin
+	fi
+done
 
 ##########################
 # Aliases

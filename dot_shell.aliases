@@ -221,7 +221,7 @@ tmux_kill_all() {
 ################################################################################
 
 work_on() {
-	workspace=$(find ~/Workspace/Projects -mindepth 1 -maxdepth 3 -type d -name ".git" -exec dirname {} \; | fzf)
+	workspace=$(find ~/Workspace/Projects -mindepth 1 -maxdepth 3 -type d -name ".git" -exec dirname {} \; | fzf-tmux -q $1)
 
 	if [ ! -z "$workspace" ]; then
 		lastname=$(basename "$workspace")
@@ -283,10 +283,12 @@ chth() {
 
 alias c='clear'
 
-alias ll='ls -l'
-alias la='ls -a'
-alias lisa='ls -lisa'
-alias ls='ls -lisa'
+hash jc 2>/dev/null && hash mlr 2>/dev/null && alias li='\ls -la | jc --ls | mlr --ijson --opprint cut -f link_to -x' || alias li='\ls -la'
+alias lila='\ls -la'
+alias lisa='\ls -lsah'
+
+hash jc 2>/dev/null && alias what='__g() { \file "$1" | jc --file; }; __g' || what='file'
+hash jc 2>/dev/null && alias lidi='\df -h | jc --df' || alias lidi='df'
 
 alias mvd='move_to_dir'
 alias edit='open_editor'
@@ -325,6 +327,7 @@ hash diff-so-fancy 2>/dev/null && alias diff='diff-so-fancy'
 hash hub 2>/dev/null && alias git='hub'
 hash code-git 2>/dev/null && alias code='code-git'
 
+
 #################
 # Nix
 #################
@@ -336,9 +339,16 @@ alias nix-update='nix-channel --update'
 alias nix-rebuild='nix-env -ir -f ~/.env.nix'
 alias nix-upgrade='nix-update && nix-rebuild'
 alias nix-purge="echo \"nix-env -e '.*' to purge env\""
+alias nix-clean='nix-collect-garbage'
 alias nix-cleanup='nix-env --delete-generations +3 && nix-collect-garbage'
 alias nix-rollback='nix-env --rollback'
 alias nix-uninstall='/nix/nix-installer uninstall'
+
+alias devga='devbox global add'
+alias devgc='nix-collect-garbage'
+alias deva='devbox add'
+alias devrm='devbox rm'
+alias devse='devbox search'
 
 #################
 # TUI

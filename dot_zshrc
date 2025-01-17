@@ -62,3 +62,6 @@ if [ -f '/Users/georgio/.local/share/google-cloud-sdk/completion.zsh.inc' ]; the
 # Launch nushell...
 # ##############################
 # nu
+
+# Added by Windsurf
+export PATH="/Users/georgio/.codeium/windsurf/bin:$PATH"

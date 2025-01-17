@@ -46,7 +46,11 @@
     "helix@latest",
     "tree@latest",
     "harlequin@1.25.0",
-    "exa@latest"
+    "exa@latest",
+    "jp@latest",
+    "docker-compose@latest",
+    "openjdk@latest",
+    "miller@latest"
   ],
   "shell": {
     "init_hook": [
