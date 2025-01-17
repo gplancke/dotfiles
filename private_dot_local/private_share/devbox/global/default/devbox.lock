@@ -1635,6 +1635,34 @@
         }
       }
     },
+    "monolith@latest": {
+      "last_modified": "2024-12-23T21:10:33Z",
+      "resolved": "github:NixOS/nixpkgs/de1864217bfa9b5845f465e771e0ecb48b30e02d#monolith",
+      "source": "devbox-search",
+      "version": "2.8.3",
+      "systems": {
+        "aarch64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/8dpn8n5jvmqc0dnpirwamkl2zir2hw25-monolith-2.8.3",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/8dpn8n5jvmqc0dnpirwamkl2zir2hw25-monolith-2.8.3"
+        },
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/7pi1vl8idnbd0hcjx8c9p17n8hbxcdbp-monolith-2.8.3",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/7pi1vl8idnbd0hcjx8c9p17n8hbxcdbp-monolith-2.8.3"
+        }
+      }
+    },
     "neovim@latest": {
       "last_modified": "2024-05-24T22:06:51Z",
       "resolved": "github:NixOS/nixpkgs/1a9df4f74273f90d04e621e8516777efcec2802a#neovim",
@@ -1849,34 +1877,6 @@
       "resolved": "github:NixOS/nixpkgs/7d0ed7f2e5aea07ab22ccb338d27fbe347ed2f11#openjdk",
       "source": "devbox-search",
       "version": "19.0.1+10"
-    },
-    "pipr@latest": {
-      "last_modified": "2024-12-23T21:10:33Z",
-      "resolved": "github:NixOS/nixpkgs/de1864217bfa9b5845f465e771e0ecb48b30e02d#pipr",
-      "source": "devbox-search",
-      "version": "0.0.16",
-      "systems": {
-        "aarch64-linux": {
-          "outputs": [
-            {
-              "name": "out",
-              "path": "/nix/store/hm214h5n2ns128i4yr4pprd3s81rm7i8-pipr-0.0.16",
-              "default": true
-            }
-          ],
-          "store_path": "/nix/store/hm214h5n2ns128i4yr4pprd3s81rm7i8-pipr-0.0.16"
-        },
-        "x86_64-linux": {
-          "outputs": [
-            {
-              "name": "out",
-              "path": "/nix/store/z7jdfhkimmi7bsw70rv2lr4fbmf0c42d-pipr-0.0.16",
-              "default": true
-            }
-          ],
-          "store_path": "/nix/store/z7jdfhkimmi7bsw70rv2lr4fbmf0c42d-pipr-0.0.16"
-        }
-      }
     },
     "pnpm@latest": {
       "last_modified": "2024-06-06T13:42:14Z",

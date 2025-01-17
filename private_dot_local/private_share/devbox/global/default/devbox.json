@@ -50,7 +50,8 @@
     "jp@latest",
     "docker-compose@latest",
     "openjdk@latest",
-    "miller@latest"
+    "miller@latest",
+    "sq@latest"
   ],
   "shell": {
     "init_hook": [
