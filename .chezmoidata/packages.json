@@ -4,7 +4,8 @@
 			"brews": [
 				"git",
 				"curl",
-				"libiconv"
+				"libiconv",
+				"imagmagick",
 			],
 			"casks": [
 				"bitwarden",
@@ -16,7 +17,8 @@
 			"apt": [],
 			"brews": [
 				"git",
-				"curl"
+				"curl",
+				"imagemagick"
 			],
 			"casks": [
 				"bitwarden",
