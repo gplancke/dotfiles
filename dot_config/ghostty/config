@@ -8,3 +8,5 @@ window-decoration = false
 theme = catppuccin-frappe
 confirm-close-surface = false
 quit-after-last-window-closed = true
+
+keybind = global:ctrl+grave_accent=toggle_quick_terminal

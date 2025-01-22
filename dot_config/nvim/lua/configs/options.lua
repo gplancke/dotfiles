@@ -35,4 +35,5 @@ vim.o.timeout = true
 vim.o.timeoutlen = 300
 -- Set completeopt to have a better completion experience
 vim.o.completeopt = 'menuone,noselect'
-
+-- Make an hyphen not a word boundary
+vim.o.isKeyword:append('-')

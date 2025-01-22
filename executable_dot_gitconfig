@@ -139,6 +139,7 @@
 
   cleanup-orig = "!f() { git ls-orig | xargs -I {} rm -f {}; }; f"
 
+	search = "!f() { for branch in $(git rev-list --all); do git ls-tree -r --name-only $branch | grep "$1" | sed 's/^/'$branch': /'; done; }; f"
 
   cwb = print-current-branch
   lsch = ls-changes

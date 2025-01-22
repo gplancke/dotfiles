@@ -3,6 +3,55 @@ local ut = require('utils.common')
 -- NOTE: Make sure the terminal supports this
 vim.o.termguicolors = true
 -- vim.o.base16colorspace = 256
+--
+--
+
+-- This makes the cursorline and cursorcolumn have the same color
+vim.api.nvim_create_autocmd("ColorScheme", {
+    callback = function()
+        local cursorline = vim.api.nvim_get_hl(
+					0,
+					{ link = false, name = "CursorLine" }
+				)
+        vim.api.nvim_set_hl(0, "CursorColumn", { bg = cursorline.bg })
+    end,
+})
+
+-- This activates the cursorline and cursorcolumn only in normal mode
+-- Applied only to the active window and for some filetypes
+vim.api.nvim_create_autocmd({ "WinEnter", "BufEnter", "InsertLeave" }, {
+  callback = function()
+    local excluded_filetypes = {
+			'snacks_dashboard',
+			'dashboard',
+			'neo-tree-preview',
+			'neo-tree',
+			'neo-tree-popup',
+			'dapui_hover',
+			'dapui_scopes',
+			'dapui_stacks',
+			'dapui_watches',
+			'dapui_breakpoints',
+			'dapui_console',
+			'dap-repl',
+			'Avante',
+      'help',
+      'NvimTree'
+    }
+    local current_ft = vim.bo.filetype
+    if not vim.tbl_contains(excluded_filetypes, current_ft) then
+      vim.wo.cursorline = true
+      -- vim.o.cursorcolumn = true
+    end
+  end,
+})
+-- Deactivate everything when leaving the window or buffer
+vim.api.nvim_create_autocmd({ "WinLeave", "BufLeave", "InsertEnter" }, {
+  callback = function()
+    vim.wo.cursorline = false
+		-- vim.o.cursorcolumn = false
+  end,
+})
 
 -- -----------------------------------------------------------
 -- -----------------------------------------------------------
@@ -321,7 +370,7 @@ local lualine_config = {
 		lualine_c = {
 			{
 				'filename',
-				path = 1,
+				path = 4,
 				file_status = true,
 				newfile_status = false,
 				draw_empty = false,
@@ -345,7 +394,7 @@ local lualine_config = {
 		lualine_c = {
 			{
 				'filename',
-				path = 4,
+				path = 1,
 				newfile_status = false,
 				draw_empty = false,
 				symbols = {
