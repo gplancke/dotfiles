@@ -51,7 +51,9 @@
     "docker-compose@latest",
     "openjdk@latest",
     "miller@latest",
-    "sq@latest"
+    "sq@latest",
+    "aider-chat@latest",
+    "bun@latest"
   ],
   "shell": {
     "init_hook": [

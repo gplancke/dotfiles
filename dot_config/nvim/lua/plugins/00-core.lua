@@ -91,6 +91,10 @@ return {
 	{
 		'ThePrimeagen/harpoon',
 	},
+	{
+		"3rd/image.nvim",
+		build = false
+	}
 	-- {
 	-- 	-- Play nice with TMUX, Wezterm, Kitty, etc.
 	-- 	'numToStr/Navigator.nvim',
