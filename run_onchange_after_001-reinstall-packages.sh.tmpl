@@ -8,6 +8,7 @@ function install_bins() {
 
 	if [ hash devbox 2>/dev/null -a -f "$(devbox global path)/devbox.json" ]; then
 		echo "Installing devbox environment"
+		eval "$(devbox global shellenv)"
 		devbox global install
 	fi
 }
