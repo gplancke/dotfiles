@@ -4,11 +4,11 @@ function install_bins() {
 	if [ hash nix-env 2>/dev/null -a -f $HOME/.env.nix ]; then
 		echo "Installing nix environment"
 		nix-env -ir -f $HOME/.env.nix
-	elif [ hash devbox 2>/dev/null -a -f "$(devbox global path)/devbox.json" ]; then
+	fi
+
+	if [ hash devbox 2>/dev/null -a -f "$(devbox global path)/devbox.json" ]; then
 		echo "Installing devbox environment"
 		devbox global install
-	else
-		echo "No nix environment found"
 	fi
 }
 

@@ -44,7 +44,11 @@ function install_nix {
   if [ ! -d "$HOME/.nix-profile" ]; then
 		echo "Installing Nix"
 		curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
-	  source $HOME/.nix-profile/etc/profile.d/nix.sh
+
+	  [ -f "$HOME/.nix-profile/etc/profile.d/nix.sh" ] && \
+			source $HOME/.nix-profile/etc/profile.d/nix.sh
+		[ -f "/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh" ] && \
+			source /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
 
 		mkdir -p $HOME/.local/bin
 		cat > $HOME/.local/bin/nix-uninstall << _EOF
@@ -63,162 +67,6 @@ _EOF
 	  fi
 	else
 		echo "Nix is already installed"
-  fi
-}
-
-#############################################
-# Install zsh plugin manager
-# We want to replace this with a nix flake
-#############################################
-
-function install_zsh_manager {
-  if [ ! -f "$HOME/.config/antigen/antigen.zsh" ]; then
-		echo "Installing zsh plugin manager (antigen)"
-    mkdir -p "$HOME/.config/antigen"
-    curl -L git.io/antigen > $HOME/.config/antigen/antigen.zsh
-	else
-		echo "Zsh plugin manager is already installed"
-  fi
-}
-
-#############################################
-# Install tmux plugin manager (tpm)
-# We want to replace this with a nix flake
-#############################################
-
-function install_tmux_manager {
-  if [ ! -d "${HOME}/.tmux/plugins/tpm" ]; then
-		echo "Installing tmux plugin manager"
-    git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
-	else
-		echo "Tmux plugin manager is already installed"
-	fi
-}
-
-#############################################
-# Install rust
-# The reason we install it with a standalone script
-# and not with nix is because it needs to be linked to the system
-# especially in Macos where it needs to find the Xcode tools
-# With nix, it can cause problems as the libraries might be siloed
-#############################################
-
-function install_rust {
-	if [ ! -d "$HOME/.cargo" ]; then
-		curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
-			| sh -s -- --defaults-toolchain nightly -y
-	fi
-}
-
-function install_cocoa_pods {
-  local os="$1"
-
-	if [ "$os" != "darwin" ]; then
-		echo "CocoaPods is only available on MacOS"
-		return 1
-	fi
-
-  if ! which cocoapods >/dev/null; then
-    echo "Installing CocoaPods"
-    brew install cocoapods
-    echo "CocoaPods installed successfully"
-  else
-    echo "Skipped installing CocoaPods, it is already installed"
-  fi
-}
-#############################################
-# Install flutter
-#############################################
-
-function install_flutter {
-  # Parameters: $1 = "linux" or "darwin"
-  local os="$1"
-
-  # Define the installation directory
-  local install_dir="$HOME/.local/share/flutter"
-
-  # Check if the OS parameter is valid
-  if [[ "$os" != "linux" && "$os" != "darwin" ]]; then
-    echo "Invalid OS specified. Use 'linux' or 'darwin'."
-    return 1
-  fi
-
-  # Determine system architecture
-  local arch
-  case "$(uname -m)" in
-    x86_64) arch="x64" ;;
-    arm64 | aarch64) arch="arm64" ;;
-    *)
-      echo "Unsupported architecture: $(uname -m)"
-      return 1
-      ;;
-  esac
-
-	if [ -d "$install_dir/bin" ]; then
-		echo "Flutter is already installed"
-		return 0
-	fi
-
-  # Set Flutter download URL based on OS and architecture
-  local base_url="https://storage.googleapis.com/flutter_infra_release/releases/stable"
-  local flutter_url
-  if [[ "$os" == "linux" ]]; then
-    flutter_url="$base_url/linux/flutter_linux_${arch}_stable.tar.xz"
-  else
-    flutter_url="$base_url/macos/flutter_macos_${arch}_stable.zip"
-  fi
-
-  # Create the installation directory if it doesn't exist
-  mkdir -p "$install_dir"
-
-  # Download Flutter
-  echo "Downloading Flutter SDK for $os ($arch)..."
-  curl -L -o flutter_archive "$flutter_url" || {
-    echo "Failed to download Flutter SDK."
-    return 1
-  }
-
-  # Extract Flutter
-  echo "Extracting Flutter SDK..."
-  if [[ "$os" == "linux" ]]; then
-    tar -xf flutter_archive -C "$install_dir" --strip-components=1 || {
-      echo "Failed to extract Flutter SDK."
-      return 1
-    }
-  else
-    unzip -q flutter_archive -d "$install_dir" || {
-      echo "Failed to extract Flutter SDK."
-      return 1
-    }
-  fi
-
-  # Clean up
-  rm flutter_archive
-
-  echo "Flutter installed successfully in $install_dir."
-}
-
-
-#############################################
-# Install theme manager
-# Mainly base16 themes
-# However, we tend to use catpuccin as mush as we can now
-#############################################
-
-function install_theme_manager {
-  if [ ! -d "$HOME/.local/share/base16-manager" ]; then
-		echo "Installing base16 theme manager"
-    mkdir -p "$HOME/.local/share/base16-manager"
-    git clone https://github.com/base16-manager/base16-manager.git \
-      $HOME/.local/share/base16-manager && \
-      cp $HOME/.local/share/base16-manager/base16-manager $HOME/.local/bin/
-    $HOME/.local/bin/base16-manager install chriskempson/base16-shell
-    $HOME/.local/bin/base16-manager install chriskempson/base16-vim
-    $HOME/.local/bin/base16-manager install nicodebo/base16-fzf
-
-    $HOME/.local/bin/base16-manager set ocean
-	else
-		echo "Base16 theme manager is already installed"
   fi
 }
 
@@ -243,19 +91,15 @@ function install_essentials() {
       sudo apt update -y
       sudo apt upgrade -y
       sudo apt install -y build-essential curl git zsh fonts-hack-ttf
-
-      brew install docker nushell
       ;;
     "darwin")
-      brew install openssl zsh nushell
-      brew tap homebrew/cask-fonts
+      brew install openssl zsh
       brew install font-hack-nerd-font
-      brew install docker docker-compose
 
       # Install a working version of cocoapods
-      brew uninstall --force ruby
-      arch -x86_64 gem install ffi
-      arch -x86_64 gem install cocoapods
+      # brew uninstall --force ruby
+      # arch -x86_64 gem install ffi
+      # arch -x86_64 gem install cocoapods
       ;;
     *)
       echo "Not supported right now"
@@ -274,9 +118,10 @@ install_nix $DISTRO
 
 install_essentials $DISTRO
 
-install_rust
-install_cocoa_pods $DISTRO
-install_flutter $DISTRO
+# install_rust
+# install_cocoa_pods $DISTRO
+# install_flutter $DISTRO
+
 install_zsh_manager
 install_tmux_manager
 install_theme_manager
