@@ -38,7 +38,6 @@
     "ruby@latest",
     "docker-buildx@latest",
     "deno@latest",
-    "gcc@13.3.0",
     "fd@latest",
     "luarocks@latest",
     "python@latest",
@@ -53,7 +52,8 @@
     "miller@latest",
     "sq@latest",
     "aider-chat@latest",
-    "bun@latest"
+    "bun@latest",
+    "gcc@latest"
   ],
   "shell": {
     "init_hook": [
