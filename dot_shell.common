@@ -20,6 +20,11 @@ fi
 [ -f "$HOME/.shell.secrets" ] && . "$HOME/.shell.secrets"
 
 ##########################
+# Installers
+##########################
+[ -f "$HOME/.shell.installers" ] && . "$HOME/.shell.installers"
+
+##########################
 # Exports
 ##########################
 export EDITOR=nvim
@@ -143,3 +148,20 @@ done
 # Aliases
 ##########################
 [ -f "$HOME/.shell.aliases" ] && . "$HOME/.shell.aliases"
+
+##########################
+# Install tools
+##########################
+if type install_zsh_manager >/dev/null 2>&1; then
+	install_zsh_manager
+fi
+if type install_theme_manager >/dev/null 2>&1; then
+	install_theme_manager
+fi
+if type install_tmux_manager >/dev/null 2>&1; then
+	install_tmux_manager
+fi
+
+# install_rust
+# install_cocoa_pods
+# install_flutter
