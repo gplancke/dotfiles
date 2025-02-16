@@ -8,8 +8,6 @@ function install_zsh_manager {
 		echo "Installing zsh plugin manager (antigen)"
     mkdir -p "$HOME/.config/antigen"
     curl -L git.io/antigen > $HOME/.config/antigen/antigen.zsh
-	else
-		echo "Zsh plugin manager is already installed"
   fi
 }
 
@@ -22,8 +20,6 @@ function install_tmux_manager {
   if [ ! -d "${HOME}/.tmux/plugins/tpm" ]; then
 		echo "Installing tmux plugin manager"
     git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
-	else
-		echo "Tmux plugin manager is already installed"
 	fi
 }
 
@@ -54,17 +50,17 @@ function install_cocoa_pods {
   elif [[ "$(uname)" == "Linux" ]]; then
     os="linux"
   else
-    echo "Unsupported operating system: $(uname)"
+    # echo "Unsupported operating system: $(uname)"
     return 1
   fi
 
 	if [ "$os" != "darwin" ]; then
-		echo "CocoaPods is only available on MacOS"
+		# echo "CocoaPods is only available on MacOS"
 		return 1
 	fi
 
   if ! command -v brew >/dev/null 2>&1; then
-    echo "Homebrew is not installed. Please install Homebrew first."
+    # echo "Homebrew is not installed. Please install Homebrew first."
     return 1
   fi
 
@@ -72,8 +68,6 @@ function install_cocoa_pods {
     echo "Installing CocoaPods"
     brew install cocoapods
     echo "CocoaPods installed successfully"
-  else
-    echo "Skipped installing CocoaPods, it is already installed"
   fi
 }
 
@@ -98,7 +92,7 @@ function install_flutter {
 
   # Check if the OS parameter is valid
   if [[ "$os" != "linux" && "$os" != "darwin" ]]; then
-    echo "Invalid OS specified. Use 'linux' or 'darwin'."
+    # echo "Invalid OS specified. Use 'linux' or 'darwin'."
     return 1
   fi
 
@@ -114,7 +108,7 @@ function install_flutter {
   esac
 
 	if [ -d "$install_dir/bin" ]; then
-		echo "Flutter is already installed"
+		# echo "Flutter is already installed"
 		return 0
 	fi
 
@@ -176,8 +170,6 @@ function install_theme_manager {
     $HOME/.local/bin/base16-manager install nicodebo/base16-fzf
 
     $HOME/.local/bin/base16-manager set ocean
-	else
-		echo "Base16 theme manager is already installed"
   fi
 }
 
