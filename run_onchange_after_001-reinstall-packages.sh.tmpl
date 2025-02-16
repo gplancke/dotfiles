@@ -16,6 +16,11 @@ function install_bins() {
 
 install_bins
 
+if [ ! -x "$(command -v brew)" ]; then
+	echo "No brew found, ...skipping"
+	exit 0
+fi
+
 brew bundle --no-lock --file=/dev/stdin <<EOF
 {{ range .packages.darwin.brews -}}
 brew {{ . | quote }}
@@ -31,6 +36,15 @@ exit 0
 
 install_bins
 
+{{ range .packages.linux.apt -}}
+sudo apt install -y {{ . | quote }}
+{{ end -}}
+
+if [ ! -x "$(command -v brew)" ]; then
+	echo "No brew found, ...skipping"
+	exit 0
+fi
+
 brew bundle --no-lock --file=/dev/stdin <<EOF
 {{ range .packages.linux.brews -}}
 brew {{ . | quote }}
@@ -39,10 +53,6 @@ brew {{ . | quote }}
 cask {{ . | quote }}
 {{ end -}}
 EOF
-
-{{ range .packages.linux.apt -}}
-sudo apt install -y {{ . | quote }}
-{{ end -}}
 
 exit 0
 
