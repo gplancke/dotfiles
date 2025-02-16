@@ -57,7 +57,7 @@ local tst_configs = require('nvim-treesitter.configs')
 local tst_context = require('treesitter-context')
 
 pcall(tst_install.update { with_sync = true })
-tst_install.compilers = { "gcc-14" }
+tst_install.compilers = { "gcc" }
 tst_context.setup{
 	enable = true, -- Enable this plugin (Can be enabled/disabled later via commands)
 	max_lines = 0, -- How many lines the window should span. Values <= 0 mean no limit.
@@ -87,7 +87,6 @@ tst_configs.setup {
 		'rust',
 		'tsx',
 		'typescript',
-		'help',
 		'vim',
 		'javascript',
 		'svelte',

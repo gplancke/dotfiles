@@ -20,7 +20,7 @@ return {
 		vuels = {},
 		prismals = {},
 		-- tailwindcss = {},
-		gopls = {},
+		-- gopls = {},
 		dartls = {
 			-- root_dir = require('lspconfig').util.root_pattern("pubspec.yaml"),
 			cmd = { "dart", "language-server", "--protocol=lsp" },
