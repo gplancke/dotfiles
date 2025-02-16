@@ -132,6 +132,8 @@ function setup_link() {
 	local cli_plugins="$HOME/.docker/cli-plugins"
 	local bin="$1"
 
+	mkdir -p $cli_plugins
+
 	if which $bin >/dev/null 2>&1 && [ ! -L "$cli_plugins/$bin" ]; then
 		local bin_path=$(which $bin)
 		ln -sf $(which "$bin") "$cli_plugins/$bin"
