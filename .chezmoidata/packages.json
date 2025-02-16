@@ -5,7 +5,7 @@
 				"git",
 				"curl",
 				"libiconv",
-				"imagmagick"
+				"imagemagick"
 			],
 			"casks": [
 				"bitwarden",
