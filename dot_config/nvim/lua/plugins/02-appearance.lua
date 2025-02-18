@@ -2,6 +2,7 @@ return {
 	{
 		-- Status line
 		'nvim-lualine/lualine.nvim',
+		event = "VeryLazy",
 		dependencies = {
 			'SmiteshP/nvim-navic',
 			'f-person/git-blame.nvim',
@@ -14,6 +15,7 @@ return {
 	{
 		-- Colorscheme
 		'catppuccin/nvim',
+		lazy = true,
 		name = 'catppuccin'
 	},
 -- {

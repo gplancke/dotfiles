@@ -4,6 +4,10 @@ return {
 		'gpanders/editorconfig.nvim',
 	},
 	{
+		-- Set Root at the right spot based on key files
+		'notjedi/nvim-rooter.lua',
+	},
+	{
 		-- Autocompletion
 		'hrsh7th/nvim-cmp',
 		dependencies = {
@@ -78,20 +82,14 @@ return {
 	{
 		-- Highlight, edit, and navigate code
 		'nvim-treesitter/nvim-treesitter',
+		event = "VeryLazy",
+    lazy = vim.fn.argc(-1) == 0, -- load treesitter early when opening a file from the cmdline
 		dependencies = {
 			-- add new text object to move faster
 			'nvim-treesitter/nvim-treesitter-textobjects',
 			-- Keep current code context on top (sticky)
 			'nvim-treesitter/nvim-treesitter-context',
 		},
-	},
-	{
-		-- Set Root at the right spot based on key files
-		'notjedi/nvim-rooter.lua',
-	},
-	{
-		-- Brings color cues to css
-		'norcalli/nvim-colorizer.lua',
 	},
 	{
 		"NeogitOrg/neogit",
@@ -110,6 +108,7 @@ return {
 	},
 	{
 		"folke/trouble.nvim",
+		event = "VeryLazy",
 	},
 	{
 		"zbirenbaum/copilot.lua",
@@ -141,6 +140,10 @@ return {
 			},
 		},
 	},
+	-- {
+	-- 	-- Brings color cues to css
+	-- 	'norcalli/nvim-colorizer.lua',
+	-- },
 	-- {
 	-- 	-- Dart and Flutter
 	-- 	"nvim-flutter/flutter-tools.nvim"

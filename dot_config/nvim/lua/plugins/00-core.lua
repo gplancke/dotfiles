@@ -4,12 +4,13 @@ return {
 		'alexghergh/nvim-tmux-navigation',
 	},
 	{
-		-- lazy.nvim
-		"folke/noice.nvim",
+		-- Multi cursors
+		'mg979/vim-visual-multi',
+	},
+	{
+		"kylechui/nvim-surround",
+		version = "*", -- Use for stability; omit to use `main` branch for the latest features
 		event = "VeryLazy",
-		dependencies = {
-			"MunifTanjim/nui.nvim",
-		}
 	},
 	{
 		"folke/snacks.nvim",
@@ -19,7 +20,16 @@ return {
 	{
 		-- pack of niceties
 		'echasnovski/mini.nvim',
+		event = "VeryLazy",
 		version = false,
+	},
+	{
+		-- lazy.nvim
+		"folke/noice.nvim",
+		event = "VeryLazy",
+		dependencies = {
+			"MunifTanjim/nui.nvim",
+		}
 	},
 	{
 		-- Fuzzy Finder (files, lsp, etc)
@@ -57,16 +67,8 @@ return {
 		},
 	},
 	{
-		"kylechui/nvim-surround",
-		version = "*", -- Use for stability; omit to use `main` branch for the latest features
-		event = "VeryLazy",
-	},
-	{
-		-- Multi cursors
-		'mg979/vim-visual-multi',
-	},
-	{
 		"jiaoshijie/undotree",
+		event = "VeryLazy",
 		dependencies = "nvim-lua/plenary.nvim",
 	},
 	{
@@ -77,6 +79,7 @@ return {
 	{
 		-- Useful plugin to show you pending keybinds.
 		'folke/which-key.nvim',
+		event = "VeryLazy",
 		opts = {}
 	},
 	--
@@ -90,9 +93,11 @@ return {
 	},
 	{
 		'ThePrimeagen/harpoon',
+		event = "VeryLazy",
 	},
 	{
 		"3rd/image.nvim",
+		event = "VeryLazy",
 		build = false
 	}
 	-- {

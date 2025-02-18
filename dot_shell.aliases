@@ -221,7 +221,7 @@ tmux_kill_all() {
 ################################################################################
 
 work_on() {
-	workspace=$(find ~/Workspace/Projects -mindepth 1 -maxdepth 3 -type d -name ".git" -exec dirname {} \; | fzf-tmux -q $1)
+	workspace=$(find ~/Workspace/Projects -mindepth 1 -maxdepth 3 -type d -name ".git" -exec dirname {} \; | fzf-tmux -q ${1:-""})
 
 	if [ ! -z "$workspace" ]; then
 		lastname=$(basename "$workspace")
