@@ -1,5 +1,11 @@
 return {
   {
+    "mg979/vim-visual-multi",
+  },
+  {
+    "gpanders/editorconfig.nvim",
+  },
+  {
     "alexghergh/nvim-tmux-navigation",
     config = function()
       require("nvim-tmux-navigation").setup({
@@ -7,69 +13,61 @@ return {
       })
     end,
   },
+  -- {
+  --   "notjedi/nvim-rooter.lua",
+  --   opts = {
+  --     rooter_patterns = { ".git", ".hg", ".svn" },
+  --     trigger_patterns = { "*" },
+  --     manual = false,
+  --   },
+  -- },
   {
-    "mg979/vim-visual-multi",
+    "sindrets/diffview.nvim",
+    event = "VeryLazy",
   },
   {
-    "gpanders/editorconfig.nvim",
-  },
-  {
-    "notjedi/nvim-rooter.lua",
-  },
-  {
-    "catppuccin/nvim",
-    lazy = true,
-    name = "catppuccin",
-    opts = {
-      flavour = "frappe",
-      integrations = {
-        aerial = true,
-        alpha = true,
-        cmp = true,
-        dashboard = true,
-        flash = true,
-        fzf = true,
-        grug_far = true,
-        gitsigns = true,
-        headlines = true,
-        illuminate = true,
-        indent_blankline = { enabled = true },
-        leap = true,
-        lsp_trouble = true,
-        mason = true,
-        markdown = true,
-        mini = true,
-        native_lsp = {
-          enabled = true,
-          underlines = {
-            errors = { "undercurl" },
-            hints = { "undercurl" },
-            warnings = { "undercurl" },
-            information = { "undercurl" },
-          },
-        },
-        navic = { enabled = true, custom_bg = "lualine" },
-        neotest = true,
-        neotree = true,
-        noice = true,
-        notify = true,
-        semantic_tokens = true,
-        snacks = true,
-        telescope = true,
-        treesitter = true,
-        treesitter_context = true,
-        which_key = true,
+    "yetone/avante.nvim",
+    event = "VeryLazy",
+    lazy = false,
+    version = false,
+    build = "make",
+    -- build = "powershell -ExecutionPolicy Bypass -File Build.ps1 -BuildFromSource false"
+    dependencies = {
+      {
+        "nvim-treesitter/nvim-treesitter",
+        event = "VeryLazy",
+      },
+      {
+        "stevearc/dressing.nvim",
+        event = "VeryLazy",
+      },
+      {
+        "nvim-lua/plenary.nvim",
+        event = "VeryLazy",
+      },
+      {
+        -- UI tools
+        "MunifTanjim/nui.nvim",
+        event = "VeryLazy",
+      },
+      {
+        -- support for image pasting
+        "HakonHarnes/img-clip.nvim",
+        event = "VeryLazy",
+      },
+      {
+        -- Make sure to set this up properly if you have lazy=true
+        "MeanderingProgrammer/render-markdown.nvim",
+        event = "VeryLazy",
+        ft = { "markdown", "Avante" },
       },
     },
-    specs = {
-      {
-        "akinsho/bufferline.nvim",
-        optional = true,
-        opts = function(_, opts)
-          if (vim.g.colors_name or ""):find("catppuccin") then
-            opts.highlights = require("catppuccin.groups.integrations.bufferline").get()
-          end
-        end,
+    opts = {
+      provider = "claude",
+      mappings = {
+        ask = "<leader>ia", -- ask
+        edit = "<leader>ie", -- edit
+        refresh = "<leader>ir", -- refresh
       },
     },
   },
