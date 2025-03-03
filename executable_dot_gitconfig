@@ -19,7 +19,7 @@
   renameLimit = 10000
   algorithm = patience
 [difftool]
-  tool = nvimdiff
+  tool = nvimdiffview
   prompt = false
 [difftool "vscode"]
   cmd = code --wait --diff $LOCAL $REMOTE
