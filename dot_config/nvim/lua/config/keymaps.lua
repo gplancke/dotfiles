@@ -16,3 +16,9 @@ map("n", "<C-h>", nvim_tmux_nav.NvimTmuxNavigateLeft)
 map("n", "<C-j>", nvim_tmux_nav.NvimTmuxNavigateDown)
 map("n", "<C-k>", nvim_tmux_nav.NvimTmuxNavigateUp)
 map("n", "<C-l>", nvim_tmux_nav.NvimTmuxNavigateRight)
+
+-- Terminal management is done via tmux when in a tmux session
+if vim.env.TMUX then
+  vim.keymap.del({ "n", "t" }, "<c-/>")
+  vim.keymap.del({ "n", "t" }, "<c-_>")
+end

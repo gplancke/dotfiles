@@ -23,47 +23,51 @@ return {
   -- },
   {
     "sindrets/diffview.nvim",
-    event = "VeryLazy",
   },
   {
     "yetone/avante.nvim",
     event = "VeryLazy",
-    lazy = false,
+    lazy = true,
     version = false,
     build = "make",
     -- build = "powershell -ExecutionPolicy Bypass -File Build.ps1 -BuildFromSource false"
     dependencies = {
       {
         "nvim-treesitter/nvim-treesitter",
-        event = "VeryLazy",
       },
       {
         "stevearc/dressing.nvim",
-        event = "VeryLazy",
       },
       {
         "nvim-lua/plenary.nvim",
-        event = "VeryLazy",
       },
       {
         -- UI tools
         "MunifTanjim/nui.nvim",
-        event = "VeryLazy",
       },
       {
         -- support for image pasting
         "HakonHarnes/img-clip.nvim",
-        event = "VeryLazy",
       },
       {
         -- Make sure to set this up properly if you have lazy=true
         "MeanderingProgrammer/render-markdown.nvim",
-        event = "VeryLazy",
-        ft = { "markdown", "Avante" },
+        ft = { "markdown", "Avante", "AvanteInput" },
       },
     },
     opts = {
       provider = "claude",
+      claude = {
+        model = "claude-3-7-sonnet-20250219",
+        endpoint = "https://api.anthropic.com",
+        temperature = 1,
+        max_tokens = 8192,
+        thinking = {
+          type = "enabled",
+          budget_tokens = 2048,
+        },
+        -- disabled_tools = { "python" },
+      },
       mappings = {
         ask = "<leader>ia", -- ask
         edit = "<leader>ie", -- edit

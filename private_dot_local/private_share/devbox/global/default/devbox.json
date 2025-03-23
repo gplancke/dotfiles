@@ -53,7 +53,8 @@
     "sq@latest",
     "aider-chat@latest",
     "bun@latest",
-    "gcc@latest"
+    "gcc@latest",
+    "claude-code@latest"
   ],
   "shell": {
     "init_hook": [

@@ -1,5 +1,40 @@
 return {
   {
+    "saghen/blink.cmp",
+    dependencies = {
+      "Kaiser-Yang/blink-cmp-avante",
+    },
+    opts = function(_, opts)
+      opts.enabled = function()
+        local constants = require("config.custom.constants")
+        return not vim.tbl_contains(constants.excluded_filetypes, vim.bo.filetype)
+          and vim.bo.buftype ~= "prompt"
+          and vim.b.completion ~= false
+      end
+
+      opts.keymap = {
+        preset = "default",
+        ["<C-n>"] = { "show", "select_next", "fallback" },
+        ["<Tab>"] = { "snippet_forward", "select_and_accept", "fallback" },
+        ["<C-space>"] = {
+          function(cmp)
+            cmp.show({ providers = { "supermaven" } })
+          end,
+        },
+      }
+
+      -- table.insert(opts.sources.default, "avante")
+      -- table.insert(opts.sources.providers, {
+      --   avante = {
+      --     module = "blink-cmp-avante",
+      --     name = "Avante",
+      --   },
+      -- })
+
+      return opts
+    end,
+  },
+  {
     "catppuccin/nvim",
     lazy = true,
     name = "catppuccin",
@@ -56,10 +91,6 @@ return {
       -- Integration with catppuccin
       if (vim.g.colors_name or ""):find("catppuccin") then
         opts.highlights = require("catppuccin.groups.integrations.bufferline").get()
-      end
-
-      for key, value in pairs(opts.options) do
-        print("Options", key, value)
       end
 
       return opts
