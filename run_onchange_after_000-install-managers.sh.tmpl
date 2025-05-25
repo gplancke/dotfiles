@@ -43,7 +43,7 @@ function install_nix {
 
   if [ ! -d "$HOME/.nix-profile" ]; then
 		echo "Installing Nix"
-		curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
+		curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install --no-confirm
 
 	  [ -f "$HOME/.nix-profile/etc/profile.d/nix.sh" ] && \
 			source $HOME/.nix-profile/etc/profile.d/nix.sh
