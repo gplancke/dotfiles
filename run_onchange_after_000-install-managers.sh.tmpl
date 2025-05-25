@@ -12,24 +12,38 @@ DISTRO="ubuntu"
 # We tend to use nix instead
 #############################################
 
-function install_brew {
-  local osType=$1
+install_brew() {
+  local os_type="$1"
+  local installer_url="https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh"
+  local brew_bin
 
-  if [ "$osType" = "darwin" ]; then
-		if [ ! -d "/opt/homebrew" ]; then
-			curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh | bash
-			eval "$(/opt/homebrew/bin/brew shellenv)"
-		else
-			echo "Homebrew is already installed"
-		fi
+  # If brew already exists, bail out
+  if command -v brew >/dev/null 2>&1; then
+    printf 'Homebrew is already installed (%s)\n' "$(command -v brew)"
+    return 0
+  fi
+
+  printf 'Installing Homebrew...\n'
+  curl -fsSL "$installer_url" | bash
+
+  # Determine where brew was installed
+  if [ "$os_type" = "darwin" ]; then
+    brew_bin="/opt/homebrew/bin/brew"
   else
-		if [ ! -d "/home/linuxbrew/.linuxbrew" ] && [ ! -d "~/.linuxbrew" ]; then
-			curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh | bash
-			[ -d "/home/linuxbrew/.linuxbrew/bin" ] && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-			[ ! -d "/home/linuxbrew/.linuxbrew/bin" ] && [ -d "~/.linuxbrew/bin" ] && eval "$(~/.linuxbrew/bin/brew shellenv)"
-		else
-			echo "Linuxbrew is already installed"
-		fi
+    if [ -d "/home/linuxbrew/.linuxbrew" ]; then
+      brew_bin="/home/linuxbrew/.linuxbrew/bin/brew"
+    else
+      brew_bin="$HOME/.linuxbrew/bin/brew"
+    fi
+  fi
+
+  # Load brew into the current shell, or error out
+  if [ -x "$brew_bin" ]; then
+    eval "$("$brew_bin" shellenv)"
+    printf 'Homebrew installed and initialized: %s\n' "$brew_bin"
+  else
+    printf 'Error: brew not found after installation\n' >&2
+    return 1
   fi
 }
 
@@ -38,35 +52,52 @@ function install_brew {
 # On darwin, we add the nix-darwin util
 #############################################
 
-function install_nix {
-  local osType=$1
+install_nix() {
+  local os_type=$1
+  local nix_profile="$HOME/.nix-profile"
+  local installer_url="https://install.determinate.systems/nix"
+  local uninstall_script="$HOME/.local/bin/nix-uninstall"
 
-  if [ ! -d "$HOME/.nix-profile" ]; then
-		echo "Installing Nix"
-		curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install --no-confirm
+  # If Nix isn’t already installed…
+  if [ ! -d "$nix_profile" ]; then
+    printf 'Installing Nix via %s\n' "$installer_url"
+    curl --proto '=https' --tlsv1.2 -sSfL "$installer_url" | sh -s -- install --no-confirm
 
-	  [ -f "$HOME/.nix-profile/etc/profile.d/nix.sh" ] && \
-			source $HOME/.nix-profile/etc/profile.d/nix.sh
-		[ -f "/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh" ] && \
-			source /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+    # Load Nix environment
+    if [ -f "$nix_profile/etc/profile.d/nix.sh" ]; then
+      # shellcheck source=/dev/null
+      . "$nix_profile/etc/profile.d/nix.sh"
+    fi
+    if [ -f "/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh" ]; then
+      # shellcheck source=/dev/null
+      . "/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh"
+    fi
 
-		mkdir -p $HOME/.local/bin
-		cat > $HOME/.local/bin/nix-uninstall << _EOF
-#!/bin/bash
-
+    # Create uninstall helper
+    mkdir -p "$HOME/.local/bin"
+    cat > "$uninstall_script" << 'EOF'
+#!/usr/bin/env bash
 /nix/nix-installer uninstall
-_EOF
-		chmod +x $HOME/.local/bin/nix-uninstall
+EOF
+    chmod +x "$uninstall_script"
 
-	  if [ "$osType" = "darwin" ]; then
-	    source $HOME/.nix-profile/etc/profile.d/nix.sh
-			nix-build https://github.com/LnL7/nix-darwin/archive/master.tar.gz -A installer
-			./result/bin/darwin-installer
-			cp ./result/bin/darwin-uninstaller $HOME/.local/bin
-			rm -rf ./result/bin
-	  fi
-	else
-		echo "Nix is already installed"
+    # macOS-specific: install nix-darwin
+    if [ "$os_type" = "darwin" ]; then
+      printf 'Setting up nix-darwin for macOS\n'
+      # Ensure Nix env is loaded again
+      # shellcheck source=/dev/null
+      . "$nix_profile/etc/profile.d/nix.sh"
+
+      local tmpdir
+      tmpdir=$(mktemp -d)
+      nix-build https://github.com/LnL7/nix-darwin/archive/master.tar.gz -A installer --out-link "$tmpdir/result"
+      "$tmpdir/result/bin/darwin-installer"
+      cp "$tmpdir/result/bin/darwin-uninstaller" "$HOME/.local/bin/"
+      rm -rf "$tmpdir"
+    fi
+
+  else
+    printf 'Nix is already installed at %s\n' "$nix_profile"
   fi
 }
 
@@ -74,40 +105,46 @@ _EOF
 # Install essential tooling
 #############################################
 
-function install_essentials() {
-  local distro="$1"
+install_essentials() {
+  local distro=$1
+  local home="$HOME"
+  local local_dir="$home/.local"
+  local workspace="$home/Workspace/Projects"
 
-  # On Mac we must disable tls check for git temporarily
-  hash git 2>/dev/null && git config --global http.sslVerify false
+  # Temporarily disable Git’s SSL check on macOS
+  if [ "$distro" = "darwin" ] && command -v git >/dev/null 2>&1; then
+    git config --global http.sslVerify false
+  fi
 
-	# Creating needed directories
-  mkdir -p $HOME/.local/{bin,share,etc,src}
-  mkdir -p $HOME/.local/share/{node_modules,python_packages,gems,pnpm}
-  mkdir -p $HOME/Workspace/Projects
+  # Create required directories
+  mkdir -p \
+    "$local_dir"/{bin,share,etc,src} \
+    "$local_dir/share"/{node_modules,python_packages,gems,pnpm} \
+    "$workspace"
 
-	# Install brew and Nix
-  case $distro in
-    "ubuntu" | "debian")
-      sudo apt update -y
-      sudo apt upgrade -y
-      sudo apt install -y build-essential curl git zsh fonts-hack-ttf
+  case "$distro" in
+    ubuntu|debian)
+      printf 'Updating APT and installing essentials...\n'
+      sudo apt-get update -y && sudo apt-get upgrade -y
+      sudo apt-get install -y \
+        build-essential curl git zsh fonts-hack-ttf
       ;;
-    "darwin")
-      brew install openssl zsh
-      brew install font-hack-nerd-font
-
-      # Install a working version of cocoapods
-      # brew uninstall --force ruby
-      # arch -x86_64 gem install ffi
-      # arch -x86_64 gem install cocoapods
+    darwin)
+      printf 'Installing essentials via Homebrew...\n'
+      brew install openssl zsh font-hack-nerd-font
       ;;
     *)
-      echo "Not supported right now"
+      printf 'Error: unsupported distribution "%s"\n' "$distro"
+      return 1
       ;;
   esac
 
-  hash git 2>/dev/null && git config --global http.sslVerify true
-  echo "Done installing. You should login and logout again"
+  # Re-enable Git’s SSL check if Git is present
+  if command -v git >/dev/null 2>&1; then
+    git config --global http.sslVerify true
+  fi
+
+  printf 'Done. Please log out and back in for changes to take effect.\n'
 }
 
 #############################################
