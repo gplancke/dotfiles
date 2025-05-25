@@ -69,7 +69,7 @@ export PATH="/Users/georgio/.codeium/windsurf/bin:$PATH"
 # ##############################
 # Launch tmux
 # ##############################
-if [ -z "$TMUX" ]; then
+if [[ -z "$TMUX" ]] && [[ "$TERM_PROGRAM" != "vscode" ]] && [[ "$TERM_PROGRAM" != "cursor" ]]; then
 	tm main
 fi
 

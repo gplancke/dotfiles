@@ -1,4 +1,5 @@
 # [Created by task 2.6.2 3/23/2025 16:56:38]
+verbose=yes
 # Taskwarrior program configuration file.
 # For more documentation, see https://taskwarrior.org or try 'man task', 'man task-color',
 # 'man task-sync' or 'man taskrc'
@@ -22,6 +23,10 @@ data.location=/Users/georgio/.task
 
 #data.location=~/.local/share/task
 #hooks.location=~/.config/task/hooks
+#
+sync.server.url=http://100.92.184.86:9090
+sync.server.client_id=30a84303-316e-4374-b351-cef58d838653
+sync.encryption_secret=j_aime_les_raviolis_en_boite
 
 # Color theme (uncomment one to use)
 #include light-16.theme
@@ -39,3 +44,4 @@ data.location=/Users/georgio/.task
 #include solarized-light-256.theme
 #include no-color.theme
 
+news.version=3.4.1

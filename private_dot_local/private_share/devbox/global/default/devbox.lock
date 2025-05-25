@@ -113,6 +113,44 @@
         }
       }
     },
+    "apktool@latest": {
+      "last_modified": "2025-03-23T05:31:05Z",
+      "resolved": "github:NixOS/nixpkgs/dd613136ee91f67e5dba3f3f41ac99ae89c5406b#apktool",
+      "source": "devbox-search",
+      "version": "2.11.1",
+      "systems": {
+        "aarch64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/aljxi559vmi0mviv7jxj261f60jvczb1-apktool-2.11.1",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/aljxi559vmi0mviv7jxj261f60jvczb1-apktool-2.11.1"
+        },
+        "x86_64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/954yj153jmv3pdabkdphx2rmwqpz7m46-apktool-2.11.1",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/954yj153jmv3pdabkdphx2rmwqpz7m46-apktool-2.11.1"
+        },
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/rrkbqjd1sh23nazpmwy87b4bishzj0g2-apktool-2.11.1",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/rrkbqjd1sh23nazpmwy87b4bishzj0g2-apktool-2.11.1"
+        }
+      }
+    },
     "bat@latest": {
       "last_modified": "2024-05-22T06:18:38Z",
       "resolved": "github:NixOS/nixpkgs/3f316d2a50699a78afe5e77ca486ad553169061e#bat",
@@ -754,6 +792,70 @@
             }
           ],
           "store_path": "/nix/store/qp4q53m4cm9y6kjzq06qcayb4icdipb3-fossil-2.23"
+        }
+      }
+    },
+    "frida-tools@latest": {
+      "last_modified": "2025-03-11T17:52:14Z",
+      "resolved": "github:NixOS/nixpkgs/0d534853a55b5d02a4ababa1d71921ce8f0aee4c#frida-tools",
+      "source": "devbox-search",
+      "version": "13.6.1",
+      "systems": {
+        "aarch64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/5946fh811kq2hc23w44va90w8krrnhqr-frida-tools-13.6.1",
+              "default": true
+            },
+            {
+              "name": "dist",
+              "path": "/nix/store/pq2cmwrsdc5gz6gk95gnkzsg384681jc-frida-tools-13.6.1-dist"
+            }
+          ],
+          "store_path": "/nix/store/5946fh811kq2hc23w44va90w8krrnhqr-frida-tools-13.6.1"
+        },
+        "aarch64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/lkzmqg2zp0p6jfn1id0c2j27x50rlcv3-frida-tools-13.6.1",
+              "default": true
+            },
+            {
+              "name": "dist",
+              "path": "/nix/store/3i8zphgbww0j2766d4c5sm9cpl721ifm-frida-tools-13.6.1-dist"
+            }
+          ],
+          "store_path": "/nix/store/lkzmqg2zp0p6jfn1id0c2j27x50rlcv3-frida-tools-13.6.1"
+        },
+        "x86_64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/ril39kghzsrcl7f7xnq1mr3j3rcanp7n-frida-tools-13.6.1",
+              "default": true
+            },
+            {
+              "name": "dist",
+              "path": "/nix/store/myy9sclg36jlib34zk2ss4bdfac51l74-frida-tools-13.6.1-dist"
+            }
+          ],
+          "store_path": "/nix/store/ril39kghzsrcl7f7xnq1mr3j3rcanp7n-frida-tools-13.6.1"
+        },
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/lr9ywzwirmlh19lc6b5pzhzya6f7lryc-frida-tools-13.6.1",
+              "default": true
+            },
+            {
+              "name": "dist",
+              "path": "/nix/store/qxkzkyfh3jjvr95fghhljg8bh3mfr0c6-frida-tools-13.6.1-dist"
+            }
+          ],
+          "store_path": "/nix/store/lr9ywzwirmlh19lc6b5pzhzya6f7lryc-frida-tools-13.6.1"
         }
       }
     },
@@ -2541,6 +2643,102 @@
             }
           ],
           "store_path": "/nix/store/5fyfyvp22k4nv3370mrjd6pwislskg56-starship-1.19.0"
+        }
+      }
+    },
+    "taskwarrior-tui@latest": {
+      "last_modified": "2025-03-11T17:52:14Z",
+      "resolved": "github:NixOS/nixpkgs/0d534853a55b5d02a4ababa1d71921ce8f0aee4c#taskwarrior-tui",
+      "source": "devbox-search",
+      "version": "0.26.3",
+      "systems": {
+        "aarch64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/6hkn1iaw5xizs686vk2p5b060j35rm4w-taskwarrior-tui-0.26.3",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/6hkn1iaw5xizs686vk2p5b060j35rm4w-taskwarrior-tui-0.26.3"
+        },
+        "aarch64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/s1nax4ddy0fxr2avfn1m8lcgr9hxr93l-taskwarrior-tui-0.26.3",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/s1nax4ddy0fxr2avfn1m8lcgr9hxr93l-taskwarrior-tui-0.26.3"
+        },
+        "x86_64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/7217fbys1kkmqifh5rlkhgkdhj0sxzy4-taskwarrior-tui-0.26.3",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/7217fbys1kkmqifh5rlkhgkdhj0sxzy4-taskwarrior-tui-0.26.3"
+        },
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/mxan0k2jlaqj8vip08zrlb214czw7zjb-taskwarrior-tui-0.26.3",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/mxan0k2jlaqj8vip08zrlb214czw7zjb-taskwarrior-tui-0.26.3"
+        }
+      }
+    },
+    "taskwarrior3@latest": {
+      "last_modified": "2025-03-17T10:12:08Z",
+      "resolved": "github:NixOS/nixpkgs/096478927c360bc18ea80c8274f013709cf7bdcd#taskwarrior3",
+      "source": "devbox-search",
+      "version": "3.4.1",
+      "systems": {
+        "aarch64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/rb33kvbiib885a2gjazncwxz1239znn7-taskwarrior-3.4.1",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/rb33kvbiib885a2gjazncwxz1239znn7-taskwarrior-3.4.1"
+        },
+        "aarch64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/hylacfgznw3h2m14lqhvpxcggylcxkj3-taskwarrior-3.4.1",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/hylacfgznw3h2m14lqhvpxcggylcxkj3-taskwarrior-3.4.1"
+        },
+        "x86_64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/jig37xmhmr9kasqyd0bnnc5dbcmzfhph-taskwarrior-3.4.1",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/jig37xmhmr9kasqyd0bnnc5dbcmzfhph-taskwarrior-3.4.1"
+        },
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/c994rhvz7nf6zr02ygnzs0ly1hxrahw2-taskwarrior-3.4.1",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/c994rhvz7nf6zr02ygnzs0ly1hxrahw2-taskwarrior-3.4.1"
         }
       }
     },

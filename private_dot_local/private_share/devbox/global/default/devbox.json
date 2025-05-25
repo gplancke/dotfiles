@@ -54,7 +54,11 @@
     "aider-chat@latest",
     "bun@latest",
     "gcc@latest",
-    "claude-code@latest"
+    "claude-code@latest",
+    "taskwarrior-tui@latest",
+    "taskwarrior3@latest",
+    "apktool@latest",
+    "frida-tools@latest"
   ],
   "shell": {
     "init_hook": [
