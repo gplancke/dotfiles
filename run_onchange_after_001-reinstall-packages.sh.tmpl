@@ -1,16 +1,24 @@
 #!/bin/bash
 
-function install_bins() {
-	if [ hash nix-env 2>/dev/null -a -f $HOME/.env.nix ]; then
-		echo "Installing nix environment"
-		nix-env -ir -f $HOME/.env.nix
-	fi
+install_bins() {
+  local nix_file="$HOME/.env.nix"
 
-	if [ hash devbox 2>/dev/null -a -f "$(devbox global path)/devbox.json" ]; then
-		echo "Installing devbox environment"
-		eval "$(devbox global shellenv)"
-		devbox global install
-	fi
+  # Nix
+  if command -v nix-env >/dev/null 2>&1 && [ -f "$nix_file" ]; then
+    printf 'Installing Nix environment from %s\n' "$nix_file"
+    nix-env -irf "$nix_file"
+  fi
+
+  # Devbox
+  if command -v devbox >/dev/null 2>&1; then
+    local db_path
+    db_path="$(devbox global path)"
+    if [ -f "$db_path/devbox.json" ]; then
+      printf 'Installing Devbox environment from %s/devbox.json\n' "$db_path"
+      eval "$(devbox global shellenv)"
+      devbox global install
+    fi
+  fi
 }
 
 {{ if eq .chezmoi.os "darwin" -}}
