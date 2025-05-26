@@ -101,6 +101,14 @@ EOF
   fi
 }
 
+install_devbox() {
+	if [ ! command -v devbox >/dev/null 2>&1 ]; then
+		curl -fsSL https://get.jetify.com/devbox | bash
+	else
+		printf 'Devbox is already installed.\n'
+	fi
+}
+
 #############################################
 # Install essential tooling
 #############################################
@@ -152,6 +160,7 @@ install_essentials() {
 #############################################
 install_brew $DISTRO
 install_nix $DISTRO
+install_devbox $DISTRO
 
 install_essentials $DISTRO
 
