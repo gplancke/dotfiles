@@ -16,7 +16,6 @@ let
       # pinned.nix
       pinned.cacert
       pinned.nix-diff
-			pinned.devbox
 
 			##### SHELLS
       pinned.bash
