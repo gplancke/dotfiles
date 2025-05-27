@@ -113,44 +113,6 @@
         }
       }
     },
-    "apktool@latest": {
-      "last_modified": "2025-03-23T05:31:05Z",
-      "resolved": "github:NixOS/nixpkgs/dd613136ee91f67e5dba3f3f41ac99ae89c5406b#apktool",
-      "source": "devbox-search",
-      "version": "2.11.1",
-      "systems": {
-        "aarch64-darwin": {
-          "outputs": [
-            {
-              "name": "out",
-              "path": "/nix/store/aljxi559vmi0mviv7jxj261f60jvczb1-apktool-2.11.1",
-              "default": true
-            }
-          ],
-          "store_path": "/nix/store/aljxi559vmi0mviv7jxj261f60jvczb1-apktool-2.11.1"
-        },
-        "x86_64-darwin": {
-          "outputs": [
-            {
-              "name": "out",
-              "path": "/nix/store/954yj153jmv3pdabkdphx2rmwqpz7m46-apktool-2.11.1",
-              "default": true
-            }
-          ],
-          "store_path": "/nix/store/954yj153jmv3pdabkdphx2rmwqpz7m46-apktool-2.11.1"
-        },
-        "x86_64-linux": {
-          "outputs": [
-            {
-              "name": "out",
-              "path": "/nix/store/rrkbqjd1sh23nazpmwy87b4bishzj0g2-apktool-2.11.1",
-              "default": true
-            }
-          ],
-          "store_path": "/nix/store/rrkbqjd1sh23nazpmwy87b4bishzj0g2-apktool-2.11.1"
-        }
-      }
-    },
     "bat@latest": {
       "last_modified": "2024-05-22T06:18:38Z",
       "resolved": "github:NixOS/nixpkgs/3f316d2a50699a78afe5e77ca486ad553169061e#bat",
