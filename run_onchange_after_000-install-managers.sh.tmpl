@@ -148,10 +148,10 @@ EOF
 }
 
 install_devbox() {
-	if [ ! command -v devbox >/dev/null 2>&1 ]; then
-		curl -fsSL https://get.jetify.com/devbox | bash
-	else
+	if command -v devbox >/dev/null 2>&1; then
 		printf 'Devbox is already installed.\n'
+	else
+		curl -fsSL https://get.jetify.com/devbox | bash
 	fi
 }
 
