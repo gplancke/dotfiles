@@ -7,6 +7,52 @@ DISTRO="ubuntu"
 {{- end }}
 
 #############################################
+# Install essential tooling
+#############################################
+
+install_essentials() {
+  local distro=$1
+  local home="$HOME"
+  local local_dir="$home/.local"
+  local workspace="$home/Workspace/Projects"
+
+  # Temporarily disable Git’s SSL check on macOS
+  if [ "$distro" = "darwin" ] && command -v git >/dev/null 2>&1; then
+    git config --global http.sslVerify false
+  fi
+
+  # Create required directories
+  mkdir -p \
+    "$local_dir"/{bin,share,etc,src} \
+    "$local_dir/share"/{node_modules,python_packages,gems,pnpm} \
+    "$workspace"
+
+  case "$distro" in
+    ubuntu|debian)
+      printf 'Updating APT and installing essentials...\n'
+      sudo apt-get update -y && sudo apt-get upgrade -y
+      sudo apt-get install -y \
+        build-essential curl git zsh fonts-hack-ttf
+      ;;
+    darwin)
+      printf 'No essentials for macos...\n'
+      # brew install openssl zsh font-hack-nerd-font
+      ;;
+    *)
+      printf 'Error: unsupported distribution "%s"\n' "$distro"
+      return 1
+      ;;
+  esac
+
+  # Re-enable Git’s SSL check if Git is present
+  if command -v git >/dev/null 2>&1; then
+    git config --global http.sslVerify true
+  fi
+
+  printf 'Done. Please log out and back in for changes to take effect.\n'
+}
+
+#############################################
 # Installs homebrew on darwin and linux
 # On linux it installs linuxbrew
 # We tend to use nix instead
@@ -31,7 +77,7 @@ install_brew() {
     brew_bin="/opt/homebrew/bin/brew"
   else
     if [ -d "/home/linuxbrew/.linuxbrew" ]; then
-      brew_bin="/home/linuxbrew/.linuxbrew/bin/brew"
+      brew_bin="/home/linuxbrew/.linuxbrew/Homebrew"
     else
       brew_bin="$HOME/.linuxbrew/bin/brew"
     fi
@@ -110,10 +156,10 @@ install_devbox() {
 }
 
 #############################################
-# Install essential tooling
+# Install complement tooling
 #############################################
 
-install_essentials() {
+install_complements() {
   local distro=$1
   local home="$HOME"
   local local_dir="$home/.local"
@@ -124,21 +170,12 @@ install_essentials() {
     git config --global http.sslVerify false
   fi
 
-  # Create required directories
-  mkdir -p \
-    "$local_dir"/{bin,share,etc,src} \
-    "$local_dir/share"/{node_modules,python_packages,gems,pnpm} \
-    "$workspace"
-
   case "$distro" in
     ubuntu|debian)
-      printf 'Updating APT and installing essentials...\n'
-      sudo apt-get update -y && sudo apt-get upgrade -y
-      sudo apt-get install -y \
-        build-essential curl git zsh fonts-hack-ttf
+      printf 'no essentials left to install...\n'
       ;;
     darwin)
-      printf 'Installing essentials via Homebrew...\n'
+      printf 'Installing complements via Homebrew...\n'
       brew install openssl zsh font-hack-nerd-font
       ;;
     *)
@@ -158,10 +195,12 @@ install_essentials() {
 #############################################
 # Install them all
 #############################################
+install_essentials $DISTRO
+
 install_brew $DISTRO
 install_nix $DISTRO
 install_devbox $DISTRO
 
-install_essentials $DISTRO
+install_complements $DISTRO
 
 exit 0
