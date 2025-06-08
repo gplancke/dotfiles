@@ -12,7 +12,7 @@ load_nix() {
 }
 
 load_brew() {
-	local brew_bin = $1
+	local brew_bin=$1
 
   if [ -x "$brew_bin" ]; then
     eval "$("$brew_bin" shellenv)"
