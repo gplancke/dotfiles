@@ -36,7 +36,7 @@ install_essentials() {
       ;;
     darwin)
       printf 'No essentials for macos...\n'
-      # brew install openssl zsh font-hack-nerd-font
+      xcode-select --install || true
       ;;
     *)
       printf 'Error: unsupported distribution "%s"\n' "$distro"
@@ -110,14 +110,12 @@ install_nix() {
     curl --proto '=https' --tlsv1.2 -sSfL "$installer_url" | sh -s -- install --no-confirm
 
     # Load Nix environment
-    if [ -f "$nix_profile/etc/profile.d/nix.sh" ]; then
-      # shellcheck source=/dev/null
-      . "$nix_profile/etc/profile.d/nix.sh"
-    fi
-    if [ -f "/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh" ]; then
-      # shellcheck source=/dev/null
-      . "/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh"
-    fi
+		if [ -d "$nix_profile" ]; then
+			export NIX_PATH="$nix_profile/etc/nix:$NIX_PATH"
+			export PATH="$nix_profile/bin:$PATH"
+			export NIX_PROFILES="$nix_profile/profiles"
+			export NIX_USER_PROFILE_DIR="$nix_profile/profiles/per-user/$USER"
+		fi
 
     # Create uninstall helper
     mkdir -p "$HOME/.local/bin"
@@ -129,11 +127,6 @@ EOF
 
     # macOS-specific: install nix-darwin
     if [ "$os_type" = "darwin" ]; then
-      printf 'Setting up nix-darwin for macOS\n'
-      # Ensure Nix env is loaded again
-      # shellcheck source=/dev/null
-      . "$nix_profile/etc/profile.d/nix.sh"
-
       local tmpdir
       tmpdir=$(mktemp -d)
       nix-build https://github.com/LnL7/nix-darwin/archive/master.tar.gz -A installer --out-link "$tmpdir/result"

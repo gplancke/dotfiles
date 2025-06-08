@@ -1,5 +1,30 @@
 #!/bin/bash
 
+load_nix() {
+	local nix_profile="$HOME/.nix-profile"
+
+	if [ -d "$nix_profile" ]; then
+		export NIX_PATH="$nix_profile/etc/nix:$NIX_PATH"
+		export PATH="$nix_profile/bin:$PATH"
+		export NIX_PROFILES="$nix_profile/profiles"
+		export NIX_USER_PROFILE_DIR="$nix_profile/profiles/per-user/$USER"
+	fi
+}
+
+load_brew() {
+	local brew_bin = $1
+
+  if [ -x "$brew_bin" ]; then
+    eval "$("$brew_bin" shellenv)"
+  fi
+}
+
+load_devbox() {
+  if command -v devbox >/dev/null 2>&1; then
+    eval "$(devbox global shellenv)"
+  fi
+}
+
 install_bins() {
   local nix_file="$HOME/.env.nix"
 
@@ -15,7 +40,6 @@ install_bins() {
     db_path="$(devbox global path)"
     if [ -f "$db_path/devbox.json" ]; then
       printf 'Installing Devbox environment from %s/devbox.json\n' "$db_path"
-      eval "$(devbox global shellenv)"
       devbox global install
     fi
   fi
@@ -23,6 +47,9 @@ install_bins() {
 
 {{ if eq .chezmoi.os "darwin" -}}
 
+load_nix
+load_devbox
+load_brew "/opt/homebrew/bin/brew"
 install_bins
 
 if [ ! -x "$(command -v brew)" ]; then
@@ -43,6 +70,9 @@ exit 0
 
 {{ else if eq .chezmoi.os "linux" -}}
 
+load_nix
+load_devbox
+load_brew "/home/linuxbrew/.linuxbrew/bin/brew"
 install_bins
 
 {{ range .packages.linux.apt -}}
