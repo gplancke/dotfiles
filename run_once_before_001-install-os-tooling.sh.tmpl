@@ -1,0 +1,19 @@
+#!/bin/sh
+
+{{ if eq .chezmoi.os "darwin" -}}
+DISTRO="darwin"
+{{- else -}}
+DISTRO="ubuntu"
+{{- end }}
+
+install_tooling() {
+  local os_type="$1"
+	if [ "$os_type" != "darwin" ]; then
+		echo "Nothing to install for $os_type"
+		return 0
+	fi
+
+	# for darwing we need to install xcode command line tools
+	xcode-select --install 2>/dev/null
+}
+
