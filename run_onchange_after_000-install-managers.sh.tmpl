@@ -1,9 +1,39 @@
 #!/bin/bash
 
+set -euo pipefail
+
+# Optional: uncomment for debugging
+# set -x
+
+{{/* Include shared utility functions */}}
+{{- template "shell-utils" . -}}
+
 {{ if eq .chezmoi.os "darwin" -}}
 DISTRO="darwin"
 {{- else -}}
-DISTRO="ubuntu"
+# Detect Linux distribution
+if [ -f /etc/os-release ]; then
+  . /etc/os-release
+  case "$ID" in
+    fedora|rhel|centos|rocky|almalinux)
+      DISTRO="fedora"
+      ;;
+    arch|manjaro|endeavouros|garuda)
+      DISTRO="arch"
+      ;;
+    ubuntu|debian|pop|elementary|linuxmint)
+      DISTRO="debian"
+      ;;
+    alpine)
+      DISTRO="alpine"
+      ;;
+    *)
+      DISTRO="unknown"
+      ;;
+  esac
+else
+  DISTRO="unknown"
+fi
 {{- end }}
 
 #############################################
@@ -16,10 +46,7 @@ install_essentials() {
   local local_dir="$home/.local"
   local workspace="$home/Workspace/Projects"
 
-  # Temporarily disable Git’s SSL check on macOS
-  if [ "$distro" = "darwin" ] && command -v git >/dev/null 2>&1; then
-    git config --global http.sslVerify false
-  fi
+  git_disable_ssl "$distro"
 
   # Create required directories
   mkdir -p \
@@ -28,11 +55,29 @@ install_essentials() {
     "$workspace"
 
   case "$distro" in
-    ubuntu|debian)
+    debian)
       printf 'Updating APT and installing essentials...\n'
       sudo apt-get update -y && sudo apt-get upgrade -y
       sudo apt-get install -y \
         build-essential curl git zsh fonts-hack-ttf
+      ;;
+    fedora)
+      printf 'Updating DNF and installing essentials...\n'
+      sudo dnf update -y
+      sudo dnf install -y \
+        @development-tools curl git zsh hack-fonts
+      ;;
+    arch)
+      printf 'Updating Pacman and installing essentials...\n'
+      sudo pacman -Syu --noconfirm
+      sudo pacman -S --noconfirm \
+        base-devel curl git zsh ttf-hack
+      ;;
+    alpine)
+      printf 'Updating APK and installing essentials...\n'
+      sudo apk update && sudo apk upgrade
+      sudo apk add \
+        build-base curl git zsh font-hack-ttf
       ;;
     darwin)
       printf 'No essentials for macos...\n'
@@ -44,10 +89,7 @@ install_essentials() {
       ;;
   esac
 
-  # Re-enable Git’s SSL check if Git is present
-  if command -v git >/dev/null 2>&1; then
-    git config --global http.sslVerify true
-  fi
+  git_enable_ssl
 
   printf 'Done. Please log out and back in for changes to take effect.\n'
 }
@@ -83,10 +125,10 @@ install_brew() {
     fi
   fi
 
-  # Load brew into the current shell, or error out
-  if [ -x "$brew_bin" ]; then
-    eval "$("$brew_bin" shellenv)"
-    printf 'Homebrew installed and initialized: %s\n' "$brew_bin"
+  load_brew "$brew_bin"
+
+  if command -v brew >/dev/null 2>&1; then
+    printf 'Homebrew installed and initialized: %s\n' "$(command -v brew)"
   else
     printf 'Error: brew not found after installation\n' >&2
     return 1
@@ -104,18 +146,12 @@ install_nix() {
   local installer_url="https://install.determinate.systems/nix"
   local uninstall_script="$HOME/.local/bin/nix-uninstall"
 
-  # If Nix isn’t already installed…
+  # If Nix isn't already installed…
   if [ ! -d "$nix_profile" ]; then
     printf 'Installing Nix via %s\n' "$installer_url"
     curl --proto '=https' --tlsv1.2 -sSfL "$installer_url" | sh -s -- install --no-confirm
 
-    # Load Nix environment
-		if [ -d "$nix_profile" ]; then
-			export NIX_PATH="$nix_profile/etc/nix:$NIX_PATH"
-			export PATH="$nix_profile/bin:$PATH"
-			export NIX_PROFILES="$nix_profile/profiles"
-			export NIX_USER_PROFILE_DIR="$nix_profile/profiles/per-user/$USER"
-		fi
+    load_nix
 
     # Create uninstall helper
     mkdir -p "$HOME/.local/bin"
@@ -154,18 +190,21 @@ install_devbox() {
 
 install_complements() {
   local distro=$1
-  local home="$HOME"
-  local local_dir="$home/.local"
-  local workspace="$home/Workspace/Projects"
 
-  # Temporarily disable Git’s SSL check on macOS
-  if [ "$distro" = "darwin" ] && command -v git >/dev/null 2>&1; then
-    git config --global http.sslVerify false
-  fi
+  git_disable_ssl "$distro"
 
   case "$distro" in
-    ubuntu|debian)
-      printf 'no essentials left to install...\n'
+    debian)
+      printf 'No additional complements needed for Debian-based systems...\n'
+      ;;
+    fedora)
+      printf 'No additional complements needed for Fedora-based systems...\n'
+      ;;
+    arch)
+      printf 'No additional complements needed for Arch-based systems...\n'
+      ;;
+    alpine)
+      printf 'No additional complements needed for Alpine Linux...\n'
       ;;
     darwin)
       printf 'Installing complements via Homebrew...\n'
@@ -177,10 +216,7 @@ install_complements() {
       ;;
   esac
 
-  # Re-enable Git’s SSL check if Git is present
-  if command -v git >/dev/null 2>&1; then
-    git config --global http.sslVerify true
-  fi
+  git_enable_ssl
 
   printf 'Done. Please log out and back in for changes to take effect.\n'
 }

@@ -1,98 +1,134 @@
 #!/bin/bash
 
-load_nix() {
-	local nix_profile="$HOME/.nix-profile"
+# Best practices: exit on error, undefined vars, and pipe failures
+set -euo pipefail
 
-	if [ -d "$nix_profile" ]; then
-		export NIX_PATH="$nix_profile/etc/nix:$NIX_PATH"
-		export PATH="$nix_profile/bin:$PATH"
-		export NIX_PROFILES="$nix_profile/profiles"
-		export NIX_USER_PROFILE_DIR="$nix_profile/profiles/per-user/$USER"
-	fi
-}
+# Optional: uncomment for debugging
+# set -x
 
-load_brew() {
-	local brew_bin=$1
-
-  if [ -x "$brew_bin" ]; then
-    eval "$("$brew_bin" shellenv)"
-  fi
-}
-
-load_devbox() {
-  if command -v devbox >/dev/null 2>&1; then
-    eval "$(devbox global shellenv)"
-  fi
-}
-
-install_bins() {
-  local nix_file="$HOME/.env.nix"
-
-  # Nix
-  if command -v nix-env >/dev/null 2>&1 && [ -f "$nix_file" ]; then
-    printf 'Installing Nix environment from %s\n' "$nix_file"
-    nix-env -irf "$nix_file"
-  fi
-
-  # Devbox
-  if command -v devbox >/dev/null 2>&1; then
-    local db_path
-    db_path="$(devbox global path)"
-    if [ -f "$db_path/devbox.json" ]; then
-      printf 'Installing Devbox environment from %s/devbox.json\n' "$db_path"
-      devbox global install
-    fi
-  fi
-}
+{{/* Include shared utility functions */}}
+{{- template "shell-utils" . -}}
 
 {{ if eq .chezmoi.os "darwin" -}}
-
-load_nix
-load_devbox
-load_brew "/opt/homebrew/bin/brew"
-install_bins
-
-if [ ! -x "$(command -v brew)" ]; then
-	echo "No brew found, ...skipping"
-	exit 0
+DISTRO="darwin"
+{{- else -}}
+# Detect Linux distribution
+if [ -f /etc/os-release ]; then
+  . /etc/os-release
+  case "$ID" in
+    fedora|rhel|centos|rocky|almalinux)
+      DISTRO="fedora"
+      ;;
+    arch|manjaro|endeavouros|garuda)
+      DISTRO="arch"
+      ;;
+    ubuntu|debian|pop|elementary|linuxmint)
+      DISTRO="debian"
+      ;;
+    alpine)
+      DISTRO="alpine"
+      ;;
+    *)
+      DISTRO="unknown"
+      ;;
+  esac
+else
+  DISTRO="unknown"
 fi
+{{- end }}
 
-brew bundle --file=/dev/stdin <<EOF
-{{ range .packages.darwin.brews -}}
-brew {{ . | quote }}
-{{ end -}}
-{{ range .packages.darwin.casks -}}
-cask {{ . | quote }}
-{{ end -}}
-EOF
+# Common initialization for all platforms
+common_setup() {
+	local distro=$1
+	local brew_path=$2
 
-exit 0
+	load_nix
+	load_devbox
+	load_brew "$brew_path"
+	install_bins
+}
 
-{{ else if eq .chezmoi.os "linux" -}}
+setup_darwin() {
+	common_setup "darwin" "/opt/homebrew/bin/brew"
 
-load_nix
-load_devbox
-load_brew "/home/linuxbrew/.linuxbrew/bin/brew"
-install_bins
+	# Install brew packages and casks
+	local brews=({{ range .packages.darwin.brews }}{{ . | quote }} {{ end }})
+	local casks=({{ range .packages.darwin.casks }}{{ . | quote }} {{ end }})
 
-{{ range .packages.linux.apt -}}
-sudo apt install -y {{ . | quote }}
-{{ end -}}
+	install_brew_packages "${brews[@]}"
+	install_brew_casks "${casks[@]}"
+}
 
-if [ ! -x "$(command -v brew)" ]; then
-	echo "No brew found, ...skipping"
-	exit 0
-fi
+setup_debian() {
+	common_setup "debian" "/home/linuxbrew/.linuxbrew/bin/brew"
 
-brew bundle --file=/dev/stdin <<EOF
-{{ range .packages.linux.brews -}}
-brew {{ . | quote }}
-{{ end -}}
-{{ range .packages.linux.casks -}}
-cask {{ . | quote }}
-{{ end -}}
-EOF
+	local apt_packages=({{ range .packages.debian.native }}{{ . | quote }} {{ end }})
+	local brews=({{ range .packages.debian.brews }}{{ . | quote }} {{ end }})
+	local casks=({{ range .packages.debian.casks }}{{ . | quote }} {{ end }})
 
-exit 0
+	install_apt_packages "${apt_packages[@]}"
+	install_brew_packages "${brews[@]}"
+	install_brew_casks "${casks[@]}"
+}
 
-{{ end -}}
+setup_fedora() {
+	common_setup "fedora" "/home/linuxbrew/.linuxbrew/bin/brew"
+
+	local dnf_packages=({{ range .packages.fedora.native }}{{ . | quote }} {{ end }})
+	local brews=({{ range .packages.fedora.brews }}{{ . | quote }} {{ end }})
+	local casks=({{ range .packages.fedora.casks }}{{ . | quote }} {{ end }})
+
+	install_dnf_packages "${dnf_packages[@]}"
+	install_brew_packages "${brews[@]}"
+	install_brew_casks "${casks[@]}"
+}
+
+setup_arch() {
+	common_setup "arch" "/home/linuxbrew/.linuxbrew/bin/brew"
+
+	local pacman_packages=({{ range .packages.arch.native }}{{ . | quote }} {{ end }})
+	local brews=({{ range .packages.arch.brews }}{{ . | quote }} {{ end }})
+	local casks=({{ range .packages.arch.casks }}{{ . | quote }} {{ end }})
+
+	install_pacman_packages "${pacman_packages[@]}"
+	install_brew_packages "${brews[@]}"
+	install_brew_casks "${casks[@]}"
+}
+
+setup_alpine() {
+	common_setup "alpine" "/home/linuxbrew/.linuxbrew/bin/brew"
+
+	local apk_packages=({{ range .packages.alpine.native }}{{ . | quote }} {{ end }})
+	local brews=({{ range .packages.alpine.brews }}{{ . | quote }} {{ end }})
+	local casks=({{ range .packages.alpine.casks }}{{ . | quote }} {{ end }})
+
+	install_apk_packages "${apk_packages[@]}"
+	install_brew_packages "${brews[@]}"
+	install_brew_casks "${casks[@]}"
+}
+
+main() {
+	case "$DISTRO" in
+		"darwin")
+			setup_darwin
+			;;
+		"debian")
+			setup_debian
+			;;
+		"fedora")
+			setup_fedora
+			;;
+		"arch")
+			setup_arch
+			;;
+		"alpine")
+			setup_alpine
+			;;
+		*)
+			echo "Unsupported distribution: $DISTRO" >&2
+			exit 1
+			;;
+	esac
+}
+
+main "$@"

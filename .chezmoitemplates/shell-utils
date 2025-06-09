@@ -1,0 +1,161 @@
+# Shell utility functions for chezmoi scripts
+# Contains common functions used across installation scripts
+
+# Load Nix environment
+load_nix() {
+	local nix_profile="$HOME/.nix-profile"
+
+	if [ -d "$nix_profile" ]; then
+		export NIX_PATH="$nix_profile/etc/nix:$NIX_PATH"
+		export PATH="$nix_profile/bin:$PATH"
+		export NIX_PROFILES="$nix_profile/profiles"
+		export NIX_USER_PROFILE_DIR="$nix_profile/profiles/per-user/$USER"
+	fi
+}
+
+# Load Brew environment
+load_brew() {
+	local brew_bin=$1
+
+	if [ -x "$brew_bin" ]; then
+		eval "$("$brew_bin" shellenv)"
+	fi
+}
+
+# Load Devbox environment
+load_devbox() {
+	if command -v devbox >/dev/null 2>&1; then
+		eval "$(devbox global shellenv)"
+	fi
+}
+
+# Install Nix environment packages
+install_bins() {
+	local nix_file="$HOME/.env.nix"
+
+	# Nix
+	if command -v nix-env >/dev/null 2>&1 && [ -f "$nix_file" ]; then
+		printf 'Installing Nix environment from %s\n' "$nix_file"
+		nix-env -irf "$nix_file"
+	fi
+
+	# Devbox
+	if command -v devbox >/dev/null 2>&1; then
+		local db_path
+		db_path="$(devbox global path)"
+		if [ -f "$db_path/devbox.json" ]; then
+			printf 'Installing Devbox environment from %s/devbox.json\n' "$db_path"
+			devbox global install
+		fi
+	fi
+}
+
+# Install Homebrew packages
+install_brew_packages() {
+	local brews=("$@")
+
+	if [ ! -x "$(command -v brew)" ]; then
+		echo "No brew found, skipping brew packages installation"
+		return 0
+	fi
+
+	if [ ${#brews[@]} -eq 0 ]; then
+		echo "No brew packages to install"
+		return 0
+	fi
+
+	{
+		for package in "${brews[@]}"; do
+			echo "brew \"$package\""
+		done
+	} | brew bundle --file=/dev/stdin
+}
+
+# Install Homebrew casks
+install_brew_casks() {
+	local casks=("$@")
+
+	if [ ! -x "$(command -v brew)" ]; then
+		echo "No brew found, skipping cask installation"
+		return 0
+	fi
+
+	if [ ${#casks[@]} -eq 0 ]; then
+		echo "No casks to install"
+		return 0
+	fi
+
+	{
+		for cask in "${casks[@]}"; do
+			echo "cask \"$cask\""
+		done
+	} | brew bundle --file=/dev/stdin
+}
+
+# Install APT packages (Debian/Ubuntu)
+install_apt_packages() {
+	local packages=("$@")
+
+	if [ ${#packages[@]} -eq 0 ]; then
+		echo "No apt packages to install"
+		return 0
+	fi
+
+	for package in "${packages[@]}"; do
+		sudo apt install -y "$package"
+	done
+}
+
+# Install DNF packages (Fedora/RHEL/CentOS)
+install_dnf_packages() {
+	local packages=("$@")
+
+	if [ ${#packages[@]} -eq 0 ]; then
+		echo "No dnf packages to install"
+		return 0
+	fi
+
+	for package in "${packages[@]}"; do
+		sudo dnf install -y "$package"
+	done
+}
+
+# Install Pacman packages (Arch/Manjaro)
+install_pacman_packages() {
+	local packages=("$@")
+
+	if [ ${#packages[@]} -eq 0 ]; then
+		echo "No pacman packages to install"
+		return 0
+	fi
+
+	sudo pacman -S --noconfirm "${packages[@]}"
+}
+
+# Install APK packages (Alpine)
+install_apk_packages() {
+	local packages=("$@")
+
+	if [ ${#packages[@]} -eq 0 ]; then
+		echo "No apk packages to install"
+		return 0
+	fi
+
+	for package in "${packages[@]}"; do
+		sudo apk add "$package"
+	done
+}
+
+# Temporarily disable Git's SSL check on macOS
+git_disable_ssl() {
+	if [ "$1" = "darwin" ] && command -v git >/dev/null 2>&1; then
+		git config --global http.sslVerify false
+	fi
+}
+
+# Re-enable Git's SSL check if Git is present
+git_enable_ssl() {
+	if command -v git >/dev/null 2>&1; then
+		git config --global http.sslVerify true
+	fi
+}

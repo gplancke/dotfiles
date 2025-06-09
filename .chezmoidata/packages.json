@@ -13,18 +13,49 @@
 				"ghostty"
 			]
 		},
-		"linux": {
-			"apt": [],
-			"brews": [
-				"git",
+		"debian": {
+			"native": [
 				"curl",
+				"git",
+				"build-essential"
+			],
+			"brews": [
 				"imagemagick"
 			],
-			"casks": [
-				"bitwarden",
-				"raycast",
-				"ghostty"
-			]
+			"casks": []
+		},
+		"fedora": {
+			"native": [
+				"curl",
+				"git",
+				"@development-tools"
+			],
+			"brews": [
+				"imagemagick"
+			],
+			"casks": []
+		},
+		"arch": {
+			"native": [
+				"curl",
+				"git",
+				"base-devel"
+			],
+			"brews": [
+				"imagemagick"
+			],
+			"casks": []
+		},
+		"alpine": {
+			"native": [
+				"curl",
+				"git",
+				"build-base"
+			],
+			"brews": [
+				"imagemagick"
+			],
+			"casks": []
 		}
 	}
 }
