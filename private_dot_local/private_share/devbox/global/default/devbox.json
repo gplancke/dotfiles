@@ -57,7 +57,8 @@
     "claude-code@latest",
     "taskwarrior-tui@latest",
     "taskwarrior3@latest",
-    "frida-tools@latest"
+    "frida-tools@latest",
+    "cargo@latest"
   ],
   "shell": {
     "init_hook": [
