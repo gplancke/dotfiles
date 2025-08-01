@@ -2,7 +2,7 @@ return {
   {
     "saghen/blink.cmp",
     dependencies = {
-      "Kaiser-Yang/blink-cmp-avante",
+      -- "Kaiser-Yang/blink-cmp-avante",
     },
     opts = function(_, opts)
       opts.enabled = function()
@@ -18,7 +18,7 @@ return {
         ["<Tab>"] = { "snippet_forward", "select_and_accept", "fallback" },
         ["<C-space>"] = {
           function(cmp)
-            cmp.show({ providers = { "supermaven" } })
+            cmp.show({ providers = { "copilot" } })
           end,
         },
       }
