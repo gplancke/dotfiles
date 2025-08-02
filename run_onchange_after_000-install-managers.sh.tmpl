@@ -226,10 +226,10 @@ install_complements() {
 #############################################
 install_essentials $DISTRO
 
-install_brew $DISTRO || true
-install_nix $DISTRO || true
-install_devbox $DISTRO || true
+install_brew $DISTRO
+install_nix $DISTRO
+install_devbox $DISTRO
 
-install_complements $DISTRO || true
+install_complements $DISTRO
 
 exit 0
