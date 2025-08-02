@@ -165,9 +165,9 @@ EOF
     if [ "$os_type" = "darwin" ]; then
       local tmpdir
       tmpdir=$(mktemp -d)
-      nix-build https://github.com/LnL7/nix-darwin/archive/master.tar.gz -A installer --out-link "$tmpdir/result"
-      "$tmpdir/result/bin/darwin-installer"
-      cp "$tmpdir/result/bin/darwin-uninstaller" "$HOME/.local/bin/"
+      # nix-build https://github.com/LnL7/nix-darwin/archive/master.tar.gz -A installer --out-link "$tmpdir/result"
+      # "$tmpdir/result/bin/darwin-installer"
+      # cp "$tmpdir/result/bin/darwin-uninstaller" "$HOME/.local/bin/"
       rm -rf "$tmpdir"
     fi
 
