@@ -43,6 +43,7 @@ common_setup() {
 	local brew_path=$2
 
 	load_nix
+	load_homemanager
 	load_devbox
 	load_brew "$brew_path"
 	install_bins

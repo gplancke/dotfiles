@@ -157,6 +157,10 @@ install_nix() {
 		# Install home-manager
 		nix-channel --add https://github.com/nix-community/home-manager/archive/master.tar.gz home-manager
 		nix-channel --update
+		if command -v nix-shell >/dev/null 2>&1; then
+			printf 'Installing Home Manager'
+			nix-shell '<home-manager>' -A install
+		fi
 
     # Create uninstall helper
     mkdir -p "$HOME/.local/bin"
@@ -203,7 +207,7 @@ install_complements() {
       ;;
     darwin)
       printf 'Installing complements via Homebrew...\n'
-      brew install openssl zsh font-hack-nerd-font
+      brew install --quiet openssl zsh font-hack-nerd-font
       ;;
     *)
       printf 'Error: unsupported distribution "%s"\n' "$distro"
