@@ -110,20 +110,22 @@ export TMUX_POWERLINE_DEFAULT_FOREGROUND_COLOR='255'
 ##########################
 # Extensions
 ##########################
-hash fnm 2>/dev/null && eval "$(fnm env)"                                   # source fnm
+hash fnm 2>/dev/null && eval "$(fnm env)"
+[ -f "${ASDF_DIR}/asdf.sh" ] && . "${ASDF_DIR}/asdf.sh"
 
-[ -f "${ASDF_DIR}/asdf.sh" ] && . "${ASDF_DIR}/asdf.sh"                         # source asdf
-
-[ -f "${NIX_DIR}/etc/profile.d/nix.sh" ] && . "${NIX_DIR}/etc/profile.d/nix.sh" # source nix
+[ -f "${NIX_DIR}/etc/profile.d/nix.sh" ] && . "${NIX_DIR}/etc/profile.d/nix.sh"
 
 [ ! -f "${NIX_DIR}/etc/profile.d/nix.sh" ] \
 	&& [ -f "/nix/var/nix/profiles/default/etc/profile.d/nix.sh" ] \
 	&& . /nix/var/nix/profiles/default/etc/profile.d/nix.sh
 
+([ -d "/etc/profiles/per-user/$(whoami)/etc/profile.d/hm-session-vars.sh" ] && . "/etc/profiles/per-user/$(whoami)/etc/profile.d/hm-session-vars.sh") || \
+([ -d "$NIX_DIR/etc/profile.d/hm-session-vars.sh" ] && . "$NIX_DIR/etc/profile.d/hm-session-vars.sh")
+
 [ -f "/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh" ] \
 	&& . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
 
-hash devbox 2>/dev/null && eval "$(devbox global shellenv)"									# source devbox
+hash devbox 2>/dev/null && eval "$(devbox global shellenv)"
 
 ##########################
 # Links
