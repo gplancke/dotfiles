@@ -39,6 +39,12 @@ install_bins() {
 		nix-env -irf "$nix_file"
 	fi
 
+	# Home manager
+	if command -v nix-shell >/dev/null 2>&1; then
+		printf 'Installing Home Manager'
+		nix-shell '<home-manager>' -A install
+	fi
+
 	# Devbox
 	if command -v devbox >/dev/null 2>&1; then
 		local db_path
@@ -64,11 +70,9 @@ install_brew_packages() {
 		return 0
 	fi
 
-	{
-		for package in "${brews[@]}"; do
-			echo "brew \"$package\""
-		done
-	} | brew bundle --file=/dev/stdin
+	for package in "${brews[@]}"; do
+		brew install "$package" || true
+	done
 }
 
 # Install Homebrew casks
@@ -85,11 +89,10 @@ install_brew_casks() {
 		return 0
 	fi
 
-	{
-		for cask in "${casks[@]}"; do
-			echo "cask \"$cask\""
-		done
-	} | brew bundle --file=/dev/stdin
+	for cask in "${casks[@]}"; do
+		echo "cask \"$cask\""
+		brew install --cask "$cask" || true
+	done
 }
 
 # Install APT packages (Debian/Ubuntu)
@@ -102,7 +105,7 @@ install_apt_packages() {
 	fi
 
 	for package in "${packages[@]}"; do
-		sudo apt install -y "$package"
+		sudo apt install -y "$package" || true
 	done
 }
 
@@ -116,7 +119,7 @@ install_dnf_packages() {
 	fi
 
 	for package in "${packages[@]}"; do
-		sudo dnf install -y "$package"
+		sudo dnf install -y "$package" || true
 	done
 }
 
@@ -129,7 +132,7 @@ install_pacman_packages() {
 		return 0
 	fi
 
-	sudo pacman -S --noconfirm "${packages[@]}"
+	sudo pacman -S --noconfirm "${packages[@]}" || true
 }
 
 # Install APK packages (Alpine)
@@ -142,7 +145,7 @@ install_apk_packages() {
 	fi
 
 	for package in "${packages[@]}"; do
-		sudo apk add "$package"
+		sudo apk add "$package" || true
 	done
 }
 
