@@ -2,17 +2,19 @@
 # Default config at setup
 ##########################
 [ -f "${HOME}/.shell.common" ] && . "${HOME}/.shell.common"
+
 # FZF
 [ -f "~/.fzf.zsh" ] && . "~/.fzf.zsh"
-# Fzf theme
 [ -f ~/.fzf.colors ] && source ~/.fzf.colors
+
 # ASDF completion
 [ -d "$ASDF_DIR" ] && fpath=(${ASDF_DIR}/completions $fpath)
-# Dir env
+
+# DIRENV setup
 hash direnv 2>/dev/null && eval "$(direnv hook zsh)"
-# Zoxide = Better cd
+# ZOXIDE setup
 hash zoxide 2>/dev/null && eval "$(zoxide init zsh)"
-# Prompt
+# STARSHIP
 hash starship 2>/dev/null && eval "$(starship init zsh)"
 
 HISTFILE=~/.histfile
@@ -57,9 +59,6 @@ if [ -f '/Users/georgio/.local/share/google-cloud-sdk/path.zsh.inc' ]; then . '/
 
 # The next line enables shell command completion for gcloud.
 if [ -f '/Users/georgio/.local/share/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/georgio/.local/share/google-cloud-sdk/completion.zsh.inc'; fi
-
-# Added by Windsurf
-export PATH="/Users/georgio/.codeium/windsurf/bin:$PATH"
 
 # ##############################
 # Launch nushell...

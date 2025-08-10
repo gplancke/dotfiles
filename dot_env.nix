@@ -6,7 +6,7 @@ let
 
   # Pinned nixpkgs version to make our env truely reproducible
   pinned = import (fetchTarball {
-    url = https://github.com/NixOS/nixpkgs/archive/refs/tags/24.05.tar.gz;
+    url = https://github.com/NixOS/nixpkgs/archive/refs/tags/25.05.tar.gz;
   }) {};
 
   # The list of packages to be installed

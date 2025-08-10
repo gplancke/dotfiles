@@ -1,73 +1,10 @@
 {
-  "$schema": "https://raw.githubusercontent.com/jetify-com/devbox/0.10.7/.schema/devbox.schema.json",
-  "packages": [
-    "direnv@latest",
-    "starship@latest",
-    "git@latest",
-    "fossil@latest",
-    "lazygit@latest",
-    "lazydocker@latest",
-    "pnpm@latest",
-    "nodejs@latest",
-    "qemu@latest",
-    "colima@latest",
-    "docker@latest",
-    "ttyd@latest",
-    "unzip@latest",
-    "socat@latest",
-    "age@latest",
-    "jq@latest",
-    "ripgrep@latest",
-    "silver-searcher@latest",
-    "fzf@latest",
-    "zoxide@latest",
-    "htop@latest",
-    "diff-so-fancy@latest",
-    "nmap@latest",
-    "bat@latest",
-    "gtop@latest",
-    "jc@latest",
-    "mkcert@latest",
-    "nnn@latest",
-    "ranger@latest",
-    "tmux@latest",
-    "hub@latest",
-    "gh@latest",
-    "neovim@latest",
-    "heroku@latest",
-    "ruby@latest",
-    "docker-buildx@latest",
-    "deno@latest",
-    "fd@latest",
-    "luarocks@latest",
-    "python@latest",
-    "zellij@latest",
-    "helix@latest",
-    "tree@latest",
-    "harlequin@1.25.0",
-    "exa@latest",
-    "jp@latest",
-    "docker-compose@latest",
-    "openjdk@latest",
-    "miller@latest",
-    "sq@latest",
-    "aider-chat@latest",
-    "bun@latest",
-    "gcc@latest",
-    "claude-code@latest",
-    "taskwarrior-tui@latest",
-    "taskwarrior3@latest",
-    "frida-tools@latest",
-    "cargo@latest"
-  ],
-  "shell": {
-    "init_hook": [
-      "echo 'Welcome to devbox!' > /dev/null"
-    ],
-    "scripts": {
-      "test": [
-        "echo \"Error: no test specified\" && exit 1"
-      ]
-    }
-  }
+	"$schema": "https://raw.githubusercontent.com/jetify-com/devbox/0.10.7/.schema/devbox.schema.json",
+	"packages": [],
+	"shell": {
+		"init_hook": ["echo 'Welcome to devbox!' > /dev/null"],
+		"scripts": {
+			"test": ["echo \"Error: no test specified\" && exit 1"]
+		}
+	}
 }
