@@ -42,12 +42,12 @@ load_devbox() {
 
 # Install Nix environment packages
 install_bins() {
-	local nix_file="$HOME/.env.nix"
+	local nix_file="$HOME/.config/nix"
 
 	# Nix
-	if command -v nix-env >/dev/null 2>&1 && [ -f "$nix_file" ]; then
+	if command -v nix-env >/dev/null 2>&1 && [ -f "$nix_file/flake.nix" ]; then
 		printf 'Installing Nix environment from %s\n' "$nix_file"
-		nix profile install -f "$nix_file"
+		nix profile install "'$nix_file'"
 	fi
 
 	# Home manager
