@@ -372,16 +372,17 @@ hash code-git 2>/dev/null && alias code='code-git'
 # Nix
 #################
 
-alias nix-ls-installed='nix-env -q | fzf-tmux'
-alias nix-ls-available='nix-env -qaP | fzf-tmux'
-alias nix-ls-generations='nix-env --list-generations'
-alias nix-update='nix-channel --update'
-alias nix-rebuild='nix-env -ir -f ~/.env.nix'
-alias nix-upgrade='nix-update && nix-rebuild'
-alias nix-purge="echo \"nix-env -e '.*' to purge env\""
-alias nix-clean='nix-collect-garbage'
-alias nix-cleanup='nix-env --delete-generations +3 && nix-collect-garbage'
-alias nix-rollback='nix-env --rollback'
+alias nix-ls-installed='nix profile list | fzf-tmux'
+alias nix-ls-available='nix search nixpkgs'
+alias nix-ls-generations='nix profile history'
+alias nix-upgrade='nix flake update && nix profile upgrade \'~/.config/nix#homies\''
+alias nix-rebuild='nix profile remove \'.*\' && nix profile install \'~/.config/nix#homies\''
+alias nix-purge='nix profile remove \'.*\''
+alias nix-clean='nix store gc'
+alias nix-cleanup='nix profile wipe-history --older-than 3d && nix store gc'
+alias nix-rollback='nix profile rollback'
+
+# Uninstall Nix
 alias nix-uninstall='/nix/nix-installer uninstall'
 
 alias devga='devbox global add'
