@@ -23,8 +23,6 @@
           pkgs.bash
           pkgs.gcc
 
-					pkgs.home-manager
-
           pkgs.tree
           pkgs.age
           pkgs.unzip
@@ -42,6 +40,9 @@
           pkgs.gtop
         ];
       };
+
+			home-manager = home-manager.packages.${pkgs.system}.home-manager;
+
     });
 
     # Home Manager standalone config (assuming "georgio" is a user on a specific system)
