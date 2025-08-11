@@ -26,9 +26,6 @@
           pkgs.tree
           pkgs.age
           pkgs.unzip
-          # mkcert might not be available on Darwin via default nixpkgs for some reasons,
-          # or might require extra setup.
-          # If it fails on macOS, you might need to conditionally add it or find an alternative.
           pkgs.mkcert
           pkgs.bat
           pkgs.jq
