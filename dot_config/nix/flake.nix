@@ -54,6 +54,7 @@
 					pkgs.docker
 					pkgs.docker-compose
 					pkgs.docker-buildx
+					pkgs.docker-rootless-extras
 					pkgs.lazydocker
 
 					pkgs.nodejs
