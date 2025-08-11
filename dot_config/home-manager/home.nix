@@ -1,4 +1,8 @@
-{ config, pkgs, ... }:
+{ 
+	config,
+	pkgs,
+	... 
+}:
 
 {
   # Home Manager needs a bit of information about you and the paths it should
@@ -19,44 +23,25 @@
   # environment.
   home.packages = [
     pkgs.hello
-		pkgs.gcc
-
-		pkgs.age
-		pkgs.mkcert
 		pkgs.direnv
-		pkgs.bat
-		pkgs.jq
-		pkgs.jc
-		pkgs.sq
+		pkgs.qemu
 		pkgs.starship
-		pkgs.fzf
-		pkgs.htop
-		pkgs.gtop
 		pkgs.diff-so-fancy
 		pkgs.ttyd
-		pkgs.tree
-		pkgs.zoxide
-		pkgs.unzip
-		pkgs.ripgrep
-		pkgs.silver-searcher
-
-		pkgs.socat
-		pkgs.nmap
-
-		pkgs.neovim
-		pkgs.tmux
+		pkgs.fzf
 
 		pkgs.git
 		pkgs.gh
 		pkgs.hub
 		pkgs.lazygit
 
+		pkgs.neovim
+		pkgs.tmux
+
 		pkgs.docker
 		pkgs.docker-compose
 		pkgs.docker-buildx
 		pkgs.lazydocker
-
-		pkgs.qemu
 
 		pkgs.nodejs
 		pkgs.deno

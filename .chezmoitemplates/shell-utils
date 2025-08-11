@@ -63,6 +63,11 @@ install_bins() {
 	if command -v home-manager >/dev/null 2>&1; then
 		printf 'Installing Home Manager'
 		home-manager switch
+	else
+		if command -v nix-shell >/dev/null 2>&1; then
+			printf 'Installing Home Manager'
+			nix-shell '<home-manager>' -A install
+		fi
 	fi
 
 	# Devbox

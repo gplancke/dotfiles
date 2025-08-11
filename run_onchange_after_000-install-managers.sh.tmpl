@@ -157,19 +157,6 @@ install_nix() {
 		# Install home-manager
 		nix-channel --add https://github.com/nix-community/home-manager/archive/master.tar.gz home-manager
 		nix-channel --update
-		if command -v nix-shell >/dev/null 2>&1; then
-			printf 'Installing Home Manager'
-			nix-shell '<home-manager>' -A install
-		fi
-
-    # Create uninstall helper
-    mkdir -p "$HOME/.local/bin"
-    cat > "$uninstall_script" << 'EOF'
-#!/usr/bin/env bash
-/nix/nix-installer uninstall
-EOF
-    chmod +x "$uninstall_script"
-
   else
     printf 'Nix is already installed at %s\n' "$nix_profile"
   fi
