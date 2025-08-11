@@ -147,16 +147,10 @@ install_nix() {
   local uninstall_script="$HOME/.local/bin/nix-uninstall"
 
   # If Nix isn't already installed…
-  if [ ! -d "$nix_profile" ]; then
+  if ! command -v nix >/dev/null 2>&1; then
     printf 'Installing Nix via %s\n' "$installer_url"
-    curl --proto '=https' --tlsv1.2 -sSfL "$installer_url" | sh -s -- install --no-confirm
-
-		# Load nix inside the current shell process
-    load_nix
-
-		# Install home-manager
-		# nix-channel --add https://github.com/nix-community/home-manager/archive/master.tar.gz home-manager
-		# nix-channel --update
+		[ "$os_type" = "darwin" ] && sudo ln -sf /etc/ssl/cert.pem /etc/ssl/certs/ca-certificates.crt
+    curl --proto '=https' --tlsv1.2 -sSfL "$installer_url" | sh -s -- install --determinate --no-confirm
   else
     printf 'Nix is already installed at %s\n' "$nix_profile"
   fi
