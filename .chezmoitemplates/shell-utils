@@ -33,15 +33,15 @@ load_brew() {
 
 # Load Home Manager
 load_homemanager() {
-	if command -v home-manager >/dev/null 2>&1; then
-		if [ -f "/etc/profiles/per-user/$USER/etc/profile.d/hm-session-vars.sh" ]; then
-			. "/etc/profiles/per-user/$USER/etc/profile.d/hm-session-vars.sh"
-		elif [ -f "$HOME/.local/state/nix/profiles/profile/etc/profile.d/hm-session-vars.sh" ]; then
-			. "$HOME/.local/state/nix/profiles/profile/etc/profile.d/hm-session-vars.sh"
-		elif [ -f "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh" ]; then
-			. "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh"
-		fi
-	fi
+	# if command -v home-manager >/dev/null 2>&1; then
+	# 	if [ -f "/etc/profiles/per-user/$USER/etc/profile.d/hm-session-vars.sh" ]; then
+	# 		. "/etc/profiles/per-user/$USER/etc/profile.d/hm-session-vars.sh"
+	# 	elif [ -f "$HOME/.local/state/nix/profiles/profile/etc/profile.d/hm-session-vars.sh" ]; then
+	# 		. "$HOME/.local/state/nix/profiles/profile/etc/profile.d/hm-session-vars.sh"
+	# 	elif [ -f "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh" ]; then
+	# 		. "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh"
+	# 	fi
+	# fi
 }
 
 # Load Devbox environment
@@ -54,18 +54,19 @@ load_devbox() {
 # Install Nix environment packages
 install_bins() {
 	local nix_file=".config/nix"
+	local cwd=$(pwd)
 
 	# Nix
 	if command -v nix >/dev/null 2>&1 && [ -f "$HOME/$nix_file/flake.nix" ]; then
 		printf 'Installing Nix environment from %s\n' "$nix_file"
-		(cd $HOME/$nix_file && nix profile add '.#homies' '.#home-manager')
-		load_homemanager
+		cd $HOME/$nix_file && nix profile add '.#homies' && cd "$cwd"
 	fi
 
 	# Home manager
 	if command -v home-manager >/dev/null 2>&1; then
-		printf 'Installing Home Manager'
-		home-manager switch
+		# load_homemanager
+		# printf 'Installing Home Manager'
+		# home-manager switch
 	fi
 
 	# Devbox

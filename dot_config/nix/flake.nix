@@ -1,9 +1,7 @@
 {
-  description = "Homies + Home Manager";
+  description = "Homies";
 
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
-  inputs.home-manager.url = "github:nix-community/home-manager";
-  inputs.home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
   outputs = { self, nixpkgs, home-manager, ... }:
   let
@@ -36,22 +34,44 @@
           pkgs.nmap
           pkgs.htop
           pkgs.gtop
+
+					pkgs.hello
+					pkgs.direnv
+					pkgs.qemu
+					pkgs.starship
+					pkgs.diff-so-fancy
+					pkgs.ttyd
+					pkgs.fzf
+
+					pkgs.git
+					pkgs.gh
+					pkgs.hub
+					pkgs.lazygit
+
+					pkgs.neovim
+					pkgs.tmux
+
+					pkgs.docker
+					pkgs.docker-compose
+					pkgs.docker-buildx
+					pkgs.lazydocker
+
+					pkgs.nodejs
+					pkgs.deno
+					pkgs.deno
+					pkgs.pnpm
+
+					pkgs.luarocks
+
+					pkgs.ruby
+
+					pkgs.python3
+					pkgs.uv
+
+					pkgs.cargo
         ];
       };
 
-      home-manager = home-manager.packages.${system}.home-manager;
     });
-
-    homeConfigurations."georgio" = let
-      currentSystem = nixpkgs.lib.system.buildPlatform.system;
-      pkgsForHomeManager = import nixpkgs { system = currentSystem; };
-    in home-manager.lib.homeManagerConfiguration {
-      pkgs = pkgsForHomeManager;
-      modules = [
-        {
-          imports = [ ./home.nix ];
-        }
-      ];
-    };
   };
 }
