@@ -58,7 +58,7 @@ install_bins() {
 	# Nix
 	if command -v nix-env >/dev/null 2>&1 && [ -f "$HOME/$nix_file/flake.nix" ]; then
 		printf 'Installing Nix environment from %s\n' "$nix_file"
-		(cd $HOME/$nix_file && nix profile install '.#homies')
+		(cd $HOME/$nix_file && nix profile install '.#homies' '.#home-manager')
 	fi
 
 	# Home manager

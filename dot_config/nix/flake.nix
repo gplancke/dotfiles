@@ -22,7 +22,6 @@
           pkgs.nix-diff
           pkgs.bash
           pkgs.gcc
-
           pkgs.tree
           pkgs.age
           pkgs.unzip
@@ -41,17 +40,11 @@
         ];
       };
 
-			home-manager = home-manager.packages.${pkgs.system}.home-manager;
-
+      # Fixed: use 'system' instead of 'pkgs.system'
+      home-manager = home-manager.packages.${system}.home-manager;
     });
 
-    # Home Manager standalone config (assuming "georgio" is a user on a specific system)
-    # You'll likely need to define `homeConfigurations` for each system you intend to use it on.
-    # For simplicity, if you only run this on one system at a time, you can get the current system
-    # from nixpkgs.lib.system.buildPlatform.system as shown below.
     homeConfigurations."georgio" = let
-      # Get the current system from nixpkgs
-      # This is useful when you're sure you're only building for the current machine.
       currentSystem = nixpkgs.lib.system.buildPlatform.system;
       pkgsForHomeManager = import nixpkgs { system = currentSystem; };
     in home-manager.lib.homeManagerConfiguration {
