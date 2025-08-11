@@ -5,21 +5,47 @@
 load_nix() {
 	local nix_profile="$HOME/.nix-profile"
 
-	if [ -d "$nix_profile" ]; then
-		export NIX_PATH="$nix_profile/etc/nix:$NIX_PATH"
-		export PATH="$nix_profile/bin:$PATH"
-		export NIX_PROFILES="$nix_profile/profiles"
-		export NIX_USER_PROFILE_DIR="$nix_profile/profiles/per-user/$USER"
+	if command -v nix >/dev/null 2>&1; then
+		printf 'Loading Nix environment\n'
+
+		if [ -d "$nix_profile" ]; then
+			export NIX_PATH="$nix_profile/etc/nix:$NIX_PATH"
+			export PATH="$nix_profile/bin:$PATH"
+			export NIX_PROFILES="$nix_profile/profiles"
+			export NIX_USER_PROFILE_DIR="$nix_profile/profiles/per-user/$USER"
+		fi
+
+		[ -f "${nix_profile}/etc/profile.d/nix.sh" ] && . "${nix_profile}/etc/profile.d/nix.sh"
+
+		[ ! -f "${nix_profile}/etc/profile.d/nix.sh" ] \
+			&& [ -f "/nix/var/nix/profiles/default/etc/profile.d/nix.sh" ] \
+			&& . /nix/var/nix/profiles/default/etc/profile.d/nix.sh
+
+		[ -f "/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh" ] \
+			&& . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
 	fi
+}
 
-	[ -f "${nix_profile}/etc/profile.d/nix.sh" ] && . "${nix_profile}/etc/profile.d/nix.sh"
+# Load Home Manager
+load_homemanager() {
+	if command -v home-manager >/dev/null 2>&1; then
+		printf 'Loading homemanager environment\n'
+		# 	if [ -f "/etc/profiles/per-user/$USER/etc/profile.d/hm-session-vars.sh" ]; then
+		# 		. "/etc/profiles/per-user/$USER/etc/profile.d/hm-session-vars.sh"
+		# 	elif [ -f "$HOME/.local/state/nix/profiles/profile/etc/profile.d/hm-session-vars.sh" ]; then
+		# 		. "$HOME/.local/state/nix/profiles/profile/etc/profile.d/hm-session-vars.sh"
+		# 	elif [ -f "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh" ]; then
+		# 		. "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh"
+		# 	fi
+	fi
+}
 
-	[ ! -f "${nix_profile}/etc/profile.d/nix.sh" ] \
-		&& [ -f "/nix/var/nix/profiles/default/etc/profile.d/nix.sh" ] \
-		&& . /nix/var/nix/profiles/default/etc/profile.d/nix.sh
-
-	[ -f "/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh" ] \
-		&& . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+# Load Devbox environment
+load_devbox() {
+	if command -v devbox >/dev/null 2>&1; then
+		printf 'Loading devbox environment\n'
+		eval "$(devbox global shellenv)"
+	fi
 }
 
 # Load Brew environment
@@ -27,45 +53,26 @@ load_brew() {
 	local brew_bin=$1
 
 	if [ -x "$brew_bin" ]; then
+		printf 'Loading Homebrew environment from\n'
 		eval "$("$brew_bin" shellenv)"
-	fi
-}
-
-# Load Home Manager
-load_homemanager() {
-	# if command -v home-manager >/dev/null 2>&1; then
-	# 	if [ -f "/etc/profiles/per-user/$USER/etc/profile.d/hm-session-vars.sh" ]; then
-	# 		. "/etc/profiles/per-user/$USER/etc/profile.d/hm-session-vars.sh"
-	# 	elif [ -f "$HOME/.local/state/nix/profiles/profile/etc/profile.d/hm-session-vars.sh" ]; then
-	# 		. "$HOME/.local/state/nix/profiles/profile/etc/profile.d/hm-session-vars.sh"
-	# 	elif [ -f "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh" ]; then
-	# 		. "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh"
-	# 	fi
-	# fi
-}
-
-# Load Devbox environment
-load_devbox() {
-	if command -v devbox >/dev/null 2>&1; then
-		eval "$(devbox global shellenv)"
 	fi
 }
 
 # Install Nix environment packages
 install_bins() {
 	local nix_file=".config/nix"
-	local cwd=$(pwd)
+	local current_dir="$(pwd)"
 
 	# Nix
 	if command -v nix >/dev/null 2>&1 && [ -f "$HOME/$nix_file/flake.nix" ]; then
 		printf 'Installing Nix environment from %s\n' "$nix_file"
-		cd $HOME/$nix_file && nix profile add '.#homies' && cd "$cwd"
+		cd $HOME/$nix_file && nix profile add '.#homies' && cd "$current_dir"
 	fi
 
 	# Home manager
 	if command -v home-manager >/dev/null 2>&1; then
 		# load_homemanager
-		# printf 'Installing Home Manager'
+		printf 'Installing Home Manager'
 		# home-manager switch
 	fi
 
