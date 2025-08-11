@@ -1,45 +1,50 @@
 {
-  description = "Homies profile (flake)";
+  description = "Homies + Home Manager";
 
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
+  inputs.home-manager.url = "github:nix-community/home-manager";
+  inputs.home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
-  outputs = { self, nixpkgs, ... }@inputs:
+  outputs = { self, nixpkgs, home-manager, ... }:
   let
-    systems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
-    forAll = f: nixpkgs.lib.genAttrs systems (system:
-      let
-        pkgs = import nixpkgs { inherit system; };
-        homies = [
-          pkgs.cacert
-          pkgs.nix-diff
-          pkgs.bash
-					pkgs.gcc
-
-					pkgs.tree
-					pkgs.age
-					pkgs.unzip
-					pkgs.mkcert
-					pkgs.bat
-					pkgs.jq
-					pkgs.jc
-					pkgs.sq
-					pkgs.zoxide
-					pkgs.ripgrep
-					pkgs.silver-searcher
-					pkgs.socat
-					pkgs.nmap
-					pkgs.htop
-					pkgs.gtop
-        ];
-      in f pkgs homies);
+    system = "x86_64-linux";
+    pkgs = import nixpkgs { inherit system; };
   in {
-    packages = forAll (pkgs: homies:
-      {
-        homies = pkgs.buildEnv { name = "homies"; paths = homies; };
-      });
+    # your existing package
+    packages.${system}.homies = pkgs.buildEnv {
+      name = "homies";
+      paths = [ 
+				pkgs.cacert
+				pkgs.nix-diff
+				pkgs.bash
+				pkgs.gcc
 
-    devShells = forAll (pkgs: homies: {
-      default = pkgs.mkShell { packages = homies; };
-    });
+				pkgs.tree
+				pkgs.age
+				pkgs.unzip
+				pkgs.mkcert
+				pkgs.bat
+				pkgs.jq
+				pkgs.jc
+				pkgs.sq
+				pkgs.zoxide
+				pkgs.ripgrep
+				pkgs.silver-searcher
+				pkgs.socat
+				pkgs.nmap
+				pkgs.htop
+				pkgs.gtop
+			];
+    };
+
+    # Home Manager standalone config
+    homeConfigurations."georgio" = home-manager.lib.homeManagerConfiguration {
+      inherit pkgs;
+      modules = [
+        {
+          imports = [ ./home.nix ];
+        }
+      ];
+    };
   };
 }

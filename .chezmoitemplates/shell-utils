@@ -34,9 +34,11 @@ load_brew() {
 # Load Home Manager
 load_homemanager() {
 	if command -v home-manager >/dev/null 2>&1; then
-		if [ -d "/etc/profiles/per-user/$USER/etc/profile.d/hm-session-vars.sh" ]; then
+		if [ -f "/etc/profiles/per-user/$USER/etc/profile.d/hm-session-vars.sh" ]; then
 			. "/etc/profiles/per-user/$USER/etc/profile.d/hm-session-vars.sh"
-		elif [ -d "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh" ]; then
+		elif [ -f "$HOME/.local/state/nix/profiles/profile/etc/profile.d/hm-session-vars.sh" ]; then
+			. "$HOME/.local/state/nix/profiles/profile/etc/profile.d/hm-session-vars.sh"
+		elif [ -f "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh" ]; then
 			. "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh"
 		fi
 	fi
@@ -63,11 +65,6 @@ install_bins() {
 	if command -v home-manager >/dev/null 2>&1; then
 		printf 'Installing Home Manager'
 		home-manager switch
-	else
-		if command -v nix-shell >/dev/null 2>&1; then
-			printf 'Installing Home Manager'
-			nix-shell '<home-manager>' -A install
-		fi
 	fi
 
 	# Devbox
