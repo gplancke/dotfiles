@@ -23,6 +23,8 @@
           pkgs.bash
           pkgs.gcc
 
+					pkgs.home-manager
+
           pkgs.tree
           pkgs.age
           pkgs.unzip
