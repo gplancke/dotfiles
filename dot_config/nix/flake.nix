@@ -13,7 +13,6 @@
     # Function to create a pkgs set for a given system
     forAllSystems = f: nixpkgs.lib.genAttrs supportedSystems (system: f system (import nixpkgs { inherit system; }));
   in {
-    # Your packages for all supported systems
     packages = forAllSystems (system: pkgs: {
       homies = pkgs.buildEnv {
         name = "homies";
@@ -40,7 +39,6 @@
         ];
       };
 
-      # Fixed: use 'system' instead of 'pkgs.system'
       home-manager = home-manager.packages.${system}.home-manager;
     });
 

@@ -10,6 +10,10 @@ load_nix() {
 		export PATH="$nix_profile/bin:$PATH"
 		export NIX_PROFILES="$nix_profile/profiles"
 		export NIX_USER_PROFILE_DIR="$nix_profile/profiles/per-user/$USER"
+		{ [ -f "$nix_profile/etc/ssl/certs/ca-bundle.crt" ] && export NIX_SSL_CERT_FILE="$nix_profile/etc/ssl/certs/ca-bundle.crt"; } || \
+			{ [ -f "$nix_profile/etc/ssl/certs/ca-certificates.crt" ] && export NIX_SSL_CERT_FILE="$nix_profile/etc/ssl/certs/ca-certificates.crt"; } || \
+			{ [ -f "/etc/ssl/certs/ca-certificates.crt" ] && export NIX_SSL_CERT_FILE="/etc/ssl/certs/ca-certificates.crt"; } || \
+			{ [ -f "/etc/ssl/certs/ca-bundle.crt" ] && export NIX_SSL_CERT_FILE="/etc/ssl/certs/ca-bundle.crt"; }
 	fi
 
 	[ -f "${nix_profile}/etc/profile.d/nix.sh" ] && . "${nix_profile}/etc/profile.d/nix.sh"
@@ -56,9 +60,13 @@ install_bins() {
 	local nix_file=".config/nix"
 
 	# Nix
-	if command -v nix-env >/dev/null 2>&1 && [ -f "$HOME/$nix_file/flake.nix" ]; then
+	if command -v nix >/dev/null 2>&1 && [ -f "$HOME/$nix_file/flake.nix" ]; then
 		printf 'Installing Nix environment from %s\n' "$nix_file"
-		(cd $HOME/$nix_file && nix profile install '.#homies' '.#home-manager')
+		(cd $HOME/$nix_file && nix profile install '.#homies')
+		# we need to reload the nix environment so that we can install home-manager
+		load_nix
+		(cd $HOME/$nix_file && nix profile install '.#home-manager')
+		load_homemanager
 	fi
 
 	# Home manager
