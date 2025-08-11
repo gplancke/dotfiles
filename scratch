@@ -1,0 +1,1 @@
+export PATH="$HOME/.local/bin:$PATH" && sh -c "$(curl -fsLS get.chezmoi.io)" -- -b $HOME/.local/bin && chezmoi init --apply gplancke

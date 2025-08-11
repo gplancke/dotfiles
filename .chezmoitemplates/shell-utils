@@ -11,6 +11,15 @@ load_nix() {
 		export NIX_PROFILES="$nix_profile/profiles"
 		export NIX_USER_PROFILE_DIR="$nix_profile/profiles/per-user/$USER"
 	fi
+
+	[ -f "${nix_profile}/etc/profile.d/nix.sh" ] && . "${nix_profile}/etc/profile.d/nix.sh"
+
+	[ ! -f "${nix_profile}/etc/profile.d/nix.sh" ] \
+		&& [ -f "/nix/var/nix/profiles/default/etc/profile.d/nix.sh" ] \
+		&& . /nix/var/nix/profiles/default/etc/profile.d/nix.sh
+
+	[ -f "/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh" ] \
+		&& . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
 }
 
 # Load Brew environment

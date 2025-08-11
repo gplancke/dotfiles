@@ -119,11 +119,11 @@ hash fnm 2>/dev/null && eval "$(fnm env)"
 	&& [ -f "/nix/var/nix/profiles/default/etc/profile.d/nix.sh" ] \
 	&& . /nix/var/nix/profiles/default/etc/profile.d/nix.sh
 
-([ -d "/etc/profiles/per-user/$(whoami)/etc/profile.d/hm-session-vars.sh" ] && . "/etc/profiles/per-user/$(whoami)/etc/profile.d/hm-session-vars.sh") || \
-([ -d "$NIX_DIR/etc/profile.d/hm-session-vars.sh" ] && . "$NIX_DIR/etc/profile.d/hm-session-vars.sh")
-
 [ -f "/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh" ] \
 	&& . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+
+([ -d "/etc/profiles/per-user/$(whoami)/etc/profile.d/hm-session-vars.sh" ] && . "/etc/profiles/per-user/$(whoami)/etc/profile.d/hm-session-vars.sh") || \
+([ -d "$NIX_DIR/etc/profile.d/hm-session-vars.sh" ] && . "$NIX_DIR/etc/profile.d/hm-session-vars.sh")
 
 hash devbox 2>/dev/null && eval "$(devbox global shellenv)"
 
