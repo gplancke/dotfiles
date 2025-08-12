@@ -35,40 +35,42 @@
           pkgs.htop
           pkgs.gtop
 
-		pkgs.hello
-		pkgs.direnv
-		pkgs.qemu
-		pkgs.starship
-		pkgs.diff-so-fancy
-		pkgs.ttyd
-		pkgs.fzf
+					pkgs.hello
+					pkgs.direnv
+					pkgs.qemu
+					pkgs.starship
+					pkgs.diff-so-fancy
+					pkgs.ttyd
+					pkgs.fzf
 
-		pkgs.git
-		pkgs.gh
-		pkgs.hub
-		pkgs.lazygit
+					pkgs.git
+					pkgs.gh
+					pkgs.hub
+					pkgs.lazygit
 
-		pkgs.neovim
-		pkgs.tmux
+					pkgs.neovim
+					pkgs.tmux
 
-		pkgs.docker
-		pkgs.docker-compose
-		pkgs.docker-buildx
-		pkgs.lazydocker
+					pkgs.docker
+					pkgs.docker-compose
+					pkgs.docker-buildx
+					pkgs.lazydocker
 
-		pkgs.nodejs
-		pkgs.deno
-		pkgs.deno
-		pkgs.pnpm
+					pkgs.nodejs
+					pkgs.deno
+					pkgs.deno
+					pkgs.pnpm
 
-		pkgs.luarocks
+					pkgs.luarocks
 
-		pkgs.ruby
+					pkgs.ruby
 
-		pkgs.python3
-		pkgs.uv
+					pkgs.python3
+					pkgs.uv
 
-		pkgs.cargo
+					pkgs.cargo
+
+					pkgs.openjdk17-bootstrap
         ];
       };
 

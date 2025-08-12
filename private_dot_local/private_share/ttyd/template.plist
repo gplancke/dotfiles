@@ -7,7 +7,7 @@
 
 		<key>ProgramArguments</key>
 		<array>
-			<string>/Users/georgio/.local/share/devbox/global/default/.devbox/nix/profile/default/bin/ttyd</string>
+			<string>/Users/georgio/.nix-profile/bin/ttyd</string>
 			<string>--writable</string>
 			<!-- <string>--ssl</string> -->
 			<!-- <string>--ssl-cert</string> -->
@@ -21,9 +21,9 @@
 			<string>--client-option</string>
 			<string>disableLeaveAlert=true</string>
 			<string>--client-option</string>
-			<string>lineHeight=1.1</string>
+			<string>lineHeight=1</string>
 			<string>--client-option</string>
-			<string>fontSize=12</string>
+			<string>fontSize=10</string>
 			<string>--client-option</string>
 			<string>fontWeight=600</string>
 			<string>--client-option</string>

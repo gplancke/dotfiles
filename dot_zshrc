@@ -3,9 +3,19 @@
 ##########################
 [ -f "${HOME}/.shell.common" ] && . "${HOME}/.shell.common"
 
+##########################
+# Install tools
+##########################
+if type install_zsh_manager >/dev/null 2>&1; then
+	install_zsh_manager
+fi
+
+##########################
+# ZSH specific settings
+##########################
+#
 # FZF
 [ -f "~/.fzf.zsh" ] && . "~/.fzf.zsh"
-[ -f ~/.fzf.colors ] && source ~/.fzf.colors
 
 # ASDF completion
 [ -d "$ASDF_DIR" ] && fpath=(${ASDF_DIR}/completions $fpath)
@@ -52,7 +62,6 @@ if [ -f ~/.config/antigen/antigen.zsh ]; then
   antigen bundle chisui/zsh-nix-shell
   antigen apply
 fi
-
 
 # The next line updates PATH for the Google Cloud SDK.
 if [ -f '/Users/georgio/.local/share/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/georgio/.local/share/google-cloud-sdk/path.zsh.inc'; fi
