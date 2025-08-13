@@ -9,8 +9,9 @@ if uname -r | grep -q 'microsoft'; then
 	export LINUX="1"
 	[ -f "${HOME}/.shell.wsl" ] && . "${HOME}/.shell.wsl"
 elif [ "$(uname)" = "Darwin" ]; then
+	sdkpath=$(xcrun --show-sdk-path)
 	export MACOS="1"
-	export SDKROOT=$(xcrun --show-sdk-path)
+	export SDKROOT="$sdkpath"
 	export XDG_CONFIG_HOME=$HOME/.config
 
 	# [ -d "/opt/homebrew/opt/libiconv/lib" ] && export LDFLAGS="-L/opt/homebrew/opt/libiconv/lib"
@@ -65,7 +66,7 @@ export TMUX_POWERLINE_DEFAULT_FOREGROUND_COLOR='255'
 ##########################
 # Path
 ##########################
-[ "$LINUX" = "1" ] && [ -d "/home/linuxbrew/.linuxbrew" ] && eval $(/home/linuxbrew/.linuxbrew/bin/brew shellenv)
+[ "$LINUX" = "1" ] && [ -d "/home/linuxbrew/.linuxbrew" ] && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 [ "$MACOS" = "1" ] && [ -f "/opt/homebrew/bin/brew" ] && eval "$(/opt/homebrew/bin/brew shellenv)"
 [ "$MACOS" = "1" ] && [ ! -f "/opt/homebrew/bin/brew" ] && [ -f "/usr/local/bin/brew" ] && eval "$(/usr/local/bin/brew shellenv)"
 
