@@ -50,7 +50,15 @@ load_devbox() {
 
 # Load Brew environment
 load_brew() {
-	local brew_bin=$1
+	local distro=$1
+
+	case "$distro" in
+		darwin)
+			brew_bin="/opt/homebrew/bin/brew"
+			;;
+		*)
+			brew_bin="/home/linuxbrew/.linuxbrew/bin/brew"
+	esac
 
 	if [ -x "$brew_bin" ]; then
 		printf 'Loading Homebrew environment from\n'
@@ -71,9 +79,9 @@ install_bins() {
 
 	# Home manager
 	if command -v home-manager >/dev/null 2>&1; then
-		# load_homemanager
+		load_homemanager
 		printf 'Installing Home Manager'
-		# home-manager switch
+		home-manager switch
 	fi
 
 	# Devbox

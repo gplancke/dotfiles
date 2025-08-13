@@ -11,9 +11,9 @@ install_tooling() {
 	if [ "$os_type" != "darwin" ]; then
 		echo "Nothing to install for $os_type"
 		return 0
+	else
+		# echo "xcode-select --install 2>/dev/null"
+		echo "should have installed xcode command line tools"
 	fi
-
-	# for darwing we need to install xcode command line tools
-	echo "xcode-select --install 2>/dev/null"
 }
 

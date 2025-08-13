@@ -37,20 +37,22 @@ else
 fi
 {{- end }}
 
+# hash: {{ include ".local/share/devbox/global/default/devbox.json" | sha256sum }}
+# hash: {{ include ".config/nix/flake.nix" | sha256sum }}
+
 # Common initialization for all platforms
 common_setup() {
 	local distro=$1
-	local brew_path=$2
 
+	load_brew "$distro"
 	load_nix
 	load_homemanager
 	load_devbox
-	load_brew "$brew_path"
 	install_bins
 }
 
 setup_darwin() {
-	common_setup "darwin" "/opt/homebrew/bin/brew"
+	common_setup "darwin"
 
 	# Install brew packages and casks
 	local brews=({{ range .packages.darwin.brews }}{{ . | quote }} {{ end }})
@@ -61,7 +63,7 @@ setup_darwin() {
 }
 
 setup_debian() {
-	common_setup "debian" "/home/linuxbrew/.linuxbrew/bin/brew"
+	common_setup "debian"
 
 	local apt_packages=({{ range .packages.debian.native }}{{ . | quote }} {{ end }})
 	local brews=({{ range .packages.debian.brews }}{{ . | quote }} {{ end }})
@@ -73,7 +75,7 @@ setup_debian() {
 }
 
 setup_fedora() {
-	common_setup "fedora" "/home/linuxbrew/.linuxbrew/bin/brew"
+	common_setup "fedora"
 
 	local dnf_packages=({{ range .packages.fedora.native }}{{ . | quote }} {{ end }})
 	local brews=({{ range .packages.fedora.brews }}{{ . | quote }} {{ end }})
@@ -85,7 +87,7 @@ setup_fedora() {
 }
 
 setup_arch() {
-	common_setup "arch" "/home/linuxbrew/.linuxbrew/bin/brew"
+	common_setup "arch"
 
 	local pacman_packages=({{ range .packages.arch.native }}{{ . | quote }} {{ end }})
 	local brews=({{ range .packages.arch.brews }}{{ . | quote }} {{ end }})
@@ -97,7 +99,7 @@ setup_arch() {
 }
 
 setup_alpine() {
-	common_setup "alpine" "/home/linuxbrew/.linuxbrew/bin/brew"
+	common_setup "alpine"
 
 	local apk_packages=({{ range .packages.alpine.native }}{{ . | quote }} {{ end }})
 	local brews=({{ range .packages.alpine.brews }}{{ . | quote }} {{ end }})

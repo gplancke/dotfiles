@@ -2,6 +2,7 @@
 
 if [ ! -f "$HOME/.config/chezmoi/key.txt" ]; then
     mkdir -p "$HOME/.config/chezmoi"
-    chezmoi age decrypt --output "$HOME/.config/chezmoi/key.txt" --passphrase "$HOME/.local/share/chezmoi/key.txt.age"
+		[ -x "$HOME/.local/bin/chezmoi" ] && chezmoiBin="$HOME/.local/bin/chezmoi" || chezmoiBin="chezmoi"
+    $chezmoiBin age decrypt --output "$HOME/.config/chezmoi/key.txt" --passphrase "$HOME/.local/share/chezmoi/key.txt.age"
     chmod 600 "$HOME/.config/chezmoi/key.txt"
 fi

@@ -2,56 +2,41 @@
 	"packages": {
 		"darwin": {
 			"brews": [
-				"git",
-				"curl",
 				"libiconv",
 				"imagemagick"
 			],
 			"casks": [
 				"bitwarden",
 				"raycast",
-				"ghostty"
+				"ghostty",
+				"orbstack",
+				"alt-tab",
+				"tailscale"
 			]
 		},
 		"debian": {
-			"native": [
-				"curl",
-				"git",
-				"build-essential"
-			],
+			"native": [],
 			"brews": [
 				"imagemagick"
 			],
 			"casks": []
 		},
 		"fedora": {
-			"native": [
-				"curl",
-				"git",
-				"@development-tools"
-			],
+			"native": [],
 			"brews": [
 				"imagemagick"
 			],
 			"casks": []
 		},
 		"arch": {
-			"native": [
-				"curl",
-				"git",
-				"base-devel"
-			],
+			"native": [],
 			"brews": [
 				"imagemagick"
 			],
 			"casks": []
 		},
 		"alpine": {
-			"native": [
-				"curl",
-				"git",
-				"build-base"
-			],
+			"native": [],
 			"brews": [
 				"imagemagick"
 			],
