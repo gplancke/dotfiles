@@ -1,3 +1,5 @@
+printf "Sourcing .profile\n"
+
 ##########################
 # Platform Specifics
 ##########################

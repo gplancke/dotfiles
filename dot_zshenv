@@ -1,1 +1,3 @@
+printf "sourcing .zshenv\n"
+
 [[ -r ~/.profile ]] && source ~/.profile

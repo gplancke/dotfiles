@@ -1,3 +1,5 @@
+printf "sourcing .zshrc\n"
+
 ##########################
 # Default config at setup
 ##########################
