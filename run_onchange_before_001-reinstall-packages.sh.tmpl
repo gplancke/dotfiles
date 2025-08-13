@@ -37,8 +37,8 @@ else
 fi
 {{- end }}
 
-# hash: {{ include ".local/share/devbox/global/default/devbox.json" | sha256sum }}
-# hash: {{ include ".config/nix/flake.nix" | sha256sum }}
+# hash: {{ include "private_dot_local/private_share/devbox/global/default/devbox.json" | sha256sum }}
+# hash: {{ include "dot_config/nix/flake.nix" | sha256sum }}
 
 # Common initialization for all platforms
 common_setup() {
