@@ -66,6 +66,16 @@ load_brew() {
 	fi
 }
 
+# Common initialization for all platforms
+common_setup() {
+	local distro=$1
+
+	load_brew "$distro"
+	load_nix
+	load_homemanager
+	load_devbox
+}
+
 # Install Nix environment packages
 install_nix_bins() {
 	local nix_file=".config/nix"

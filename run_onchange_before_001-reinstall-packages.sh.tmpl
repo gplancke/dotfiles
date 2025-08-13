@@ -37,21 +37,6 @@ else
 fi
 {{- end }}
 
-# hash: {{ include "private_dot_local/private_share/devbox/global/default/devbox.json" | sha256sum }}
-# hash: {{ include "dot_config/nix/flake.nix" | sha256sum }}
-
-# Common initialization for all platforms
-common_setup() {
-	local distro=$1
-
-	load_brew "$distro"
-	load_nix
-	load_homemanager
-	load_devbox
-
-	install_nix_bins
-}
-
 setup_darwin() {
 	common_setup "darwin"
 

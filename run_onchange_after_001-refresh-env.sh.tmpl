@@ -1,0 +1,44 @@
+#!/bin/bash
+
+# Best practices: exit on error, undefined vars, and pipe failures
+set -euo pipefail
+
+# Optional: uncomment for debugging
+# set -x
+
+{{/* Include shared utility functions */}}
+{{- template "shell-utils" . -}}
+
+{{ if eq .chezmoi.os "darwin" -}}
+DISTRO="darwin"
+{{- else -}}
+# Detect Linux distribution
+if [ -f /etc/os-release ]; then
+  . /etc/os-release
+  case "$ID" in
+    fedora|rhel|centos|rocky|almalinux)
+      DISTRO="fedora"
+      ;;
+    arch|manjaro|endeavouros|garuda)
+      DISTRO="arch"
+      ;;
+    ubuntu|debian|pop|elementary|linuxmint)
+      DISTRO="debian"
+      ;;
+    alpine)
+      DISTRO="alpine"
+      ;;
+    *)
+      DISTRO="unknown"
+      ;;
+  esac
+else
+  DISTRO="unknown"
+fi
+{{- end }}
+
+# hash: {{ include "private_dot_local/private_share/devbox/global/default/devbox.json" | sha256sum }}
+# hash: {{ include "dot_config/nix/flake.nix" | sha256sum }}
+
+common_setup "$DISTRO"
+install_nix_bins
