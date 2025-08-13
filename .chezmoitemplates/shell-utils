@@ -67,7 +67,7 @@ load_brew() {
 }
 
 # Install Nix environment packages
-install_bins() {
+install_nix_bins() {
 	local nix_file=".config/nix"
 	local current_dir="$(pwd)"
 
@@ -79,7 +79,6 @@ install_bins() {
 
 	# Home manager
 	if command -v home-manager >/dev/null 2>&1; then
-		load_homemanager
 		printf 'Installing Home Manager'
 		home-manager switch
 	fi
