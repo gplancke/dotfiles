@@ -51,9 +51,6 @@
 					pkgs.neovim
 					pkgs.tmux
 
-					pkgs.docker
-					pkgs.docker-compose
-					pkgs.docker-buildx
 					pkgs.lazydocker
 
 					pkgs.nodejs
