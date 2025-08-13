@@ -354,6 +354,239 @@ install_nix_bins() {
 }
 
 #############################################
+# Install TTYD service
+# Installs ttyd via brew and configures it as a service
+# Supports macOS (launchctl), Linux (systemd), and Alpine (OpenRC)
+#############################################
+install_ttyd() {
+	local distro=$1
+	local ttyd_port="${TTYD_PORT:-7681}"
+	local ttyd_label="${TTYD_LABEL:-localhost.ttyd}"
+	local home="$HOME"
+	local local_dir="$home/.local"
+	local ttyd_dir="$local_dir/share/ttyd"
+
+	# Install ttyd via brew
+	if command -v brew >/dev/null 2>&1; then
+		printf 'Installing ttyd via Homebrew...\n'
+		brew install ttyd || true
+	else
+		printf 'Homebrew not found, skipping ttyd installation\n'
+		return 1
+	fi
+
+	# Verify ttyd installation
+	if ! command -v ttyd >/dev/null 2>&1; then
+		printf 'Error: ttyd not found after installation\n' >&2
+		return 1
+	fi
+
+	# Create ttyd directory
+	mkdir -p "$ttyd_dir"
+
+	case "$distro" in
+		darwin)
+			install_ttyd_macos "$ttyd_dir" "$ttyd_label" "$ttyd_port"
+			;;
+		linux)
+			install_ttyd_linux "$ttyd_dir" "$ttyd_label" "$ttyd_port"
+			;;
+		alpine)
+			install_ttyd_alpine "$ttyd_dir" "$ttyd_label" "$ttyd_port"
+			;;
+		*)
+			printf 'Unsupported distribution "%s" for ttyd service\n' "$distro"
+			return 1
+			;;
+	esac
+
+	printf 'ttyd service installation complete\n'
+}
+
+#############################################
+# Install TTYD service on macOS using launchctl
+#############################################
+install_ttyd_macos() {
+	local ttyd_dir="$1"
+	local ttyd_label="$2"
+	local ttyd_port="$3"
+	local plist_dir="$HOME/Library/LaunchAgents"
+	local plist_file="$plist_dir/${ttyd_label}.plist"
+	local ttyd_bin
+
+	# Find ttyd binary
+	ttyd_bin="$(command -v ttyd)"
+	if [ -z "$ttyd_bin" ]; then
+		printf 'Error: ttyd binary not found\n' >&2
+		return 1
+	fi
+
+	mkdir -p "$plist_dir"
+
+	# Create launchd plist
+	cat > "$plist_file" << EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>$ttyd_label</string>
+
+	<key>ProgramArguments</key>
+	<array>
+		<string>$ttyd_bin</string>
+		<string>--writable</string>
+		<string>--interface</string>
+		<string>127.0.0.1</string>
+		<string>--port</string>
+		<string>$ttyd_port</string>
+		<string>--client-option</string>
+		<string>disableLeaveAlert=true</string>
+		<string>--client-option</string>
+		<string>lineHeight=1</string>
+		<string>--client-option</string>
+		<string>fontSize=10</string>
+		<string>--client-option</string>
+		<string>fontWeight=600</string>
+		<string>--client-option</string>
+		<string>fontFamily='FiraCode Nerd Font Mono'</string>
+		<string>--client-option</string>
+		<string>theme={
+			"background": "#303446",
+			"foreground": "#c6d0f5",
+			"cursor": "#f2d5cf",
+			"black": "#51576d",
+			"blue": "#8caaee",
+			"red": "#e78284",
+			"green": "#a6d189",
+			"yellow": "#e5c890",
+			"magenta": "#f4b8e4",
+			"cyan": "#81c8be",
+			"white": "#b5bfe2",
+			"brightBlack": "#626880",
+			"brightWhite": "#a5adce",
+			"brightBlue": "#8caaee",
+			"brightRed": "#e78284",
+			"brightGreen": "#a6d189",
+			"brightYellow": "#e5c890",
+			"brightMagenta": "#f4b8e4",
+			"brightCyan": "#81c8be"
+		}</string>
+		<string>$SHELL</string>
+		<string>--login</string>
+	</array>
+
+	<key>RunAtLoad</key>
+	<true/>
+
+	<key>KeepAlive</key>
+	<true/>
+
+	<key>WorkingDirectory</key>
+	<string>$HOME</string>
+
+	<key>StandardOutPath</key>
+	<string>$HOME/Library/Logs/$ttyd_label.log</string>
+
+	<key>StandardErrorPath</key>
+	<string>$HOME/Library/Logs/$ttyd_label.log</string>
+</dict>
+</plist>
+EOF
+
+	# Load the service
+	launchctl load "$plist_file" 2>/dev/null || true
+	printf 'ttyd service installed and loaded on macOS\n'
+	printf 'Access at: http://localhost:%s\n' "$ttyd_port"
+}
+
+#############################################
+# Install TTYD service on Linux using systemd
+#############################################
+install_ttyd_linux() {
+	local ttyd_dir="$1"
+	local ttyd_label="$2"
+	local ttyd_port="$3"
+	local service_file="/etc/systemd/system/${ttyd_label}.service"
+	local ttyd_bin
+
+	# Find ttyd binary
+	ttyd_bin="$(command -v ttyd)"
+	if [ -z "$ttyd_bin" ]; then
+		printf 'Error: ttyd binary not found\n' >&2
+		return 1
+	fi
+
+	# Create systemd service file
+	sudo tee "$service_file" > /dev/null << EOF
+[Unit]
+Description=TTYD Web Terminal
+After=network.target
+
+[Service]
+Type=simple
+User=$USER
+Group=$USER
+ExecStart=$ttyd_bin --writable --interface 127.0.0.1 --port $ttyd_port --client-option disableLeaveAlert=true --client-option lineHeight=1 --client-option fontSize=10 --client-option fontWeight=600 --client-option fontFamily='FiraCode Nerd Font Mono' --client-option theme='{"background": "#303446", "foreground": "#c6d0f5", "cursor": "#f2d5cf", "black": "#51576d", "blue": "#8caaee", "red": "#e78284", "green": "#a6d189", "yellow": "#e5c890", "magenta": "#f4b8e4", "cyan": "#81c8be", "white": "#b5bfe2", "brightBlack": "#626880", "brightWhite": "#a5adce", "brightBlue": "#8caaee", "brightRed": "#e78284", "brightGreen": "#a6d189", "brightYellow": "#e5c890", "brightMagenta": "#f4b8e4", "brightCyan": "#81c8be"}' $SHELL --login
+WorkingDirectory=$HOME
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+	# Reload systemd and enable service
+	sudo systemctl daemon-reload
+	sudo systemctl enable "$ttyd_label"
+	sudo systemctl start "$ttyd_label"
+
+	printf 'ttyd service installed and started on Linux\n'
+	printf 'Access at: http://localhost:%s\n' "$ttyd_port"
+	printf 'Manage with: sudo systemctl {start|stop|restart|status} %s\n' "$ttyd_label"
+}
+
+#############################################
+# Install TTYD service on Alpine using OpenRC
+#############################################
+install_ttyd_alpine() {
+	local ttyd_dir="$1"
+	local ttyd_label="$2"
+	local ttyd_port="$3"
+	local init_file="/etc/init.d/$ttyd_label"
+	local ttyd_bin
+
+	# Find ttyd binary
+	ttyd_bin="$(command -v ttyd)"
+	if [ -z "$ttyd_bin" ]; then
+		printf 'Error: ttyd binary not found\n' >&2
+		return 1
+	fi
+
+	# Create OpenRC init script
+	sudo tee "$init_file" > /dev/null << EOF
+#!/sbin/openrc-run
+
+name="TTYD Web Terminal"
+description="TTYD Web Terminal Service"
+command="$ttyd_bin"
+command_args="--writable --interface 127.0.0.1 --port $ttyd_port --client-option disableLeaveAlert=true --client-option lineHeight=1 --client-option fontSize=10 --client-option fontWeight=600 --client-option fontFamily='FiraCode Nerd Font Mono' --client-option theme='{\"background\": \"#303446\", \"foreground\": \"#c6d0f5\", \"cursor\": \"#f2d5cf\", \"black\": \"#51576d\", \"blue\": \"#8caaee\", \"red\": \"#e78284\", \"green\": \"#a6d189\", \"yellow\": \"#e5c890\", \"magenta\": \"#f4b8e4\", \"cyan\": \"#81c8be\", \"white\": \"#b5bfe2\", \"brightBlack\": \"#626880\", \"brightWhite\": \"#a5adce\", \"brightBlue\": \"#8caaee\", \"brightRed\": \"#e78284\", \"brightGreen\": \"#a6d189\", \"brightYellow\": \"#e5c890\", \"brightMagenta\": \"#f4b8e4\", \"brightCyan\": \"#81c8be\"}' $SHELL --login"
+command_user="$USER:$USER"
+command_background=true
+pidfile="/var/run/\${RC_SVCNAME}.pid"
+EOF
+
+	# Make executable and add to default runlevel
+	sudo chmod +x "$init_file"
+	sudo rc-update add "$ttyd_label" default
+	sudo rc-service "$ttyd_label" start
+
+	printf 'ttyd service installed and started on Alpine\n'
+	printf 'Access at: http://localhost:%s\n' "$ttyd_port"
+	printf 'Manage with: sudo rc-service %s {start|stop|restart|status}\n' "$ttyd_label"
+}
+
+#############################################
 # Install Homebrew packages
 #############################################
 install_brew_packages() {

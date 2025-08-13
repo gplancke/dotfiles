@@ -1,0 +1,239 @@
+#!/bin/bash
+
+# TTYD Service Manager
+# Manages ttyd web terminal service across different platforms
+# Supports macOS (launchctl), Linux (systemd), and Alpine (OpenRC)
+
+set -euo pipefail
+
+# Default configuration
+TTYD_PORT="${TTYD_PORT:-7681}"
+TTYD_LABEL="${TTYD_LABEL:-localhost.ttyd}"
+TTYD_URL="http://localhost:${TTYD_PORT}"
+
+# Detect platform
+detect_platform() {
+	case "$(uname -s)" in
+		Darwin)
+			echo "darwin"
+			;;
+		Linux)
+			if [ -f /etc/alpine-release ]; then
+				echo "alpine"
+			else
+				echo "linux"
+			fi
+			;;
+		*)
+			echo "unknown"
+			;;
+	esac
+}
+
+# Check if ttyd is installed
+check_ttyd() {
+	if ! command -v ttyd >/dev/null 2>&1; then
+		echo "Error: ttyd not found. Install it first with: brew install ttyd" >&2
+		return 1
+	fi
+}
+
+# macOS service management
+manage_macos() {
+	local action="$1"
+	local plist_file="$HOME/Library/LaunchAgents/${TTYD_LABEL}.plist"
+
+	case "$action" in
+		install)
+			check_ttyd
+			echo "Installing ttyd service on macOS..."
+			# This will be handled by the shell-utils install_ttyd function
+			echo "Use the install_ttyd function from shell-utils"
+			;;
+		start)
+			if [ -f "$plist_file" ]; then
+				launchctl load "$plist_file" 2>/dev/null || true
+				echo "ttyd service started"
+			else
+				echo "Error: ttyd service not installed" >&2
+				return 1
+			fi
+			;;
+		stop)
+			launchctl unload "$plist_file" 2>/dev/null || true
+			echo "ttyd service stopped"
+			;;
+		restart)
+			manage_macos stop
+			sleep 1
+			manage_macos start
+			;;
+		status)
+			if launchctl list | grep -q "$TTYD_LABEL"; then
+				echo "ttyd service is running"
+				echo "Access at: $TTYD_URL"
+			else
+				echo "ttyd service is not running"
+			fi
+			;;
+		uninstall)
+			manage_macos stop
+			rm -f "$plist_file"
+			echo "ttyd service uninstalled"
+			;;
+		*)
+			echo "Unknown action: $action" >&2
+			return 1
+			;;
+	esac
+}
+
+# Linux systemd service management
+manage_linux() {
+	local action="$1"
+	local service_name="$TTYD_LABEL"
+
+	case "$action" in
+		install)
+			check_ttyd
+			echo "Installing ttyd service on Linux..."
+			# This will be handled by the shell-utils install_ttyd function
+			echo "Use the install_ttyd function from shell-utils"
+			;;
+		start)
+			sudo systemctl start "$service_name"
+			echo "ttyd service started"
+			;;
+		stop)
+			sudo systemctl stop "$service_name"
+			echo "ttyd service stopped"
+			;;
+		restart)
+			sudo systemctl restart "$service_name"
+			echo "ttyd service restarted"
+			;;
+		status)
+			if sudo systemctl is-active --quiet "$service_name"; then
+				echo "ttyd service is running"
+				echo "Access at: $TTYD_URL"
+			else
+				echo "ttyd service is not running"
+			fi
+			sudo systemctl status "$service_name" --no-pager -l
+			;;
+		uninstall)
+			sudo systemctl stop "$service_name" 2>/dev/null || true
+			sudo systemctl disable "$service_name" 2>/dev/null || true
+			sudo rm -f "/etc/systemd/system/${service_name}.service"
+			sudo systemctl daemon-reload
+			echo "ttyd service uninstalled"
+			;;
+		*)
+			echo "Unknown action: $action" >&2
+			return 1
+			;;
+	esac
+}
+
+# Alpine OpenRC service management
+manage_alpine() {
+	local action="$1"
+	local service_name="$TTYD_LABEL"
+
+	case "$action" in
+		install)
+			check_ttyd
+			echo "Installing ttyd service on Alpine..."
+			# This will be handled by the shell-utils install_ttyd function
+			echo "Use the install_ttyd function from shell-utils"
+			;;
+		start)
+			sudo rc-service "$service_name" start
+			echo "ttyd service started"
+			;;
+		stop)
+			sudo rc-service "$service_name" stop
+			echo "ttyd service stopped"
+			;;
+		restart)
+			sudo rc-service "$service_name" restart
+			echo "ttyd service restarted"
+			;;
+		status)
+			if sudo rc-service "$service_name" status >/dev/null 2>&1; then
+				echo "ttyd service is running"
+				echo "Access at: $TTYD_URL"
+			else
+				echo "ttyd service is not running"
+			fi
+			;;
+		uninstall)
+			sudo rc-service "$service_name" stop 2>/dev/null || true
+			sudo rc-update del "$service_name" default 2>/dev/null || true
+			sudo rm -f "/etc/init.d/$service_name"
+			echo "ttyd service uninstalled"
+			;;
+		*)
+			echo "Unknown action: $action" >&2
+			return 1
+			;;
+	esac
+}
+
+# Main function
+main() {
+	local action="${1:-status}"
+	local platform
+
+	platform=$(detect_platform)
+
+	case "$platform" in
+		darwin)
+			manage_macos "$action"
+			;;
+		linux)
+			manage_linux "$action"
+			;;
+		alpine)
+			manage_alpine "$action"
+			;;
+		*)
+			echo "Unsupported platform: $platform" >&2
+			return 1
+			;;
+	esac
+}
+
+# Show usage
+usage() {
+	cat << EOF
+Usage: $0 [ACTION]
+
+Actions:
+  install    - Install ttyd service (use install_ttyd function from shell-utils)
+  start      - Start ttyd service
+  stop       - Stop ttyd service
+  restart    - Restart ttyd service
+  status     - Show service status (default)
+  uninstall  - Uninstall ttyd service
+
+Environment variables:
+  TTYD_PORT  - Port for ttyd to listen on (default: 7681)
+  TTYD_LABEL - Service label/name (default: localhost.ttyd)
+
+Examples:
+  $0 status
+  $0 start
+  $0 stop
+  TTYD_PORT=8080 $0 restart
+EOF
+}
+
+# Handle help
+if [ "${1:-}" = "-h" ] || [ "${1:-}" = "--help" ]; then
+	usage
+	exit 0
+fi
+
+# Run main function
+main "$@"
