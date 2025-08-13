@@ -61,7 +61,7 @@ load_brew() {
 	esac
 
 	if [ -x "$brew_bin" ]; then
-		printf 'Loading Homebrew environment from\n'
+		printf 'Loading Homebrew environment from %s\n' "$brew_bin"
 		eval "$("$brew_bin" shellenv)"
 	fi
 }

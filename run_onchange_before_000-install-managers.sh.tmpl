@@ -223,6 +223,11 @@ install_nix() {
   fi
 }
 
+install_homemanager() {
+  load_nix
+	printf 'Installing Home Manager...\n'
+}
+
 install_devbox() {
 	if ! command -v devbox >/dev/null 2>&1; then
 		curl -fsSL https://get.jetify.com/devbox | bash
@@ -273,6 +278,7 @@ install_docker $DISTRO
 install_brew $DISTRO
 
 install_nix $DISTRO
+install_homemanager $DISTRO
 install_devbox $DISTRO
 
 install_complements $DISTRO
