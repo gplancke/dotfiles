@@ -366,6 +366,8 @@ install_ttyd() {
 	local local_dir="$home/.local"
 	local ttyd_dir="$local_dir/share/ttyd"
 
+	load_brew "$distro"
+
 	# Install ttyd via brew
 	if command -v brew >/dev/null 2>&1; then
 		printf 'Installing ttyd via Homebrew...\n'
@@ -385,14 +387,14 @@ install_ttyd() {
 	mkdir -p "$ttyd_dir"
 
 	case "$distro" in
-		darwin)
-			install_ttyd_macos "$ttyd_dir" "$ttyd_label" "$ttyd_port"
+		launchctl)
+			install_ttyd_launchctl "$ttyd_dir" "$ttyd_label" "$ttyd_port"
 			;;
-		linux)
-			install_ttyd_linux "$ttyd_dir" "$ttyd_label" "$ttyd_port"
+		systemd)
+			install_ttyd_systemctl "$ttyd_dir" "$ttyd_label" "$ttyd_port"
 			;;
-		alpine)
-			install_ttyd_alpine "$ttyd_dir" "$ttyd_label" "$ttyd_port"
+		openrc)
+			install_ttyd_openrc "$ttyd_dir" "$ttyd_label" "$ttyd_port"
 			;;
 		*)
 			printf 'Unsupported distribution "%s" for ttyd service\n' "$distro"
@@ -406,7 +408,7 @@ install_ttyd() {
 #############################################
 # Install TTYD service on macOS using launchctl
 #############################################
-install_ttyd_macos() {
+install_ttyd_launchctl() {
 	local ttyd_dir="$1"
 	local ttyd_label="$2"
 	local ttyd_port="$3"
@@ -503,7 +505,7 @@ EOF
 #############################################
 # Install TTYD service on Linux using systemd
 #############################################
-install_ttyd_linux() {
+install_ttyd_systemctl() {
 	local ttyd_dir="$1"
 	local ttyd_label="$2"
 	local ttyd_port="$3"
@@ -549,7 +551,7 @@ EOF
 #############################################
 # Install TTYD service on Alpine using OpenRC
 #############################################
-install_ttyd_alpine() {
+install_ttyd_openrc() {
 	local ttyd_dir="$1"
 	local ttyd_label="$2"
 	local ttyd_port="$3"
