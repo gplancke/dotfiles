@@ -49,4 +49,8 @@ install_devbox $DISTRO
 
 install_complements $DISTRO
 
+# Switch to zsh if it exists
+ZSH_PATH=$(which zsh 2>/dev/null)
+[[ "$SHELL" != "$ZSH_PATH" ]] && [[ -n "$ZSH_PATH" ]] && [[ -x "$ZSH_PATH" ]] && sudo chsh -s "$ZSH_PATH" "$USER"
+
 exit 0
