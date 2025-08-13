@@ -227,7 +227,7 @@ install_brew() {
   fi
 
   printf 'Installing Homebrew...\n'
-  /bin/bash -c "$(curl -fsSL $installer_url)"
+  NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL $installer_url)"
 
   # Determine where brew was installed
   if [ "$os_type" = "darwin" ]; then
