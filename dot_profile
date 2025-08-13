@@ -94,7 +94,7 @@ export TMUX_POWERLINE_DEFAULT_FOREGROUND_COLOR='255'
 ##########################
 # Extensions
 ##########################
-command -v fnm 2>/dev/null && eval "$(fnm env)"
+command -v fnm >/dev/null 2>&1 && eval "$(fnm env)"
 [ -f "${ASDF_DIR}/asdf.sh" ] && . "${ASDF_DIR}/asdf.sh"
 
 { [ -f "${NIX_DIR}/etc/profile.d/nix.sh" ] && . "${NIX_DIR}/etc/profile.d/nix.sh"; } ||
@@ -106,4 +106,4 @@ command -v fnm 2>/dev/null && eval "$(fnm env)"
 	{ [ -f "$HOME/.local/state/nix/profiles/profile/etc/profile.d/hm-session-vars.sh" ] && . "$HOME/.local/state/nix/profiles/profile/etc/profile.d/hm-session-vars.sh"; } ||
 	{ [ -n "${NIX_DIR:-}" ] && [ -f "$NIX_DIR/etc/profile.d/hm-session-vars.sh" ] && . "$NIX_DIR/etc/profile.d/hm-session-vars.sh"; }
 
-command -v devbox 2>/dev/null && eval "$(devbox global shellenv)"
+command -v devbox >/dev/null 2>&1 && eval "$(devbox global shellenv)"
