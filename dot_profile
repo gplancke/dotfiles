@@ -1,4 +1,4 @@
-printf "Sourcing .profile\n"
+printf "sourcing .profile\n"
 
 ##########################
 # Platform Specifics

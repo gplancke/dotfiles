@@ -1,4 +1,4 @@
 printf "sourcing ~/.bash_profile\n"
 
-[ -f "$HOME/.profile" ] && source "$HOME/.profile"
+# [ -f "$HOME/.profile" ] && source "$HOME/.profile"
 [ -f "$HOME/.bashrc" ] && source "$HOME/.bashrc"
