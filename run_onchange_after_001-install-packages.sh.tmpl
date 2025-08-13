@@ -37,8 +37,12 @@ else
 fi
 {{- end }}
 
+# hash: {{ include "private_dot_local/private_share/devbox/global/default/devbox.json" | sha256sum }}
+# hash: {{ include "dot_config/nix/flake.nix" | sha256sum }}
+
 setup_darwin() {
 	common_setup "darwin"
+	install_nix_bins
 
 	# Install brew packages and casks
 	local brews=({{ range .packages.darwin.brews }}{{ . | quote }} {{ end }})
@@ -50,6 +54,7 @@ setup_darwin() {
 
 setup_debian() {
 	common_setup "debian"
+	install_nix_bins
 
 	local apt_packages=({{ range .packages.debian.native }}{{ . | quote }} {{ end }})
 	local brews=({{ range .packages.debian.brews }}{{ . | quote }} {{ end }})
@@ -62,6 +67,7 @@ setup_debian() {
 
 setup_fedora() {
 	common_setup "fedora"
+	install_nix_bins
 
 	local dnf_packages=({{ range .packages.fedora.native }}{{ . | quote }} {{ end }})
 	local brews=({{ range .packages.fedora.brews }}{{ . | quote }} {{ end }})
@@ -74,6 +80,7 @@ setup_fedora() {
 
 setup_arch() {
 	common_setup "arch"
+	install_nix_bins
 
 	local pacman_packages=({{ range .packages.arch.native }}{{ . | quote }} {{ end }})
 	local brews=({{ range .packages.arch.brews }}{{ . | quote }} {{ end }})
@@ -86,6 +93,7 @@ setup_arch() {
 
 setup_alpine() {
 	common_setup "alpine"
+	install_nix_bins
 
 	local apk_packages=({{ range .packages.alpine.native }}{{ . | quote }} {{ end }})
 	local brews=({{ range .packages.alpine.brews }}{{ . | quote }} {{ end }})
