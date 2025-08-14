@@ -1,4 +1,5 @@
 #!/bin/bash
+
 # This script resizes input images to the Apple Store required dimensions.
 # It requires ImageMagick to be installed (for the 'convert' command).
 

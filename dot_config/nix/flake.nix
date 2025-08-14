@@ -3,7 +3,7 @@
 
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
 
-  outputs = { self, nixpkgs, home-manager, ... }:
+  outputs = { nixpkgs, ... }:
   let
     # Define a set of supported systems
     supportedSystems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
@@ -34,13 +34,13 @@
           pkgs.nmap
           pkgs.htop
           pkgs.gtop
+					pkgs.ttyd
 
 					pkgs.hello
 					pkgs.direnv
 					pkgs.qemu
 					pkgs.starship
 					pkgs.diff-so-fancy
-					pkgs.ttyd
 					pkgs.fzf
 
 					pkgs.git
