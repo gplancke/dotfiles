@@ -41,7 +41,7 @@ fi
 # hash: {{ include "dot_config/nix/flake.nix" | sha256sum }}
 
 setup_darwin() {
-	common_setup "darwin"
+	load_env "darwin"
 	install_nix_bins
 	install_ttyd "launchctl"
 
@@ -54,7 +54,7 @@ setup_darwin() {
 }
 
 setup_debian() {
-	common_setup "debian"
+	load_env "debian"
 	install_nix_bins
 
 	local apt_packages=({{ range .packages.debian.native }}{{ . | quote }} {{ end }})
@@ -67,7 +67,7 @@ setup_debian() {
 }
 
 setup_fedora() {
-	common_setup "fedora"
+	load_env "fedora"
 	install_nix_bins
 
 	local dnf_packages=({{ range .packages.fedora.native }}{{ . | quote }} {{ end }})
@@ -80,7 +80,7 @@ setup_fedora() {
 }
 
 setup_arch() {
-	common_setup "arch"
+	load_env "arch"
 	install_nix_bins
 
 	local pacman_packages=({{ range .packages.arch.native }}{{ . | quote }} {{ end }})
@@ -93,7 +93,7 @@ setup_arch() {
 }
 
 setup_alpine() {
-	common_setup "alpine"
+	load_env "alpine"
 	install_nix_bins
 
 	local apk_packages=({{ range .packages.alpine.native }}{{ . | quote }} {{ end }})

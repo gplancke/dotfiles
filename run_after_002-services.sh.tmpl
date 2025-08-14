@@ -40,18 +40,23 @@ fi
 main() {
 	case "$DISTRO" in
 		"darwin")
+			load_env "darwin"
 			setup_ttyd "launchctl"
 			;;
 		"debian")
+			load_env "debian"
 			setup_ttyd "systemd"
 			;;
 		"fedora")
+			load_env "fedora"
 			setup_ttyd "systemd"
 			;;
 		"arch")
+			load_env "arch"
 			setup_ttyd "systemd"
 			;;
 		"alpine")
+			load_env "alpine"
 			setup_ttyd "openrc"
 			;;
 		*)
