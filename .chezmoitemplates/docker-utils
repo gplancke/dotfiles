@@ -1,0 +1,62 @@
+# Docker utility functions for chezmoi scripts
+
+#############################################
+# Install Docker engine and CLI
+# Ensures daemon is enabled and user is in docker group
+#############################################
+install_docker() {
+  local distro=$1
+
+	if command -v docker >/dev/null 2>&1; then
+		# printf 'Docker is already installed.\n'
+		return 0
+	fi
+
+  case "$distro" in
+    debian|fedora)
+      printf 'Installing Docker using the official convenience script...\n'
+      curl -fsSL https://get.docker.com -o /tmp/get-docker.sh
+      sh /tmp/get-docker.sh
+
+      sudo systemctl enable docker || true
+      sudo systemctl start docker || true
+
+      sudo groupadd docker 2>/dev/null || true
+      sudo usermod -aG docker "$USER" || true
+      ;;
+    arch)
+      printf 'Installing Docker on Arch-based systems...\n'
+      sudo pacman -Syu --noconfirm
+      sudo pacman -S --noconfirm docker docker-compose || true
+
+      sudo systemctl enable docker || true
+      sudo systemctl start docker || true
+
+      sudo groupadd docker 2>/dev/null || true
+      sudo usermod -aG docker "$USER" || true
+      ;;
+    alpine)
+      printf 'Installing Docker on Alpine Linux...\n'
+      sudo apk add docker docker-compose || true
+
+      sudo rc-update add docker default || true
+      sudo service docker start || true
+
+      addgroup "$USER" docker || true
+      ;;
+    darwin)
+      printf 'Installing Docker Desktop and CLI on macOS...\n'
+      if command -v brew >/dev/null 2>&1; then
+        brew install --quiet docker || true
+				brew install --quiet docker-compose || true
+				brew install --quiet docker-buildx || true
+        brew install --quiet colima || true
+      fi
+      ;;
+    *)
+      printf 'Skipping Docker: unsupported distribution "%s"\n' "$distro"
+      ;;
+  esac
+
+  printf 'Docker installation step complete. You may need to log out/in for group changes to apply.\n'
+}

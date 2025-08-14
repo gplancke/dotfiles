@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# Best practices: exit on error, undefined vars, and pipe failures
 set -euo pipefail
 
 # Optional: uncomment for debugging
@@ -36,23 +37,29 @@ else
 fi
 {{- end }}
 
-#############################################
-# Install them all
-#############################################
+main() {
+	case "$DISTRO" in
+		"darwin")
+			setup_ttyd "launchctl"
+			;;
+		"debian")
+			setup_ttyd "systemd"
+			;;
+		"fedora")
+			setup_ttyd "systemd"
+			;;
+		"arch")
+			setup_ttyd "systemd"
+			;;
+		"alpine")
+			setup_ttyd "openrc"
+			;;
+		*)
+			echo "Unsupported distribution: $DISTRO" >&2
+			exit 1
+			;;
+	esac
+}
+
 sudo -v
-
-install_essentials $DISTRO
-install_brew $DISTRO
-install_docker $DISTRO
-
-install_nix $DISTRO
-install_homemanager $DISTRO
-install_devbox $DISTRO
-
-install_complements $DISTRO
-
-# Switch to zsh if it exists
-ZSH_PATH=$(which zsh 2>/dev/null)
-[[ "$SHELL" != "$ZSH_PATH" ]] && [[ -n "$ZSH_PATH" ]] && [[ -x "$ZSH_PATH" ]] && sudo chsh -s "$ZSH_PATH" "$USER"
-
-exit 0
+main "$@"

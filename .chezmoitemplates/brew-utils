@@ -1,0 +1,104 @@
+# Brew utility functions for chezmoi scripts
+
+#############################################
+# Load Brew environment
+#############################################
+load_brew() {
+	local distro=$1
+
+	case "$distro" in
+		darwin)
+			brew_bin="/opt/homebrew/bin/brew"
+			;;
+		*)
+			brew_bin="/home/linuxbrew/.linuxbrew/bin/brew"
+	esac
+
+	if [ -x "$brew_bin" ]; then
+		printf 'Loading Homebrew environment from %s\n' "$brew_bin"
+		eval "$("$brew_bin" shellenv)"
+	fi
+}
+
+#############################################
+# Installs homebrew on darwin and linux
+# On linux it installs linuxbrew
+# We tend to use nix instead
+#############################################
+install_brew() {
+  local os_type="$1"
+  local installer_url="https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh"
+  local brew_bin
+
+  # If brew already exists, bail out
+  if command -v brew >/dev/null 2>&1; then
+    # printf 'Homebrew is already installed (%s)\n' "$(command -v brew)"
+    return 0
+  fi
+
+  printf 'Installing Homebrew...\n'
+  NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL $installer_url)"
+
+  # Determine where brew was installed
+  if [ "$os_type" = "darwin" ]; then
+    brew_bin="/opt/homebrew/bin/brew"
+  else
+    if [ -d "/home/linuxbrew/.linuxbrew" ]; then
+      brew_bin="/home/linuxbrew/.linuxbrew/bin/brew"
+    else
+      brew_bin="$HOME/.linuxbrew/bin/brew"
+    fi
+  fi
+
+  load_brew "$os_type"
+
+  if command -v brew >/dev/null 2>&1; then
+    printf 'Homebrew installed and initialized: %s\n' "$(command -v brew)"
+  else
+    printf 'Error: brew not found after installation\n' >&2
+    return 1
+  fi
+}
+
+#############################################
+# Install Homebrew packages
+#############################################
+install_brew_packages() {
+	local brews=("$@")
+
+	if [ ! -x "$(command -v brew)" ]; then
+		echo "No brew found, skipping brew packages installation"
+		return 0
+	fi
+
+	if [ ${#brews[@]} -eq 0 ]; then
+		echo "No brew packages to install"
+		return 0
+	fi
+
+	for package in "${brews[@]}"; do
+		brew install "$package" || true
+	done
+}
+
+#############################################
+# Install Homebrew casks
+#############################################
+install_brew_casks() {
+	local casks=("$@")
+
+	if [ ! -x "$(command -v brew)" ]; then
+		echo "No brew found, skipping cask installation"
+		return 0
+	fi
+
+	if [ ${#casks[@]} -eq 0 ]; then
+		echo "No casks to install"
+		return 0
+	fi
+
+	for cask in "${casks[@]}"; do
+		echo "cask \"$cask\""
+		brew install --cask "$cask" || true
+	done
+}
