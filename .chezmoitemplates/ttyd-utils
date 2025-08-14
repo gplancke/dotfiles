@@ -7,7 +7,10 @@
 #############################################
 setup_ttyd() {
 	local init_system=$1
-	local ttyd_port="${TTYD_PORT:-7681}"
+	# Generate a default port between 7682-7999 based on hostname
+	local HOSTNAME_HASH=$(echo "$HOSTNAME" | cksum | cut -d' ' -f1)
+	local DEFAULT_TTYD_PORT=$((7682 + (HOSTNAME_HASH % 318)))  # 7682-7999 range
+	local ttyd_port="${TTYD_PORT:-$DEFAULT_TTYD_PORT}"
 	local ttyd_label="${TTYD_LABEL:-localhost.ttyd}"
 	local home="$HOME"
 
