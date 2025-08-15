@@ -91,15 +91,19 @@ setup_ttyd() {
 	# Detect the best available monospace font
 	local font_name=$(detect_mono_font)
 
-	# Common ttyd arguments
-	local ttyd_args="--writable --interface 127.0.0.1 --port $ttyd_port"
-	ttyd_args="$ttyd_args --client-option disableLeaveAlert=true"
-	ttyd_args="$ttyd_args --client-option lineHeight=1"
-	ttyd_args="$ttyd_args --client-option fontSize=10"
-	ttyd_args="$ttyd_args --client-option fontWeight=600"
-	ttyd_args="$ttyd_args --client-option fontFamily='$font_name'"
-	ttyd_args="$ttyd_args --client-option theme='{\"background\": \"#303446\", \"foreground\": \"#c6d0f5\", \"cursor\": \"#f2d5cf\", \"black\": \"#51576d\", \"blue\": \"#8caaee\", \"red\": \"#e78284\", \"green\": \"#a6d189\", \"yellow\": \"#e5c890\", \"magenta\": \"#f4b8e4\", \"cyan\": \"#81c8be\", \"white\": \"#b5bfe2\", \"brightBlack\": \"#626880\", \"brightWhite\": \"#a5adce\", \"brightBlue\": \"#8caaee\", \"brightRed\": \"#e78284\", \"brightGreen\": \"#a6d189\", \"brightYellow\": \"#e5c890\", \"brightMagenta\": \"#f4b8e4\", \"brightCyan\": \"#81c8be\"}'"
-	ttyd_args="$ttyd_args $shell_cmd"
+	# Build ttyd arguments as an array to preserve quoted strings
+	local ttyd_args=(
+		"--writable"
+		"--interface" "127.0.0.1"
+		"--port" "$ttyd_port"
+		"--client-option" "disableLeaveAlert=true"
+		"--client-option" "lineHeight=1"
+		"--client-option" "fontSize=10"
+		"--client-option" "fontWeight=600"
+		"--client-option" "fontFamily=$font_name"
+		"--client-option" 'theme={"background": "#303446", "foreground": "#c6d0f5", "cursor": "#f2d5cf", "black": "#51576d", "blue": "#8caaee", "red": "#e78284", "green": "#a6d189", "yellow": "#e5c890", "magenta": "#f4b8e4", "cyan": "#81c8be", "white": "#b5bfe2", "brightBlack": "#626880", "brightWhite": "#a5adce", "brightBlue": "#8caaee", "brightRed": "#e78284", "brightGreen": "#a6d189", "brightYellow": "#e5c890", "brightMagenta": "#f4b8e4", "brightCyan": "#81c8be"}'
+		$shell_cmd
+	)
 
 	case "$init_system" in
 		launchctl)
@@ -123,7 +127,7 @@ setup_ttyd() {
 EOF
 
 			# Add ttyd arguments to plist
-			for arg in $ttyd_args; do
+			for arg in "${ttyd_args[@]}"; do
 				printf '		<string>%s</string>\n' "$arg" >> "$plist_file"
 			done
 
@@ -165,7 +169,7 @@ After=network.target
 Type=simple
 User=$USER
 Group=$USER
-ExecStart=$ttyd_bin $ttyd_args
+ExecStart=$ttyd_bin "${ttyd_args[@]}"
 WorkingDirectory=$HOME
 Restart=always
 RestartSec=3
@@ -192,7 +196,7 @@ EOF
 name="TTYD Web Terminal"
 description="TTYD Web Terminal Service"
 command="$ttyd_bin"
-command_args="$ttyd_args"
+command_args="${ttyd_args[*]}"
 command_user="$USER:$USER"
 command_background=true
 pidfile="/var/run/\${RC_SVCNAME}.pid"
