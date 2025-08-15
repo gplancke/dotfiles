@@ -81,9 +81,9 @@ setup_ttyd() {
 	# Determine the shell to use: tmux > zsh > $SHELL
 	local shell_cmd
 	if command -v tmux >/dev/null 2>&1; then
-		shell_cmd="tmux new-session -A -s default"
+		shell_cmd="$(command -v tmux) new-session -A -s default"
 	elif command -v zsh >/dev/null 2>&1; then
-		shell_cmd="zsh --login"
+		shell_cmd="$(command -v zsh) --login"
 	else
 		shell_cmd="$SHELL --login"
 	fi
