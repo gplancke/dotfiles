@@ -43,7 +43,6 @@ fi
 setup_darwin() {
 	load_env "darwin"
 	install_nix_bins
-	install_ttyd "launchctl"
 
 	# Install brew packages and casks
 	local brews=({{ range .packages.darwin.brews }}{{ . | quote }} {{ end }})
