@@ -44,32 +44,32 @@ install_essentials() {
       printf 'Updating APT and installing essentials...\n'
       sudo apt-get update -y && sudo apt-get upgrade -y
       sudo apt-get install -y \
-        build-essential curl git zsh
+        build-essential wget curl git zsh
       ;;
     fedora)
       printf 'Updating DNF and installing essentials...\n'
       sudo dnf update -y
       sudo dnf install -y \
-        @development-tools curl git zsh
+        @development-tools wget curl git zsh
       ;;
     arch)
       printf 'Updating Pacman and installing essentials...\n'
       sudo pacman -Syu --noconfirm
       sudo pacman -S --noconfirm \
-        base-devel curl git zsh
+        base-devel wget curl git zsh
       ;;
     alpine)
       printf 'Updating APK and installing essentials...\n'
       sudo apk update && sudo apk upgrade
       sudo apk add \
-        build-base curl git zsh
+        build-base wget curl git zsh
       ;;
     darwin)
       printf 'Installing essentials for macos...\n'
       xcode-select --install || true
       install_brew "darwin"
       if command -v brew >/dev/null 2>&1; then
-        brew install --quiet openssl curl git zsh
+        brew install --quiet openssl wget curl git zsh
       fi
       ;;
     *)
