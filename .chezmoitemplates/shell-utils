@@ -69,7 +69,7 @@ install_essentials() {
       xcode-select --install || true
       install_brew "darwin"
       if command -v brew >/dev/null 2>&1; then
-        brew install --quiet openssl wget curl git zsh
+        brew install --quiet openssl wget curl git zsh || :
       fi
       ;;
     *)
