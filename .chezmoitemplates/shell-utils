@@ -43,32 +43,32 @@ install_essentials() {
       printf 'Updating APT and installing essentials...\n'
       sudo apt-get update -y && sudo apt-get upgrade -y
       sudo apt-get install -y \
-        build-essential curl git zsh fonts-hack-ttf
+        build-essential curl git zsh
       ;;
     fedora)
       printf 'Updating DNF and installing essentials...\n'
       sudo dnf update -y
       sudo dnf install -y \
-        @development-tools curl git zsh hack-fonts
+        @development-tools curl git zsh
       ;;
     arch)
       printf 'Updating Pacman and installing essentials...\n'
       sudo pacman -Syu --noconfirm
       sudo pacman -S --noconfirm \
-        base-devel curl git zsh ttf-hack
+        base-devel curl git zsh
       ;;
     alpine)
       printf 'Updating APK and installing essentials...\n'
       sudo apk update && sudo apk upgrade
       sudo apk add \
-        build-base curl git zsh font-hack-ttf
+        build-base curl git zsh
       ;;
     darwin)
       printf 'Installing essentials for macos...\n'
       xcode-select --install || true
       install_brew "darwin"
       if command -v brew >/dev/null 2>&1; then
-        brew install --quiet openssl curl git zsh font-hack-nerd-font
+        brew install --quiet openssl curl git zsh
       fi
       ;;
     *)
@@ -93,19 +93,19 @@ install_complements() {
 
   case "$distro" in
     debian)
-      printf 'No additional complements needed for Debian-based systems...\n'
+      install_nerd_fonts "debian"
       ;;
     fedora)
-      printf 'No additional complements needed for Fedora-based systems...\n'
+      install_nerd_fonts "fedora"
       ;;
     arch)
-      printf 'No additional complements needed for Arch-based systems...\n'
+      install_nerd_fonts "arch"
       ;;
     alpine)
-      printf 'No additional complements needed for Alpine Linux...\n'
+      install_nerd_fonts "alpine"
       ;;
     darwin)
-      printf 'Installing complements via Homebrew...\n'
+      install_nerd_fonts "darwin"
       ;;
     *)
       printf 'Error: unsupported distribution "%s"\n' "$distro"
