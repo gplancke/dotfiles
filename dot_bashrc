@@ -1,5 +1,9 @@
 printf "sourcing .bashrc\n"
 
+# FZF
+[ -f "~/.fzf.bash" ] && . "~/.fzf.bash"
+[ -f "~/.fzf.colors" ] && "~/.fzf.colors"
+
 ##########################
 # BASH SHIT
 ##########################

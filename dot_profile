@@ -106,5 +106,4 @@ command -v fnm >/dev/null 2>&1 && eval "$(fnm env)"
 { [ -f "/etc/profiles/per-user/$USER/etc/profile.d/hm-session-vars.sh" ] && . "/etc/profiles/per-user/$USER/etc/profile.d/hm-session-vars.sh"; } ||
 	{ [ -f "$HOME/.local/state/nix/profiles/profile/etc/profile.d/hm-session-vars.sh" ] && . "$HOME/.local/state/nix/profiles/profile/etc/profile.d/hm-session-vars.sh"; } ||
 	{ [ -n "${NIX_DIR:-}" ] && [ -f "$NIX_DIR/etc/profile.d/hm-session-vars.sh" ] && . "$NIX_DIR/etc/profile.d/hm-session-vars.sh"; }
-
 command -v devbox >/dev/null 2>&1 && eval "$(devbox global shellenv)"

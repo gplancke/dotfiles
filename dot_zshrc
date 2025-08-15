@@ -15,9 +15,9 @@ fi
 ##########################
 # ZSH specific settings
 ##########################
-#
 # FZF
 [ -f "~/.fzf.zsh" ] && . "~/.fzf.zsh"
+[ -f "~/.fzf.colors" ] && "~/.fzf.colors"
 
 # ASDF completion
 [ -d "$ASDF_DIR" ] && fpath=(${ASDF_DIR}/completions $fpath)
