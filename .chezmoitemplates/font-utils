@@ -16,7 +16,7 @@ install_nerd_fonts() {
 			printf 'Installing %s Nerd Font...\n' "$font"
 			cd "$font_dir"
 			wget -q "${font_url}/${font}.zip"
-			unzip -q "${font}.zip"
+			unzip -qo "${font}.zip"
 			rm "${font}.zip"
 		fi
 	done
