@@ -83,3 +83,4 @@ if [ -f '/Users/georgio/.local/share/google-cloud-sdk/completion.zsh.inc' ]; the
 # 	tm main
 # fi
 
+[ -f ~/.fzf.colors ] && source ~/.fzf.colors
