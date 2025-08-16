@@ -44,25 +44,25 @@ install_essentials() {
       printf 'Updating APT and installing essentials...\n'
       sudo apt-get update -y && sudo apt-get upgrade -y
       sudo apt-get install -y \
-        build-essential wget curl git zsh
+        build-essential wget curl git zsh unzip
       ;;
     fedora)
       printf 'Updating DNF and installing essentials...\n'
       sudo dnf update -y
       sudo dnf install -y \
-        @development-tools wget curl git zsh
+        @development-tools wget curl git zsh unzip
       ;;
     arch)
       printf 'Updating Pacman and installing essentials...\n'
       sudo pacman -Syu --noconfirm
       sudo pacman -S --noconfirm \
-        base-devel wget curl git zsh
+        base-devel wget curl git zsh unzip
       ;;
     alpine)
       printf 'Updating APK and installing essentials...\n'
       sudo apk update && sudo apk upgrade
       sudo apk add \
-        build-base wget curl git zsh
+        build-base wget curl git zsh unzip
       ;;
     darwin)
       printf 'Installing essentials for macos...\n'
