@@ -53,8 +53,7 @@
 
 					pkgs.lazydocker
 
-					pkgs.nodejs
-					pkgs.deno
+					pkgs.nodejs_22
 					pkgs.deno
 					pkgs.pnpm
 

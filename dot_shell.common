@@ -32,6 +32,34 @@ fi
 [ -f "${HOME}/.fzf.colors" ] && . "${HOME}/.fzf.colors"
 
 ##########################
+# Path
+##########################
+echo "PATH Before adding: ${PATH}"
+[ -d "${HOME}/.local/bin" ] && PATH="${HOME}/.local/bin:${PATH}"
+[ -d "${NIX_DIR}" ] && PATH="${NIX_DIR}/bin:${PATH}"
+
+[ -d "${FZF_HOME}/bin" ] && PATH="${PATH}:${FZF_HOME}/bin"
+[ -d "${EMACS_HOME}/bin" ] && PATH="${PATH}:${EMACS_HOME}/bin"
+
+[ -d "${GOPATH}/bin" ] && PATH="${PATH}:${GOPATH}/bin"
+[ -d "${NPM_HOME}/bin" ] && PATH="${PATH}:${NPM_HOME}/bin"
+[ -d "${DENO_HOME}/bin" ] && PATH="${PATH}:${DENO_HOME}/bin"
+[ -d "${PNPM_HOME}" ] && PATH="${PATH}:${PNPM_HOME}"
+[ -d "${GEM_HOME}/bin" ] && PATH="${PATH}:${GEM_HOME}/bin"
+[ -d "${PIP_HOME}/bin" ] && PATH="${PATH}:${PIP_HOME}/bin"
+
+[ -d "${JAVA_HOME}/bin" ] && PATH="${PATH}:${JAVA_HOME}/bin"
+[ -d "${ANDROID_HOME}/cmdline-tools/latest/bin" ] && PATH="${PATH}:${ANDROID_HOME}/cmdline-tools/latest/bin"
+[ -d "${ANDROID_HOME}/platform-tools" ] && PATH="${PATH}:${ANDROID_HOME}/platform-tools"
+[ -d "${ANDROID_HOME}/bin" ] && PATH="${PATH}:${ANDROID_HOME}/bin"
+[ -d "${FLUTTER_ROOT}/bin" ] && PATH="${PATH}:${FLUTTER_ROOT}/bin"
+[ -d "${DART_HOME}/bin" ] && PATH="${PATH}:${DART_HOME}/bin"
+
+[ -d "${RUST_HOME}/bin" ] && PATH="${PATH}:${RUST_HOME}/bin"
+[ -d "${RUST_HOME}" ] && [ -f "${RUST_HOME}/env" ] && source "${RUST_HOME}/env"
+
+echo "PATH after: ${PATH}"
+##########################
 # Links
 ##########################
 function setup_link() {

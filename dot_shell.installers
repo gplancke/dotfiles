@@ -76,117 +76,81 @@ function install_cocoa_pods {
 #############################################
 
 function install_flutter {
-  local os arch install_dir flutter_url temp_file
+  local os
 
-  # Detect OS
-  case "$(uname)" in
-    Darwin) os="macos" ;;
-    Linux) os="linux" ;;
-    *)
-      echo "❌ Unsupported operating system: $(uname)" >&2
-      return 1
-      ;;
-  esac
+  if [[ "$(uname)" == "Darwin" ]]; then
+    os="darwin"
+  elif [[ "$(uname)" == "Linux" ]]; then
+    os="linux"
+  else
+    echo "Unsupported operating system: $(uname)"
+    return 1
+  fi
 
-  # Detect architecture
+  # Define the installation directory
+  local install_dir="$HOME/.local/share/flutter"
+
+  # Check if the OS parameter is valid
+  if [[ "$os" != "linux" && "$os" != "darwin" ]]; then
+    # echo "Invalid OS specified. Use 'linux' or 'darwin'."
+    return 1
+  fi
+
+  # Determine system architecture
+  local arch
   case "$(uname -m)" in
     x86_64) arch="x64" ;;
-    arm64|aarch64) arch="arm64" ;;
+    arm64 | aarch64) arch="arm64" ;;
     *)
-      echo "❌ Unsupported architecture: $(uname -m)" >&2
+      echo "Unsupported architecture: $(uname -m)"
       return 1
       ;;
   esac
 
-  # Installation directory
-  install_dir="${FLUTTER_INSTALL_DIR:-$HOME/.local/share/flutter}"
+	if [ -d "$install_dir/bin" ]; then
+		# echo "Flutter is already installed"
+		return 0
+	fi
 
-  # Check if already installed
-  if [[ -d "$install_dir/bin" && -x "$install_dir/bin/flutter" ]]; then
-    echo "✅ Flutter already installed at $install_dir"
-    return 0
-  fi
-
-  # Use the correct Flutter download URLs
+  # Set Flutter download URL based on OS and architecture
+  local base_url="https://storage.googleapis.com/flutter_infra_release/releases/stable"
+  local flutter_url
   if [[ "$os" == "linux" ]]; then
-    flutter_url="https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_${arch}-stable.tar.xz"
-    temp_file="$(mktemp).tar.xz"
+    flutter_url="$base_url/linux/flutter_linux_${arch}_stable.tar.xz"
   else
-    # macOS uses universal binaries now (no separate arm64/x64)
-    flutter_url="https://storage.googleapis.com/flutter_infra_release/releases/stable/macos/flutter_macos-stable.zip"
-    temp_file="$(mktemp).zip"
+    flutter_url="$base_url/macos/flutter_macos_${arch}_stable.zip"
   fi
 
-  # Create installation directory
-  mkdir -p "$install_dir" || {
-    echo "❌ Failed to create directory: $install_dir" >&2
+  # Create the installation directory if it doesn't exist
+  mkdir -p "$install_dir"
+
+  # Download Flutter
+  echo "Downloading Flutter SDK for $os ($arch)..."
+  curl -L -o flutter_archive "$flutter_url" || {
+    echo "Failed to download Flutter SDK."
     return 1
   }
 
-  # Download with progress
-  echo "📥 Downloading latest stable Flutter SDK for $os..."
-  if ! curl -L --fail --progress-bar -o "$temp_file" "$flutter_url"; then
-    echo "❌ Download failed. Trying alternative method..." >&2
-
-    # Fallback: use git clone (official method)
-    echo "📥 Cloning Flutter from GitHub (stable branch)..."
-    if ! git clone -b stable --depth 1 https://github.com/flutter/flutter.git "$install_dir"; then
-      echo "❌ Failed to clone Flutter repository" >&2
-      rm -f "$temp_file"
-      return 1
-    fi
-
-    # Verify git clone installation
-    if [[ -x "$install_dir/bin/flutter" ]]; then
-      echo "✅ Flutter cloned successfully at $install_dir"
-      echo "💡 Add to your PATH: export PATH=\"$install_dir/bin:\$PATH\""
-      "$install_dir/bin/flutter" --version 2>/dev/null | head -1
-      return 0
-    else
-      echo "❌ Git clone verification failed" >&2
-      return 1
-    fi
-  fi
-
-  # Extract downloaded archive
-  echo "📦 Extracting Flutter SDK..."
+  # Extract Flutter
+  echo "Extracting Flutter SDK..."
   if [[ "$os" == "linux" ]]; then
-    if ! tar -xf "$temp_file" -C "$install_dir" --strip-components=1; then
-      echo "❌ Failed to extract Flutter SDK" >&2
-      rm -f "$temp_file"
+    tar -xf flutter_archive -C "$install_dir" --strip-components=1 || {
+      echo "Failed to extract Flutter SDK."
       return 1
-    fi
+    }
   else
-    local temp_dir
-    temp_dir="$(mktemp -d)"
-    if ! unzip -q "$temp_file" -d "$temp_dir"; then
-      echo "❌ Failed to extract Flutter SDK" >&2
-      rm -f "$temp_file"
-      rm -rf "$temp_dir"
+    unzip -q flutter_archive -d "$install_dir" || {
+      echo "Failed to extract Flutter SDK."
       return 1
-    fi
-    if ! mv "$temp_dir/flutter"/* "$install_dir/" 2>/dev/null; then
-      echo "❌ Failed to move Flutter files" >&2
-      rm -f "$temp_file"
-      rm -rf "$temp_dir"
-      return 1
-    fi
-    rm -rf "$temp_dir"
+    }
   fi
 
   # Clean up
-  rm -f "$temp_file"
+  rm flutter_archive
 
-  # Verify installation
-  if [[ -x "$install_dir/bin/flutter" ]]; then
-    echo "✅ Flutter installed successfully at $install_dir"
-    echo "💡 Add to your PATH: export PATH=\"$install_dir/bin:\$PATH\""
-    "$install_dir/bin/flutter" --version 2>/dev/null | head -1
-  else
-    echo "❌ Installation verification failed" >&2
-    return 1
-  fi
+  echo "Flutter installed successfully in $install_dir."
 }
+
 
 #############################################
 # Install theme manager

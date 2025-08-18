@@ -64,35 +64,6 @@ export TMUX_POWERLINE_DEFAULT_BACKGROUND_COLOR='0'
 export TMUX_POWERLINE_DEFAULT_FOREGROUND_COLOR='255'
 
 ##########################
-# Path
-##########################
-[ "$LINUX" = "1" ] && [ -d "/home/linuxbrew/.linuxbrew" ] && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-[ "$MACOS" = "1" ] && [ -f "/opt/homebrew/bin/brew" ] && eval "$(/opt/homebrew/bin/brew shellenv)"
-[ "$MACOS" = "1" ] && [ ! -f "/opt/homebrew/bin/brew" ] && [ -f "/usr/local/bin/brew" ] && eval "$(/usr/local/bin/brew shellenv)"
-
-[ -d "${HOME}/.local/bin" ] && PATH="${HOME}/.local/bin:${PATH}"
-
-[ -d "${FZF_HOME}/bin" ] && PATH="${PATH}:${FZF_HOME}/bin"
-[ -d "${EMACS_HOME}/bin" ] && PATH="${PATH}:${EMACS_HOME}/bin"
-
-[ -d "${GOPATH}/bin" ] && PATH="${PATH}:${GOPATH}/bin"
-[ -d "${NPM_HOME}/bin" ] && PATH="${PATH}:${NPM_HOME}/bin"
-[ -d "${DENO_HOME}/bin" ] && PATH="${PATH}:${DENO_HOME}/bin"
-[ -d "${PNPM_HOME}" ] && PATH="${PATH}:${PNPM_HOME}"
-[ -d "${GEM_HOME}/bin" ] && PATH="${PATH}:${GEM_HOME}/bin"
-[ -d "${PIP_HOME}/bin" ] && PATH="${PATH}:${PIP_HOME}/bin"
-
-[ -d "${JAVA_HOME}/bin" ] && PATH="${PATH}:${JAVA_HOME}/bin"
-[ -d "${ANDROID_HOME}/cmdline-tools/latest/bin" ] && PATH="${PATH}:${ANDROID_HOME}/cmdline-tools/latest/bin"
-[ -d "${ANDROID_HOME}/platform-tools" ] && PATH="${PATH}:${ANDROID_HOME}/platform-tools"
-[ -d "${ANDROID_HOME}/bin" ] && PATH="${PATH}:${ANDROID_HOME}/bin"
-[ -d "${FLUTTER_ROOT}/bin" ] && PATH="${PATH}:${FLUTTER_ROOT}/bin"
-[ -d "${DART_HOME}/bin" ] && PATH="${PATH}:${DART_HOME}/bin"
-
-[ -d "${RUST_HOME}/bin" ] && PATH="${PATH}:${RUST_HOME}/bin"
-[ -d "${RUST_HOME}" ] && [ -f "${RUST_HOME}/env" ] && source "${RUST_HOME}/env"
-
-##########################
 # Extensions
 ##########################
 command -v fnm >/dev/null 2>&1 && eval "$(fnm env)"
@@ -106,4 +77,9 @@ command -v fnm >/dev/null 2>&1 && eval "$(fnm env)"
 { [ -f "/etc/profiles/per-user/$USER/etc/profile.d/hm-session-vars.sh" ] && . "/etc/profiles/per-user/$USER/etc/profile.d/hm-session-vars.sh"; } ||
 	{ [ -f "$HOME/.local/state/nix/profiles/profile/etc/profile.d/hm-session-vars.sh" ] && . "$HOME/.local/state/nix/profiles/profile/etc/profile.d/hm-session-vars.sh"; } ||
 	{ [ -n "${NIX_DIR:-}" ] && [ -f "$NIX_DIR/etc/profile.d/hm-session-vars.sh" ] && . "$NIX_DIR/etc/profile.d/hm-session-vars.sh"; }
+
 command -v devbox >/dev/null 2>&1 && eval "$(devbox global shellenv)"
+
+[ "$LINUX" = "1" ] && [ -d "/home/linuxbrew/.linuxbrew" ] && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+[ "$MACOS" = "1" ] && [ -f "/opt/homebrew/bin/brew" ] && eval "$(/opt/homebrew/bin/brew shellenv)"
+[ "$MACOS" = "1" ] && [ ! -f "/opt/homebrew/bin/brew" ] && [ -f "/usr/local/bin/brew" ] && eval "$(/usr/local/bin/brew shellenv)"

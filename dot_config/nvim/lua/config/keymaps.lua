@@ -17,6 +17,19 @@ map("n", "<C-j>", nvim_tmux_nav.NvimTmuxNavigateDown)
 map("n", "<C-k>", nvim_tmux_nav.NvimTmuxNavigateUp)
 map("n", "<C-l>", nvim_tmux_nav.NvimTmuxNavigateRight)
 
+-- map({ "n", "v" }, "<leader>iq", function()
+--   vim.cmd("CodeCompanionActions")
+-- end, { desc = "See IA Actions" })
+-- map({ "n", "v" }, "<leader>ii", function()
+--   vim.cmd("CodeCompanion")
+-- end, { desc = "CodeCompanion Inline" })
+-- map({ "n", "v" }, "<leader>ia", function()
+--   vim.cmd("CodeCompanionChat Toggle")
+-- end, { desc = "Toggle IA Chat" })
+-- map("v", "<leader>is", function()
+--   vim.cmd("CodeCompanionChat Add")
+-- end, { desc = "Add selection to Chat" })
+
 -- Terminal management is done via tmux when in a tmux session
 if vim.env.TMUX then
   vim.keymap.del({ "n", "t" }, "<c-/>")
