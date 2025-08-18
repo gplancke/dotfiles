@@ -1,4 +1,3 @@
 printf "sourcing .zprofile\n"
-echo "PATH Before adding: ${PATH}"
 
 source "$HOME/.orbstack/shell/init.zsh" 2>/dev/null || :

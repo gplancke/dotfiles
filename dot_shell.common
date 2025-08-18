@@ -34,7 +34,6 @@ fi
 ##########################
 # Path
 ##########################
-echo "PATH Before adding: ${PATH}"
 [ -d "${HOME}/.local/bin" ] && PATH="${HOME}/.local/bin:${PATH}"
 [ -d "${NIX_DIR}" ] && PATH="${NIX_DIR}/bin:${PATH}"
 
@@ -58,7 +57,6 @@ echo "PATH Before adding: ${PATH}"
 [ -d "${RUST_HOME}/bin" ] && PATH="${PATH}:${RUST_HOME}/bin"
 [ -d "${RUST_HOME}" ] && [ -f "${RUST_HOME}/env" ] && source "${RUST_HOME}/env"
 
-echo "PATH after: ${PATH}"
 ##########################
 # Links
 ##########################
