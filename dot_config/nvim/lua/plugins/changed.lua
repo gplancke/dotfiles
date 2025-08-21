@@ -1,5 +1,11 @@
 return {
   {
+    "LazyVim/LazyVim",
+    opts = {
+      colorscheme = "catppuccin",
+    },
+  },
+  {
     "saghen/blink.cmp",
     dependencies = {
       -- "Kaiser-Yang/blink-cmp-avante",
@@ -90,16 +96,10 @@ return {
 
       -- Integration with catppuccin
       if (vim.g.colors_name or ""):find("catppuccin") then
-        opts.highlights = require("catppuccin.groups.integrations.bufferline").get()
+        opts.highlights = require("catppuccin.groups.integrations.bufferline").get_theme()
       end
 
       return opts
     end,
-  },
-  {
-    "LazyVim/LazyVim",
-    opts = {
-      colorscheme = "catppuccin",
-    },
   },
 }
