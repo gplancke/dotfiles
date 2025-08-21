@@ -2,3 +2,4 @@
 [ -d "/Applications/Tailscale.app" ] && alias tailscale="/Applications/Tailscale.app/Contents/MacOS/Tailscale"
 
 alias mac-start-check='ls /Library/StartupItems && ls /Library/LaunchDaemons && ls /System/Library/LaunchDaemons && ls ~/Library/LaunchAgents && ls /Library/LaunchAgents/ && ls /System/Library/LaunchAgents/'
+alias bro='f() { ssh -p 32222 -i ~/.orbstack/ssh/id_ed25519 default@${1:-cavaou}@localhost -t "tmux new-session -A -s default"; }; f()'
