@@ -112,7 +112,7 @@ fi
 hash direnv 2>/dev/null && eval "$(direnv hook bash)"
 hash zoxide 2>/dev/null && eval "$(zoxide init bash)"
 hash starship 2>/dev/null && eval "$(starship init bash)"
-command -v mise 2>/dev/null && eval "$(~/.local/bin/mise activate bash --shims)"
+command -v mise 2>/dev/null && eval "$(~/.local/bin/mise activate bash)"
 
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
 [ -f ~/.fzf.colors ] && source ~/.fzf.colors
