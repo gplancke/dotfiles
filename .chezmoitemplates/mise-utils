@@ -1,8 +1,7 @@
-# Docker utility functions for chezmoi scripts
+# Mise utility functions for chezmoi scripts
 
 #############################################
-# Install Docker engine and CLI
-# Ensures daemon is enabled and user is in docker group
+# Install Mise CLI
 #############################################
 install_mise() {
   local distro=$1
@@ -15,6 +14,7 @@ install_mise() {
   case "$distro" in
     debian|fedora|arch|alpine|darwin)
 			curl https://mise.run | sh
+			;;
     *)
       printf 'Skipping Mise: unsupported distribution "%s"\n' "$distro"
       ;;
@@ -26,9 +26,8 @@ install_mise() {
 # Install Mise environment packages
 #############################################
 install_mise_bins() {
-	# Nix
 	if command -v mise >/dev/null 2>&1 && [ -d "$HOME/.config/mise" ]; then
-		printf 'Installing Mise environment"
+		printf 'Installing Mise environment\n'
 		mise install
 	fi
 }

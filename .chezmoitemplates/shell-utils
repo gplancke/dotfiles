@@ -67,7 +67,7 @@ install_essentials() {
       ;;
     darwin)
       printf 'Installing essentials for macos...\n'
-      xcode-select --install || true
+      xcode-select --install 2>/dev/null || :
       install_brew "darwin"
       if command -v brew >/dev/null 2>&1; then
         brew install --quiet openssl wget curl git zsh || :
