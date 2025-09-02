@@ -28,6 +28,8 @@ hash direnv 2>/dev/null && eval "$(direnv hook zsh)"
 hash zoxide 2>/dev/null && eval "$(zoxide init zsh)"
 # STARSHIP
 hash starship 2>/dev/null && eval "$(starship init zsh)"
+# MISE setup
+command -v mise 2>/dev/null && eval "$(~/.local/bin/mise activate zsh --shims)"
 
 HISTFILE=~/.histfile
 HISTSIZE=10000

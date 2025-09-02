@@ -17,12 +17,13 @@
         paths = [
           pkgs.cacert
           pkgs.nix-diff
-          pkgs.bash
           pkgs.gcc
+          pkgs.bash
+          pkgs.zsh
+					pkgs.fzf
           pkgs.tree
           pkgs.age
           pkgs.unzip
-          pkgs.mkcert
           pkgs.bat
           pkgs.jq
           pkgs.jc
@@ -30,28 +31,29 @@
           pkgs.zoxide
           pkgs.ripgrep
           pkgs.silver-searcher
+					pkgs.diff-so-fancy
+					pkgs.starship
+
+          pkgs.mkcert
           pkgs.socat
           pkgs.nmap
-          pkgs.htop
-          pkgs.gtop
-					pkgs.ttyd
 
-					pkgs.hello
 					pkgs.direnv
 					pkgs.qemu
-					pkgs.starship
-					pkgs.diff-so-fancy
-					pkgs.fzf
 
 					pkgs.git
 					pkgs.gh
 					pkgs.hub
-					pkgs.lazygit
+					pkgs.fossil
 
-					pkgs.neovim
+					pkgs.ttyd
 					pkgs.tmux
+					pkgs.neovim
 
+          pkgs.htop
+          pkgs.gtop
 					pkgs.lazydocker
+					pkgs.lazygit
 
 					pkgs.nodejs_22
 					pkgs.deno
@@ -60,6 +62,7 @@
 					pkgs.luarocks
 
 					pkgs.ruby
+					pkgs.cocoapods
 
 					pkgs.python3
 					pkgs.uv

@@ -55,6 +55,7 @@ setup_darwin() {
 setup_debian() {
 	load_env "debian"
 	install_nix_bins
+	install_mise_bins
 
 	local apt_packages=({{ range .packages.debian.native }}{{ . | quote }} {{ end }})
 	local brews=({{ range .packages.debian.brews }}{{ . | quote }} {{ end }})
@@ -68,6 +69,7 @@ setup_debian() {
 setup_fedora() {
 	load_env "fedora"
 	install_nix_bins
+	install_mise_bins
 
 	local dnf_packages=({{ range .packages.fedora.native }}{{ . | quote }} {{ end }})
 	local brews=({{ range .packages.fedora.brews }}{{ . | quote }} {{ end }})
@@ -81,6 +83,7 @@ setup_fedora() {
 setup_arch() {
 	load_env "arch"
 	install_nix_bins
+	install_mise_bins
 
 	local pacman_packages=({{ range .packages.arch.native }}{{ . | quote }} {{ end }})
 	local brews=({{ range .packages.arch.brews }}{{ . | quote }} {{ end }})
@@ -94,6 +97,7 @@ setup_arch() {
 setup_alpine() {
 	load_env "alpine"
 	install_nix_bins
+	install_mise_bins
 
 	local apk_packages=({{ range .packages.alpine.native }}{{ . | quote }} {{ end }})
 	local brews=({{ range .packages.alpine.brews }}{{ . | quote }} {{ end }})
