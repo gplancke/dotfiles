@@ -5,6 +5,7 @@
 {{- template "brew-utils" . -}}
 {{- template "distro-utils" . -}}
 {{- template "docker-utils" . -}}
+{{- template "mise-utils" . -}}
 {{- template "font-utils" . -}}
 {{- template "git-utils" . -}}
 {{- template "nix-utils" . -}}
