@@ -15,7 +15,7 @@
 			]
 		},
 		"debian": {
-			"native": [],
+			"native": ["libffi-dev"],
 			"brews": [
 				"imagemagick"
 			],
