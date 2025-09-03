@@ -2,8 +2,8 @@
 flutter = "latest"
 java = "latest"
 node = "latest"
+pnpm = "latest"
 python = "latest"
-ruby = "latest"
 rust = "latest"
 uv = "latest"
 

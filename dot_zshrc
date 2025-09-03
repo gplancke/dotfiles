@@ -84,3 +84,4 @@ if [ -f '/Users/georgio/.local/share/google-cloud-sdk/completion.zsh.inc' ]; the
 # if [[ -z "$TMUX" ]] && [[ "$TERM_PROGRAM" != "vscode" ]] && [[ "$TERM_PROGRAM" != "cursor" ]]; then
 # 	tm main
 # fi
+[ -f ~/.fzf.colors ] && source ~/.fzf.colors
