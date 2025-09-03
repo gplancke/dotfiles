@@ -39,7 +39,6 @@
           pkgs.nmap
 
 					pkgs.direnv
-					pkgs.qemu
 
 					pkgs.git
 					pkgs.gh
@@ -54,22 +53,6 @@
           pkgs.gtop
 					pkgs.lazydocker
 					pkgs.lazygit
-
-					pkgs.nodejs_22
-					pkgs.deno
-					pkgs.pnpm
-
-					pkgs.luarocks
-
-					pkgs.ruby
-					pkgs.cocoapods
-
-					pkgs.python3
-					pkgs.uv
-
-					pkgs.cargo
-
-					pkgs.openjdk17-bootstrap
         ];
       };
 

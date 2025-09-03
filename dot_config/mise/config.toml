@@ -1,5 +1,11 @@
 [tools]
 flutter = "latest"
+java = "latest"
+node = "latest"
+python = "latest"
+ruby = "latest"
+rust = "latest"
+uv = "latest"
 
 [env]
 MISE_LOADED = 1
