@@ -1,2 +1,5 @@
 [tools]
 flutter = "latest"
+
+[env]
+MISE_LOADED = 1
