@@ -15,8 +15,10 @@ load_brew() {
 	esac
 
 	if [ -x "$brew_bin" ]; then
-		printf 'Loading Homebrew environment from %s\n' "$brew_bin"
+		printf '...Loading Homebrew environment from %s\n' "$brew_bin"
 		eval "$("$brew_bin" shellenv)"
+	else
+		printf '...Brew binary not found at %s\n' "$brew_bin"
 	fi
 }
 
@@ -26,17 +28,19 @@ load_brew() {
 # We tend to use nix instead
 #############################################
 install_brew() {
+	printf '[BREW] Installing Homebrew\n'
+
   local os_type="$1"
   local installer_url="https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh"
   local brew_bin
 
   # If brew already exists, bail out
   if command -v brew >/dev/null 2>&1; then
-    # printf 'Homebrew is already installed (%s)\n' "$(command -v brew)"
+    printf '...Homebrew is already installed (%s)\n' "$(command -v brew)"
     return 0
   fi
 
-  printf 'Installing Homebrew...\n'
+	printf '...Proceeding to installation of Homebrew\n'
   NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL $installer_url)"
 
   # Determine where brew was installed
@@ -53,9 +57,9 @@ install_brew() {
   load_brew "$os_type"
 
   if command -v brew >/dev/null 2>&1; then
-    printf 'Homebrew installed and initialized: %s\n' "$(command -v brew)"
+    printf '...Homebrew installed and initialized: %s\n' "$(command -v brew)"
   else
-    printf 'Error: brew not found after installation\n' >&2
+    printf '...Error: brew not found after installation\n' >&2
     return 1
   fi
 }
@@ -64,20 +68,22 @@ install_brew() {
 # Install Homebrew packages
 #############################################
 install_brew_packages() {
+	printf '[BREW] Installing Homebrew packages\n'
+
 	local brews=("$@")
 
 	if [ ! -x "$(command -v brew)" ]; then
-		echo "No brew found, skipping brew packages installation"
+		echo "...No brew installation found, skipping brew packages installation"
 		return 0
 	fi
 
 	if [ ${#brews[@]} -eq 0 ]; then
-		echo "No brew packages to install"
+		echo "...No brew packages to install"
 		return 0
 	fi
 
 	for package in "${brews[@]}"; do
-		brew install "$package" || true
+		brew install --quiet "$package" || :
 	done
 }
 
@@ -85,20 +91,21 @@ install_brew_packages() {
 # Install Homebrew casks
 #############################################
 install_brew_casks() {
+	printf '[BREW] Installing Homebrew Casks\n'
+
 	local casks=("$@")
 
 	if [ ! -x "$(command -v brew)" ]; then
-		echo "No brew found, skipping cask installation"
+		printf '...No brew found, skipping cask installation\n'
 		return 0
 	fi
 
 	if [ ${#casks[@]} -eq 0 ]; then
-		echo "No casks to install"
+		printf '...No casks to install\n'
 		return 0
 	fi
 
 	for cask in "${casks[@]}"; do
-		echo "cask \"$cask\""
-		brew install --cask "$cask" || true
+		brew install --quiet --cask "$cask" || :
 	done
 }

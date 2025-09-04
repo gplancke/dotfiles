@@ -30,6 +30,8 @@ detect_mono_font() {
 # Supports macOS (launchctl), Linux (systemd), and Alpine (OpenRC)
 #############################################
 setup_ttyd() {
+	printf '[TTYD] Setting up ttyd web terminal service\n'
+
 	local init_system=$1
 	# Generate a default port between 7682-7999 based on hostname
 	local HOSTNAME_HASH=$(echo "$HOSTNAME" | cksum | cut -d' ' -f1)
@@ -40,7 +42,7 @@ setup_ttyd() {
 
 	# Verify ttyd installation
 	if ! command -v ttyd >/dev/null 2>&1; then
-		printf 'ttyd not found\n' >&2
+		printf '...ttyd not found\n' >&2
 		return 1
 	fi
 
@@ -50,21 +52,21 @@ setup_ttyd() {
 			local plist_dir="$HOME/Library/LaunchAgents"
 			local plist_file="$plist_dir/${ttyd_label}.plist"
 			if [ -f "$plist_file" ]; then
-				printf 'ttyd launchctl service already exists: %s\n' "$plist_file"
+				printf '...ttyd launchctl service already exists: %s\n' "$plist_file"
 				return 0
 			fi
 			;;
 		systemd)
 			local systemd_file="$HOME/.config/systemd/user/${ttyd_label}.service"
 			if [ -f "$systemd_file" ]; then
-				printf 'ttyd systemd user service already exists: %s\n' "$systemd_file"
+				printf '...ttyd systemd user service already exists: %s\n' "$systemd_file"
 				return 0
 			fi
 			;;
 		openrc)
 			local openrc_file="/etc/init.d/${ttyd_label}"
 			if [ -f "$openrc_file" ]; then
-				printf 'ttyd openrc service already exists: %s\n' "$openrc_file"
+				printf '...ttyd openrc service already exists: %s\n' "$openrc_file"
 				return 0
 			fi
 			;;
@@ -74,7 +76,7 @@ setup_ttyd() {
 	local ttyd_bin
 	ttyd_bin="$(command -v ttyd)"
 	if [ -z "$ttyd_bin" ]; then
-		printf 'Error: ttyd binary not found\n' >&2
+		printf '...Error: ttyd binary not found\n' >&2
 		return 1
 	fi
 
@@ -157,7 +159,7 @@ EOF
 EOF
 
 			launchctl load "$plist_file" 2>/dev/null || true
-			printf 'ttyd service installed and loaded on macOS\n'
+			printf '...ttyd service installed and loaded on macOS\n'
 			;;
 
 		systemd)
@@ -186,8 +188,8 @@ EOF
 			sudo systemctl enable "$ttyd_label"
 			sudo systemctl start "$ttyd_label"
 
-			printf 'ttyd service installed and started on Linux\n'
-			printf 'Manage with: sudo systemctl {start|stop|restart|status} %s\n' "$ttyd_label"
+			printf '...ttyd service installed and started on Linux\n'
+			printf '...Manage with: sudo systemctl {start|stop|restart|status} %s\n' "$ttyd_label"
 			;;
 
 		openrc)
@@ -210,11 +212,11 @@ EOF
 			sudo rc-update add "$ttyd_label" default
 			sudo rc-service "$ttyd_label" start
 
-			printf 'ttyd service installed and started on Alpine\n'
-			printf 'Manage with: sudo rc-service %s {start|stop|restart|status}\n' "$ttyd_label"
+			printf '...ttyd service installed and started on Alpine\n'
+			printf '...Manage with: sudo rc-service %s {start|stop|restart|status}\n' "$ttyd_label"
 			;;
 	esac
 
-	printf 'Access at: http://localhost:%s\n' "$ttyd_port"
-	printf 'ttyd service installation complete\n'
+	printf '...Access at: http://localhost:%s\n' "$ttyd_port"
+	printf '...ttyd service installation complete\n'
 }

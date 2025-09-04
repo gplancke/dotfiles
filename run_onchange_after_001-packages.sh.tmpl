@@ -43,6 +43,7 @@ fi
 setup_darwin() {
 	load_env "darwin"
 	install_nix_bins
+	install_mise_bins
 
 	# Install brew packages and casks
 	local brews=({{ range .packages.darwin.brews }}{{ . | quote }} {{ end }})

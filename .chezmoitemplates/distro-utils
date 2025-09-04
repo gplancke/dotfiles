@@ -4,15 +4,16 @@
 # Install APT packages (Debian/Ubuntu)
 #############################################
 install_apt_packages() {
+	printf '[APT] Installing APT packages\n'
 	local packages=("$@")
 
 	if [ ${#packages[@]} -eq 0 ]; then
-		echo "No apt packages to install"
+		echo "...No apt packages to install"
 		return 0
 	fi
 
 	for package in "${packages[@]}"; do
-		sudo apt install -y "$package" || true
+		sudo apt install -y "$package" || :
 	done
 }
 
@@ -20,15 +21,16 @@ install_apt_packages() {
 # Install DNF packages (Fedora/RHEL/CentOS)
 #############################################
 install_dnf_packages() {
+	printf '[DNF] Installing DNF packages\n'
 	local packages=("$@")
 
 	if [ ${#packages[@]} -eq 0 ]; then
-		echo "No dnf packages to install"
+		echo "...No dnf packages to install"
 		return 0
 	fi
 
 	for package in "${packages[@]}"; do
-		sudo dnf install -y "$package" || true
+		sudo dnf install -y "$package" || :
 	done
 }
 
@@ -36,28 +38,30 @@ install_dnf_packages() {
 # Install Pacman packages (Arch/Manjaro)
 #############################################
 install_pacman_packages() {
+	printf '[PACMAN] Installing Pacman packages\n'
 	local packages=("$@")
 
 	if [ ${#packages[@]} -eq 0 ]; then
-		echo "No pacman packages to install"
+		echo "...No pacman packages to install"
 		return 0
 	fi
 
-	sudo pacman -S --noconfirm "${packages[@]}" || true
+	sudo pacman -S --noconfirm "${packages[@]}" || :
 }
 
 #############################################
 # Install APK packages (Alpine)
 #############################################
 install_apk_packages() {
+	printf '[APK] Installing APK packages\n'
 	local packages=("$@")
 
 	if [ ${#packages[@]} -eq 0 ]; then
-		echo "No apk packages to install"
+		echo "...No apk packages to install"
 		return 0
 	fi
 
 	for package in "${packages[@]}"; do
-		sudo apk add "$package" || true
+		sudo apk add "$package" || :
 	done
 }

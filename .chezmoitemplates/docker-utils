@@ -5,6 +5,8 @@
 # Ensures daemon is enabled and user is in docker group
 #############################################
 install_docker() {
+	printf '[DOCKER] Installing Docker engine and CLI\n'
+
   local distro=$1
 
 	if command -v docker >/dev/null 2>&1; then
@@ -14,7 +16,7 @@ install_docker() {
 
   case "$distro" in
     debian|fedora)
-      printf 'Installing Docker using the official convenience script...\n'
+      printf '...Installing Docker using the official convenience script\n'
       curl -fsSL https://get.docker.com -o /tmp/get-docker.sh
       sh /tmp/get-docker.sh
 
@@ -25,7 +27,7 @@ install_docker() {
       sudo usermod -aG docker "$USER" || true
       ;;
     arch)
-      printf 'Installing Docker on Arch-based systems...\n'
+      printf '...Installing Docker on Arch-based systems\n'
       sudo pacman -Syu --noconfirm
       sudo pacman -S --noconfirm docker docker-compose || true
 
@@ -36,7 +38,7 @@ install_docker() {
       sudo usermod -aG docker "$USER" || true
       ;;
     alpine)
-      printf 'Installing Docker on Alpine Linux...\n'
+      printf '...Installing Docker on Alpine Linux\n'
       sudo apk add docker docker-compose || true
 
       sudo rc-update add docker default || true
@@ -45,7 +47,7 @@ install_docker() {
       addgroup "$USER" docker || true
       ;;
     darwin)
-      printf 'Installing Docker Desktop and CLI on macOS...\n'
+      printf '...Installing Docker Desktop and CLI on macOS\n'
       if command -v brew >/dev/null 2>&1; then
         brew install --quiet docker || true
 				brew install --quiet docker-compose || true
@@ -54,9 +56,7 @@ install_docker() {
       fi
       ;;
     *)
-      printf 'Skipping Docker: unsupported distribution "%s"\n' "$distro"
+      printf '...Skipping Docker: unsupported distribution "%s"\n' "$distro"
       ;;
   esac
-
-  printf 'Docker installation step complete. You may need to log out/in for group changes to apply.\n'
 }

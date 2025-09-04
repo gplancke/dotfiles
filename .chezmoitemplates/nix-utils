@@ -9,7 +9,7 @@ load_nix() {
 	local nix_profile="$HOME/.nix-profile"
 
 	if command -v nix >/dev/null 2>&1; then
-		printf 'Loading Nix environment\n'
+		printf '...Loading Nix environment\n'
 
 		if [ -d "$nix_profile" ]; then
 			export NIX_PATH="$nix_profile/etc/nix:$NIX_PATH"
@@ -34,7 +34,7 @@ load_nix() {
 #############################################
 load_homemanager() {
 	if command -v home-manager >/dev/null 2>&1; then
-		printf 'Loading homemanager environment\n'
+		printf '...Loading homemanager environment\n'
 		# 	if [ -f "/etc/profiles/per-user/$USER/etc/profile.d/hm-session-vars.sh" ]; then
 		# 		. "/etc/profiles/per-user/$USER/etc/profile.d/hm-session-vars.sh"
 		# 	elif [ -f "$HOME/.local/state/nix/profiles/profile/etc/profile.d/hm-session-vars.sh" ]; then
@@ -50,7 +50,7 @@ load_homemanager() {
 #############################################
 load_devbox() {
 	if command -v devbox >/dev/null 2>&1; then
-		printf 'Loading devbox environment\n'
+		printf '...Loading devbox environment\n'
 		eval "$(devbox global shellenv)"
 	fi
 }
@@ -60,6 +60,8 @@ load_devbox() {
 # On darwin, we add the nix-darwin util
 #############################################
 install_nix() {
+	printf '[NIX] Installing Nix package manager\n'
+
   local os_type=$1
   local nix_profile="$HOME/.nix-profile"
   local installer_url="https://install.determinate.systems/nix"
@@ -67,12 +69,12 @@ install_nix() {
 
   # If Nix isn't already installed…
   if ! command -v nix >/dev/null 2>&1; then
-    printf 'Installing Nix via %s\n' "$installer_url"
+    printf '...Installing Nix via %s\n' "$installer_url"
 		[ "$os_type" = "darwin" ] && sudo ln -sf /etc/ssl/cert.pem /etc/ssl/certs/ca-certificates.crt
     curl --proto '=https' --tlsv1.2 -sSfL "$installer_url" | sh -s -- install --determinate --no-confirm
 		load_nix
   else
-    printf 'Nix is already installed at %s\n' "$nix_profile"
+    printf '...Nix is already installed at %s\n' "$nix_profile"
   fi
 }
 
@@ -80,16 +82,18 @@ install_nix() {
 # Install Home Manager
 #############################################
 install_homemanager() {
+	printf '[HM] Installing Home Manager...\n'
   load_nix
-	printf 'Installing Home Manager...\n'
 }
 
 #############################################
 # Install Devbox
 #############################################
 install_devbox() {
+	printf '[DEVBOX] Installing Devbox...\n'
 	load_nix
 	if ! command -v devbox >/dev/null 2>&1; then
+		printf '...Installing via https://get.jetify.com/devbox\n'
 		curl -fsSL https://get.jetify.com/devbox | bash -s -- --force
 	fi
 }
@@ -98,18 +102,20 @@ install_devbox() {
 # Install Nix environment packages
 #############################################
 install_nix_bins() {
+	printf '[NIX] Installing Nix packages\n'
+
 	local nix_file=".config/nix"
 	local current_dir="$(pwd)"
 
 	# Nix
 	if command -v nix >/dev/null 2>&1 && [ -f "$HOME/$nix_file/flake.nix" ]; then
-		printf 'Installing Nix environment from %s\n' "$nix_file"
+		printf '...Installing Nix packages from %s\n' "$nix_file"
 		cd $HOME/$nix_file && nix profile add '.#homies' && cd "$current_dir"
 	fi
 
 	# Home manager
 	if command -v home-manager >/dev/null 2>&1; then
-		printf 'Installing Home Manager'
+		printf '...Installing Home Manager packages'
 		home-manager switch
 	fi
 
@@ -118,7 +124,7 @@ install_nix_bins() {
 		local db_path
 		db_path="$(devbox global path)"
 		if [ -f "$db_path/devbox.json" ]; then
-			printf 'Installing Devbox environment from %s/devbox.json\n' "$db_path"
+			printf '...Installing Devbox packages from %s/devbox.json\n' "$db_path"
 			devbox global install
 		fi
 	fi
