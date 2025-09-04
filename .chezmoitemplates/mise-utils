@@ -14,7 +14,7 @@ install_mise() {
 
   case "$distro" in
     debian|fedora|arch|alpine|darwin)
-			printf '...Proceeding to installation'
+			printf '...Proceeding to installation\n'
 			curl -sS https://mise.run | sh >/dev/null 2>&1 || :
 			;;
     *)
