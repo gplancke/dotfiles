@@ -28,6 +28,6 @@ install_mise() {
 install_mise_bins() {
 	if command -v mise >/dev/null 2>&1 && [ -d "$HOME/.config/mise" ]; then
 		printf 'Installing Mise environment\n'
-		mise install
+		(cd $HOME && mise install || :)
 	fi
 }
