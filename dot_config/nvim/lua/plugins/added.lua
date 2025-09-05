@@ -6,6 +6,9 @@ return {
     "gpanders/editorconfig.nvim",
   },
   {
+    "sindrets/diffview.nvim",
+  },
+  {
     "alexghergh/nvim-tmux-navigation",
     config = function()
       require("nvim-tmux-navigation").setup({
@@ -13,59 +16,16 @@ return {
       })
     end,
   },
-  {
-    "sindrets/diffview.nvim",
-  },
-  -- {
-  --   "olimorris/codecompanion.nvim",
-  --   opts = {},
-  --   dependencies = {
-  --     "nvim-lua/plenary.nvim",
-  --     "nvim-treesitter/nvim-treesitter",
-  --     "ravitemer/mcphub.nvim",
-  --   },
-  --   config = function()
-  --     require("codecompanion").setup({
-  --       adapters = {
-  --         anthropic = function()
-  --           return require("codecompanion.adapters").extend("anthropic", {
-  --             env = {
-  -- 						api_key = "MY_OTHER_ANTHROPIC_KEY",
-  --             },
-  --           })
-  --         end,
-  --       },
-  --       strategies = {
-  --         chat = {
-  --           adapter = "anthropic",
-  --         },
-  --         inline = {
-  --           adapter = "copilot",
-  --         },
-  --         cmd = {
-  --           adapter = "anthtopic",
-  --         },
-  --       },
-  --       extensions = {
-  --         mcphub = {
-  --           callback = "mcphub.extensions.codecompanion",
-  --           opts = {
-  --             make_vars = true,
-  --             make_slash_commands = true,
-  --             show_result_in_chat = true,
-  --           },
-  --         },
-  --       },
-  --     })
-  --   end,
-  -- },
   -- {
   --   "notjedi/nvim-rooter.lua",
-  --   opts = {
-  --     rooter_patterns = { ".git", ".hg", ".svn" },
-  --     trigger_patterns = { "*" },
-  --     manual = false,
-  --   },
+  --   config = function()
+  --     require("nvim-rooter").setup({
+  --       rooter_patterns = { ".git", ".hg", ".svn", "pnpm-lock.yaml", "pnpm-workspace.yaml", "lazy-lock.json" },
+  --       trigger_patterns = { "*" },
+  --       manual = false,
+  --       cd_scope = "global",
+  --     })
+  --   end,
   -- },
   {
     "yetone/avante.nvim",
@@ -75,6 +35,9 @@ return {
     build = "make",
     -- build = "powershell -ExecutionPolicy Bypass -File Build.ps1 -BuildFromSource false"
     dependencies = {
+      {
+        "ravitemer/mcphub.nvim",
+      },
       {
         "nvim-treesitter/nvim-treesitter",
       },
@@ -116,4 +79,48 @@ return {
       },
     },
   },
+  -- {
+  --   "olimorris/codecompanion.nvim",
+  --   enable = false,
+  --   opts = {},
+  --   dependencies = {
+  --     "nvim-lua/plenary.nvim",
+  --     "nvim-treesitter/nvim-treesitter",
+  --     "ravitemer/mcphub.nvim",
+  --   },
+  --   config = function()
+  --     require("codecompanion").setup({
+  --       adapters = {
+  --         anthropic = function()
+  --           return require("codecompanion.adapters").extend("anthropic", {
+  --             env = {
+  --               api_key = "MY_OTHER_ANTHROPIC_KEY",
+  --             },
+  --           })
+  --         end,
+  --       },
+  --       strategies = {
+  --         chat = {
+  --           adapter = "anthropic",
+  --         },
+  --         inline = {
+  --           adapter = "copilot",
+  --         },
+  --         cmd = {
+  --           adapter = "anthtopic",
+  --         },
+  --       },
+  --       extensions = {
+  --         mcphub = {
+  --           callback = "mcphub.extensions.codecompanion",
+  --           opts = {
+  --             make_vars = true,
+  --             make_slash_commands = true,
+  --             show_result_in_chat = true,
+  --           },
+  --         },
+  --       },
+  --     })
+  --   end,
+  -- },
 }

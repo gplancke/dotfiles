@@ -9,7 +9,7 @@ map({ "n", "i" }, "<C-q>", function()
 end, { desc = "Delete Buffer" })
 
 map({ "n" }, "<C-e>", function()
-  Snacks.explorer()
+  Snacks.explorer({ cwd = LazyVim.root() })
 end, { desc = "Toggle file tree" })
 
 map("n", "<C-h>", nvim_tmux_nav.NvimTmuxNavigateLeft)
@@ -35,3 +35,15 @@ if vim.env.TMUX then
   vim.keymap.del({ "n", "t" }, "<c-/>")
   vim.keymap.del({ "n", "t" }, "<c-_>")
 end
+
+vim.keymap.del({ "n" }, "<leader>D") -- DB ui
+vim.keymap.del({ "n" }, "<leader>K") -- Keywordprg -- don't even know what it is
+vim.keymap.del({ "n" }, "<leader>|") -- Split window
+vim.keymap.del({ "n" }, "<leader>-") -- Split window
+vim.keymap.del({ "n" }, "<leader>S") -- Select scratch buffer
+vim.keymap.del({ "n" }, "<leader>l") -- Lazy
+vim.keymap.del({ "n" }, "<leader>L") -- Lazy changelog
+vim.keymap.del({ "n" }, "<leader>e") -- Snacks file picker
+vim.keymap.del({ "n" }, "<leader>E") -- Snacks file picker at root
+vim.keymap.del({ "n" }, "<leader>`") -- Switch buffer
+-- vim.keymap.del({ "n" }, "<leader>?") -- Buffer keymap

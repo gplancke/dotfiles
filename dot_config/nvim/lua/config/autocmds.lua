@@ -6,3 +6,15 @@
 --
 -- Or remove existing autocmds by their group name (which is prefixed with `lazyvim_` for the defaults)
 -- e.g. vim.api.nvim_del_augroup_by_name("lazyvim_wrap_spell")
+
+-- Change working directory to project root on startup
+-- vim.api.nvim_create_autocmd("VimEnter", {
+--   group = vim.api.nvim_create_augroup("change_to_root", { clear = true }),
+--   callback = function()
+--     local root = LazyVim.root()
+--     print("Project root: ", root)
+--     if root and root ~= vim.fn.getcwd() then
+--       vim.cmd.cd(root)
+--     end
+--   end,
+-- })
