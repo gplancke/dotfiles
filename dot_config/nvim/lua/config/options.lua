@@ -5,3 +5,7 @@
 -- Do or do not use blink/cmp for ai completion
 vim.g.ai_cmp = true
 vim.g.root_spec = { "lsp", { ".git", ".hg", ".svn", "pnpm-lock.yaml", "pnpm-workspace.yaml", "lazy-lock.json" }, "cwd" }
+
+if vim.g.neovide then
+  vim.o.guifont = "FiraMono Nerd Font Mono:h11:b"
+end

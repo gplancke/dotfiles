@@ -9,5 +9,6 @@ theme = catppuccin-frappe
 # theme = tokyonight
 confirm-close-surface = false
 quit-after-last-window-closed = true
+shell-integration = none
 
 # keybind = global:ctrl+grave_accent=toggle_quick_terminal
