@@ -4,6 +4,7 @@ java = "latest"
 node = "latest"
 pnpm = "latest"
 python = "latest"
+ruby = "3.3.5"
 rust = "latest"
 uv = "latest"
 

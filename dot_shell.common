@@ -72,49 +72,46 @@ export TMUX_POWERLINE_DEFAULT_FOREGROUND_COLOR='255'
 ##########################
 # Path
 ##########################
-[ -d "${HOME}/.local/bin" ] && PATH="${HOME}/.local/bin:${PATH}"
-[ -d "${NIX_DIR}" ] && PATH="${NIX_DIR}/bin:${PATH}"
 
-[ -d "${FZF_HOME}/bin" ] && PATH="${PATH}:${FZF_HOME}/bin"
-[ -d "${EMACS_HOME}/bin" ] && PATH="${PATH}:${EMACS_HOME}/bin"
-
-[ -d "${GOPATH}/bin" ] && PATH="${PATH}:${GOPATH}/bin"
-[ -d "${NPM_HOME}/bin" ] && PATH="${PATH}:${NPM_HOME}/bin"
-[ -d "${DENO_HOME}/bin" ] && PATH="${PATH}:${DENO_HOME}/bin"
-[ -d "${PNPM_HOME}" ] && PATH="${PATH}:${PNPM_HOME}"
-[ -d "${GEM_HOME}/bin" ] && PATH="${PATH}:${GEM_HOME}/bin"
-[ -d "${PIP_HOME}/bin" ] && PATH="${PATH}:${PIP_HOME}/bin"
-
-[ -d "${JAVA_HOME}/bin" ] && PATH="${PATH}:${JAVA_HOME}/bin"
-[ -d "${ANDROID_HOME}/cmdline-tools/latest/bin" ] && PATH="${PATH}:${ANDROID_HOME}/cmdline-tools/latest/bin"
-[ -d "${ANDROID_HOME}/platform-tools" ] && PATH="${PATH}:${ANDROID_HOME}/platform-tools"
-[ -d "${ANDROID_HOME}/bin" ] && PATH="${PATH}:${ANDROID_HOME}/bin"
-[ -d "${FLUTTER_ROOT}/bin" ] && PATH="${PATH}:${FLUTTER_ROOT}/bin"
-[ -d "${DART_HOME}/bin" ] && PATH="${PATH}:${DART_HOME}/bin"
-
-[ -d "${RUST_HOME}/bin" ] && PATH="${PATH}:${RUST_HOME}/bin"
-[ -d "${RUST_HOME}" ] && [ -f "${RUST_HOME}/env" ] && source "${RUST_HOME}/env"
-
-##########################
-# Extensions
-##########################
+# FZF
+[ -d "${FZF_HOME}/bin" ] && PATH="${FZF_HOME}/bin:${PATH}"
+# Emacs
+[ -d "${EMACS_HOME}/bin" ] && PATH="${EMACS_HOME}/bin:${PATH}"
+# FNM
 command -v fnm >/dev/null 2>&1 && eval "$(fnm env)"
+# ASDF
 [ -f "${ASDF_DIR}/asdf.sh" ] && . "${ASDF_DIR}/asdf.sh"
-
+# Nix
 { [ -f "${NIX_DIR}/etc/profile.d/nix.sh" ] && . "${NIX_DIR}/etc/profile.d/nix.sh"; } ||
 	{ [ -f "/nix/var/nix/profiles/default/etc/profile.d/nix.sh" ] && . "/nix/var/nix/profiles/default/etc/profile.d/nix.sh"; }
-
 [ -f "/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh" ] && . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
-
 { [ -f "/etc/profiles/per-user/$USER/etc/profile.d/hm-session-vars.sh" ] && . "/etc/profiles/per-user/$USER/etc/profile.d/hm-session-vars.sh"; } ||
 	{ [ -f "$HOME/.local/state/nix/profiles/profile/etc/profile.d/hm-session-vars.sh" ] && . "$HOME/.local/state/nix/profiles/profile/etc/profile.d/hm-session-vars.sh"; } ||
 	{ [ -n "${NIX_DIR:-}" ] && [ -f "$NIX_DIR/etc/profile.d/hm-session-vars.sh" ] && . "$NIX_DIR/etc/profile.d/hm-session-vars.sh"; }
-
+[ -d "${NIX_DIR}" ] && PATH="${NIX_DIR}/bin:${PATH}"
+# Devbox
 command -v devbox >/dev/null 2>&1 && eval "$(devbox global shellenv)"
-
+# Brew
 [ "$LINUX" = "1" ] && [ -d "/home/linuxbrew/.linuxbrew" ] && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 [ "$MACOS" = "1" ] && [ -f "/opt/homebrew/bin/brew" ] && eval "$(/opt/homebrew/bin/brew shellenv)"
 [ "$MACOS" = "1" ] && [ ! -f "/opt/homebrew/bin/brew" ] && [ -f "/usr/local/bin/brew" ] && eval "$(/usr/local/bin/brew shellenv)"
+# Various language Specific Packages
+[ -d "${GOPATH}/bin" ] && PATH="${GOPATH}/bin:${PATH}"
+[ -d "${NPM_HOME}/bin" ] && PATH="${NPM_HOME}/bin:${PATH}"
+[ -d "${DENO_HOME}/bin" ] && PATH="${DENO_HOME}/bin:${PATH}"
+[ -d "${PNPM_HOME}" ] && PATH="${PNPM_HOME}:${PATH}"
+[ -d "${GEM_HOME}/bin" ] && PATH="${GEM_HOME}/bin:${PATH}"
+[ -d "${PIP_HOME}/bin" ] && PATH="${PIP_HOME}/bin:${PATH}"
+[ -d "${JAVA_HOME}/bin" ] && PATH="${JAVA_HOME}/bin:${PATH}"
+[ -d "${ANDROID_HOME}/cmdline-tools/latest/bin" ] && PATH="${ANDROID_HOME}/cmdline-tools/latest/bin:${PATH}"
+[ -d "${ANDROID_HOME}/platform-tools" ] && PATH="${ANDROID_HOME}/platform-tools:${PATH}"
+[ -d "${ANDROID_HOME}/bin" ] && PATH="${ANDROID_HOME}/bin:${PATH}"
+[ -d "${FLUTTER_ROOT}/bin" ] && PATH="${FLUTTER_ROOT}/bin:${PATH}"
+[ -d "${DART_HOME}/bin" ] && PATH="${DART_HOME}/bin:${PATH}"
+[ -d "${RUST_HOME}/bin" ] && PATH="${RUST_HOME}/bin:${PATH}"
+[ -d "${RUST_HOME}" ] && [ -f "${RUST_HOME}/env" ] && source "${RUST_HOME}/env"
+# My binaries come first :)
+[ -d "${HOME}/.local/bin" ] && PATH="${HOME}/.local/bin:${PATH}"
 
 ##########################
 # Links
