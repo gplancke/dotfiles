@@ -1,3 +1,3 @@
-printf "sourcing .zprofile\n"
+SOURCED="${SOURCED:-root}:.zprofile"
 
 source "$HOME/.orbstack/shell/init.zsh" 2>/dev/null || :

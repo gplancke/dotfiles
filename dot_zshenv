@@ -1,3 +1,3 @@
-printf "sourcing .zshenv\n"
+SOURCED="${SOURCED:-root}:.zshenv"
 
 [[ -r ~/.profile ]] && source ~/.profile

@@ -3,6 +3,7 @@ node_modules/
 dist/
 output/
 .nx/cache
+.pnpm-store
 
 # Direnv
 .direnv

@@ -1,8 +1,4 @@
-printf "sourcing .bashrc\n"
-
-# FZF
-[ -f "~/.fzf.bash" ] && . "~/.fzf.bash"
-[ -f "~/.fzf.colors" ] && "~/.fzf.colors"
+SOURCED="${SOURCED:-root}:.bashrc"
 
 ##########################
 # BASH SHIT
@@ -31,7 +27,10 @@ shopt -s checkwinsize
 
 # If set, the pattern "**" used in a pathname expansion context will
 # match all files and zero or more directories and subdirectories.
-shopt -s globstar
+# Only enable globstar if we're actually running bash and it supports it
+if [ -n "$BASH_VERSION" ] && [ "${BASH_VERSINFO[0]}" -ge 4 ]; then
+    shopt -s globstar 2>/dev/null || true
+fi
 
 # make less more friendly for non-text input files, see lesspipe(1)
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
@@ -79,6 +78,11 @@ esac
 
 # enable color support of ls and also add handy aliases
 if [ -x /usr/bin/dircolors ]; then
+	if test -r ~/.dircolors; then
+		eval "$(dircolors -b ~/.dircolors)"
+	else
+		eval "$(dircolors -b)"
+	fi
 	test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
 	alias ls='ls --color=auto'
 	alias dir='dir --color=auto'
@@ -114,6 +118,11 @@ hash zoxide 2>/dev/null && eval "$(zoxide init bash)"
 hash starship 2>/dev/null && eval "$(starship init bash)"
 command -v mise 2>/dev/null && eval "$(~/.local/bin/mise activate bash)"
 
-[ -f ~/.fzf.bash ] && source ~/.fzf.bash
-[ -f ~/.fzf.colors ] && source ~/.fzf.colors
-[ -f "$ASDF_DIR/completions" ] && source $ASDF_DIR/completions/asdf.bash
+[ -f "$ASDF_DIR/completions" ] && source "$ASDF_DIR/completions/asdf.bash"
+
+[ -f "$HOME/.fzf.bash" ] && source "$HOME/.fzf.bash"
+[ -f "$HOME/.fzf.colors" ] && source "$HOME/.fzf.colors"
+
+##########################
+
+echo "${SOURCED}" | tr ':' ' -> '

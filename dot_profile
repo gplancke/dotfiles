@@ -1,4 +1,4 @@
-printf "sourcing .profile\n"
+SOURCED="${SOURCED:-root}:.profile"
 
 ##########################
 # Platform Specifics
