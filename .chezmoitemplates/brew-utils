@@ -113,7 +113,7 @@ install_brew_casks() {
 #############################################
 # Install Homebrew bundle
 #############################################
-install_brew_casks() {
+install_brew_bundle() {
 	printf '[BREW] Installing Homebrew bundle\n'
 
 	local file=$1
