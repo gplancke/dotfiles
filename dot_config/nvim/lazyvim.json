@@ -1,11 +1,13 @@
 {
   "extras": [
+    "lazyvim.plugins.extras.ai.avante",
     "lazyvim.plugins.extras.ai.copilot",
     "lazyvim.plugins.extras.coding.mini-surround",
     "lazyvim.plugins.extras.coding.yanky",
     "lazyvim.plugins.extras.dap.core",
     "lazyvim.plugins.extras.editor.inc-rename",
     "lazyvim.plugins.extras.editor.navic",
+    "lazyvim.plugins.extras.editor.neo-tree",
     "lazyvim.plugins.extras.editor.refactoring",
     "lazyvim.plugins.extras.formatting.biome",
     "lazyvim.plugins.extras.lang.docker",
@@ -34,7 +36,7 @@
   ],
   "install_version": 8,
   "news": {
-    "NEWS.md": "10960"
+    "NEWS.md": "11866"
   },
   "version": 8
 }

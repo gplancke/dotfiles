@@ -10,3 +10,6 @@ uv = "latest"
 
 [env]
 MISE_LOADED = 1
+
+[settings]
+lockfile = true

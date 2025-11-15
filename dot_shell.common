@@ -28,7 +28,7 @@ export WORK_DIR="$HOME/Workspace/Projects"
 export NIXPKGS_ALLOW_UNFREE=1
 export HOMEBREW_NO_AUTO_UPDATE=1
 
-export NIX_PATH=darwin-config="$HOME/.nixpkgs/darwin-configuration.nix:$HOME/.nix-defexpr/channels" # ${NIX_PATH:+:}$NIX_PATH
+# export NIX_PATH=darwin-config="$HOME/.nixpkgs/darwin-configuration.nix:$HOME/.nix-defexpr/channels" # ${NIX_PATH:+:}$NIX_PATH
 export NIX_DIR="$HOME/.nix-profile"
 export ASDF_DIR="$HOME/.local/share/asdf"
 
@@ -90,7 +90,7 @@ command -v fnm >/dev/null 2>&1 && eval "$(fnm env)"
 	{ [ -n "${NIX_DIR:-}" ] && [ -f "$NIX_DIR/etc/profile.d/hm-session-vars.sh" ] && . "$NIX_DIR/etc/profile.d/hm-session-vars.sh"; }
 [ -d "${NIX_DIR}" ] && PATH="${NIX_DIR}/bin:${PATH}"
 # Devbox
-command -v devbox >/dev/null 2>&1 && eval "$(devbox global shellenv)"
+# command -v devbox >/dev/null 2>&1 && eval "$(devbox global shellenv)"
 # Brew
 [ "$LINUX" = "1" ] && [ -d "/home/linuxbrew/.linuxbrew" ] && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 [ "$MACOS" = "1" ] && [ -f "/opt/homebrew/bin/brew" ] && eval "$(/opt/homebrew/bin/brew shellenv)"

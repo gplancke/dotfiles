@@ -9,3 +9,5 @@ vim.g.root_spec = { "lsp", { ".git", ".hg", ".svn", "pnpm-lock.yaml", "pnpm-work
 if vim.g.neovide then
   vim.o.guifont = "FiraMono Nerd Font Mono:h11:b"
 end
+
+-- vim.opts.rocks.hererocks = false

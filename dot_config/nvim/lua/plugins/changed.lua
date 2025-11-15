@@ -2,14 +2,11 @@ return {
   {
     "LazyVim/LazyVim",
     opts = {
-      colorscheme = "catppuccin",
+      colorscheme = "tokyonight",
     },
   },
   {
     "saghen/blink.cmp",
-    dependencies = {
-      -- "Kaiser-Yang/blink-cmp-avante",
-    },
     opts = function(_, opts)
       opts.enabled = function()
         local constants = require("config.custom.constants")
@@ -29,19 +26,83 @@ return {
         },
       }
 
-      -- table.insert(opts.sources.default, "avante")
-      -- table.insert(opts.sources.providers, {
-      --   avante = {
-      --     module = "blink-cmp-avante",
-      --     name = "Avante",
-      --   },
-      -- })
+      return opts
+    end,
+  },
+  {
+    "nvim-neo-tree/neo-tree.nvim",
+    opts = function(_, opts)
+      opts.filesystem = opts.filesystem or {}
+      opts.filesystem.hijack_netrw_behavior = "open_default"
+    end,
+  },
+  {
+    "yetone/avante.nvim",
+    opts = function(_, opts)
+      opts.options = opts.options or {}
+      opts.provider = "goose"
+
+      opts.providers = {
+        claude = {
+          endpoint = "https://api.anthropic.com",
+          model = "claude-haiku-4-5",
+          disable_tools = true,
+          timeout = 30000,
+          extra_request_body = {
+            temperature = 0,
+            max_tokens = 4096,
+          },
+        },
+      }
+
+      opts.acp_providers = {
+        ["opencode"] = {
+          command = "opencode",
+          args = { "acp" },
+          env = {
+            ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY"),
+          },
+        },
+        ["cursor"] = {
+          command = "npx",
+          args = { "@blowmage/cursor-agent-acp" },
+          env = {},
+        },
+        ["goose"] = {
+          command = "goose",
+          args = { "acp" },
+          env = {},
+        },
+      }
+
+      return opts
+    end,
+  },
+  {
+    "akinsho/bufferline.nvim",
+    enabled = false,
+    -- init = function()
+    --   local bufline = require("catppuccin.groups.integrations.bufferline")
+    --   function bufline.get()
+    --     return bufline.get_theme()
+    --   end
+    -- end,
+    opts = function(_, opts)
+      -- Try to always show bufferline
+      opts.options = opts.options or {}
+      opts.options.always_show_bufferline = true
+
+      -- Integration with catppuccin
+      if (vim.g.colors_name or ""):find("catppuccin") then
+        opts.highlights = require("catppuccin.groups.integrations.bufferline").get_theme()
+      end
 
       return opts
     end,
   },
   {
     "catppuccin/nvim",
+    enabled = false,
     lazy = true,
     name = "catppuccin",
     opts = {
@@ -86,26 +147,5 @@ return {
         which_key = true,
       },
     },
-  },
-  {
-    "akinsho/bufferline.nvim",
-    init = function()
-      local bufline = require("catppuccin.groups.integrations.bufferline")
-      function bufline.get()
-        return bufline.get_theme()
-      end
-    end,
-    opts = function(_, opts)
-      -- Try to always show bufferline
-      opts.options = opts.options or {}
-      opts.options.always_show_bufferline = true
-
-      -- Integration with catppuccin
-      if (vim.g.colors_name or ""):find("catppuccin") then
-        opts.highlights = require("catppuccin.groups.integrations.bufferline").get_theme()
-      end
-
-      return opts
-    end,
   },
 }

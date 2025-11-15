@@ -83,5 +83,29 @@ fi
 # fi
 [ -f $HOME/.fzf.colors ] && source $HOME/.fzf.colors
 
+
+################################################################################
+################################################################################
+# OVVERIDES ZSH command not found handler
+################################################################################
+################################################################################
+
+command_not_found_handler() {
+  local input="$1 ${*:2}"
+  local cmd
+  cmd="$("$HOME/.local/bin/cnf-claude" "$input" 2>/dev/null)" || return 127
+
+  if [[ -n "$cmd" ]]; then
+    print "[llm] $cmd"
+    read -r "?Run this command? [y/N] " reply
+    if [[ "$reply" == [Yy]* ]]; then
+      eval "$cmd"
+    fi
+    return 0
+  fi
+
+  return 127
+}
+
 # ##############################
 echo "${SOURCED}" | tr ':' ' -> '

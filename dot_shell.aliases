@@ -317,6 +317,22 @@ clean_workspaces() {
 
 ################################################################################
 ################################################################################
+# Automatically run brew bundle dump when re-adding in chezmoi
+################################################################################
+################################################################################
+
+chez() {
+  if [ "$1" = "re-add" ]; then
+    mkdir -p "$HOME/.config/brew"
+    brew bundle dump \
+      --all --describe --force \
+      --file "$HOME/.config/brew/Brewfile"
+  fi
+  command chezmoi "$@"
+}
+
+################################################################################
+################################################################################
 # Aliases
 ################################################################################
 ################################################################################
@@ -324,6 +340,7 @@ clean_workspaces() {
 alias c='clear'
 
 hash jc 2>/dev/null && hash mlr 2>/dev/null && alias li='\ls -la | jc --ls | mlr --ijson --opprint cut -f link_to -x' || alias li='\ls -la'
+alias ls='ls'
 alias lila='\ls -la'
 alias lisa='\ls -lsah'
 
@@ -405,6 +422,7 @@ alias lgit='lazygit'
 
 alias kport='__kill_port'
 alias kports='__kill_ports'
+alias nodeports='echo -e "PORT\tPID\tPACKAGE\tCOMMAND\n----\t---\t-------\t-------" && lsof -iTCP -sTCP:LISTEN -n -P | grep node | awk '"'"'{print $2, $9}'"'"' | while read pid port; do port_num=$(echo $port | cut -d: -f2); cwd=$(lsof -p $pid 2>/dev/null | grep cwd | awk '"'"'{print $NF}'"'"'); cmd=$(ps -p $pid -o command= 2>/dev/null | head -c 80); pkg=$(basename "$cwd" 2>/dev/null || echo "unknown"); echo -e "$port_num\t$pid\t$pkg\t$cmd"; done | sort -n | column -t -s $'"'"'\t'"'"
 alias myip='dig +short txt ch whoami.cloudflare @1.0.0.1 | tr -d "\""'
 alias find-rpi='arp -na | grep -i "dc:a6:32"'
 alias find-old-rpi='arp -na | grep -i "b8:27:eb"'

@@ -173,3 +173,73 @@ function install_theme_manager {
   fi
 }
 
+
+#############################################
+# Individual package manager update functions
+#############################################
+
+function update_brew {
+	if command -v brew >/dev/null 2>&1; then
+		echo "Updating Homebrew itself..."
+		brew update
+		echo "Homebrew updated successfully"
+	fi
+}
+
+function update_nix {
+	if command -v nix >/dev/null 2>&1; then
+		echo "Updating Nix itself..."
+
+		# If using flakes, update the Nix flake registry
+		if nix flake --help >/dev/null 2>&1; then
+			echo "Updating Nix flake registry..."
+			nix registry update 2>/dev/null || true
+		fi
+
+		# Update nix channels (the package manager metadata)
+		if command -v nix-channel >/dev/null 2>&1; then
+			echo "Updating Nix channels..."
+			nix-channel --update
+		fi
+
+		# Update Nix daemon and tools
+		if command -v nix-env >/dev/null 2>&1; then
+			echo "Updating Nix installation..."
+			nix-env -iA nixpkgs.nix 2>/dev/null || true
+		fi
+
+		echo "Nix package manager updated successfully"
+	fi
+}
+
+function update_devbox {
+	if command -v devbox >/dev/null 2>&1; then
+		echo "Updating Devbox itself..."
+		devbox version update
+		echo "Devbox updated successfully"
+	fi
+}
+
+function update_mise {
+	if command -v mise >/dev/null 2>&1; then
+		echo "Updating Mise itself..."
+		mise self-update
+		echo "Mise updated successfully"
+	fi
+}
+
+#############################################
+# Update all package managers
+#############################################
+
+function update_package_managers {
+	echo "Starting package manager updates (updating the managers themselves, not their packages)..."
+
+	# Update package managers themselves
+	update_brew
+	update_nix
+	update_devbox
+	update_mise
+
+	echo "All package manager updates completed!"
+}
