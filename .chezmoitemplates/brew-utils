@@ -109,3 +109,24 @@ install_brew_casks() {
 		brew install --quiet --cask "$cask" || :
 	done
 }
+
+#############################################
+# Install Homebrew bundle
+#############################################
+install_brew_casks() {
+	printf '[BREW] Installing Homebrew bundle\n'
+
+	local file=$1
+
+	if [ ! -x "$(command -v brew)" ]; then
+		printf '...No brew found, skipping bundle installation\n'
+		return 0
+	fi
+
+	if [ -z "${file}" ]; then
+		printf '...No bundle to install\n'
+		return 0
+	fi
+
+	brew bundle --file="${file}" || :
+}

@@ -39,6 +39,7 @@ fi
 
 # hash: {{ include "private_dot_local/private_share/devbox/global/default/devbox.json" | sha256sum }}
 # hash: {{ include "dot_config/nix/flake.nix" | sha256sum }}
+# hash: {{ include "dot_config/brew/Brewfile" | sha256sum }}
 
 setup_darwin() {
 	load_env "darwin"
@@ -51,6 +52,7 @@ setup_darwin() {
 
 	install_brew_packages "${brews[@]}"
 	install_brew_casks "${casks[@]}"
+	install_brew_bundle "${HOME}/.config/brew/Brewfile"
 }
 
 setup_debian() {
@@ -65,6 +67,7 @@ setup_debian() {
 	install_apt_packages "${apt_packages[@]}"
 	install_brew_packages "${brews[@]}"
 	install_brew_casks "${casks[@]}"
+	install_brew_bundle "${HOME}/.config/brew/Brewfile"
 }
 
 setup_fedora() {
@@ -79,6 +82,7 @@ setup_fedora() {
 	install_dnf_packages "${dnf_packages[@]}"
 	install_brew_packages "${brews[@]}"
 	install_brew_casks "${casks[@]}"
+	install_brew_bundle "${HOME}/.config/brew/Brewfile"
 }
 
 setup_arch() {
@@ -93,6 +97,7 @@ setup_arch() {
 	install_pacman_packages "${pacman_packages[@]}"
 	install_brew_packages "${brews[@]}"
 	install_brew_casks "${casks[@]}"
+	install_brew_bundle "${HOME}/.config/brew/Brewfile"
 }
 
 setup_alpine() {
@@ -107,6 +112,7 @@ setup_alpine() {
 	install_apk_packages "${apk_packages[@]}"
 	install_brew_packages "${brews[@]}"
 	install_brew_casks "${casks[@]}"
+	install_brew_bundle "${HOME}/.config/brew/Brewfile"
 }
 
 main() {
