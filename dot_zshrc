@@ -109,3 +109,4 @@ command_not_found_handler() {
 
 # ##############################
 echo "${SOURCED}" | tr ':' ' -> '
+[ -f ~/.fzf.colors ] && source ~/.fzf.colors

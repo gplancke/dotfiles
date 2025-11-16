@@ -53,6 +53,8 @@ brew "node"
 brew "emscripten"
 # Simple, fast and user-friendly alternative to find
 brew "fd"
+# Easy to use base16 scheme manager that integrates with any workflow
+brew "flavours"
 # Distributed software configuration management
 brew "fossil"
 # Command-line fuzzy finder written in Go

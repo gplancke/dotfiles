@@ -296,9 +296,16 @@ __kill_port() {
 
 chth() {
   theme="${1:=eighties}"
-  sway="/home/georgio/.local/share/base16-manager/rkubosz/base16-sway/themes/base16-${theme}.config"
-  base16-manager set "$theme" 2>/dev/null
-  [ -f "${sway}" ] && cp "${sway}" "/home/georgio/.config/sway/colorscheme"
+
+	if command -v flavours >/dev/null 2>&1; then
+		flavours --config "$HOME/.config/flavours/config.toml" apply "$theme"
+	elif command -v base16-manager >/dev/null 2>&1; then
+		sway="/home/georgio/.local/share/base16-manager/rkubosz/base16-sway/themes/base16-${theme}.config"
+		base16-manager set "$theme" 2>/dev/null
+		[ -f "${sway}" ] && cp "${sway}" "/home/georgio/.config/sway/colorscheme"
+	else
+		echo "No theme manager"
+	fi
 }
 
 ################################################################################

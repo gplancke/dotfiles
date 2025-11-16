@@ -126,3 +126,4 @@ command -v mise 2>/dev/null && eval "$(~/.local/bin/mise activate bash)"
 ##########################
 
 echo "${SOURCED}" | tr ':' ' -> '
+[ -f ~/.fzf.colors ] && source ~/.fzf.colors
