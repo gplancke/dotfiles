@@ -1,10 +1,10 @@
 return {
-  {
-    "LazyVim/LazyVim",
-    opts = {
-      colorscheme = "tokyonight",
-    },
-  },
+  -- {
+  --   "LazyVim/LazyVim",
+  --   opts = {
+  --     colorscheme = "tokyonight",
+  --   },
+  -- },
   {
     "saghen/blink.cmp",
     opts = function(_, opts)
@@ -29,18 +29,20 @@ return {
       return opts
     end,
   },
-  {
-    "nvim-neo-tree/neo-tree.nvim",
-    opts = function(_, opts)
-      opts.filesystem = opts.filesystem or {}
-      opts.filesystem.hijack_netrw_behavior = "open_default"
-    end,
-  },
+  -- {
+  --   "nvim-neo-tree/neo-tree.nvim",
+  --   opts = function(_, opts)
+  --     opts.filesystem = opts.filesystem or {}
+  --     opts.filesystem.hijack_netrw_behavior = "open_default"
+  --   end,
+  -- },
   {
     "yetone/avante.nvim",
     opts = function(_, opts)
       opts.options = opts.options or {}
-      opts.provider = "goose"
+      opts.provider = "claude"
+
+      opts.mode = "legacy" -- could be 'legacy' or 'agentic'
 
       opts.providers = {
         claude = {
@@ -100,52 +102,52 @@ return {
       return opts
     end,
   },
-  {
-    "catppuccin/nvim",
-    enabled = false,
-    lazy = true,
-    name = "catppuccin",
-    opts = {
-      flavour = "frappe",
-      integrations = {
-        aerial = true,
-        alpha = true,
-        blink_cmp = true,
-        cmp = true,
-        dashboard = true,
-        flash = true,
-        fzf = true,
-        grug_far = true,
-        gitsigns = true,
-        headlines = true,
-        illuminate = true,
-        indent_blankline = { enabled = true },
-        leap = true,
-        lsp_trouble = true,
-        mason = true,
-        markdown = true,
-        mini = true,
-        native_lsp = {
-          enabled = true,
-          underlines = {
-            errors = { "undercurl" },
-            hints = { "undercurl" },
-            warnings = { "undercurl" },
-            information = { "undercurl" },
-          },
-        },
-        navic = { enabled = true, custom_bg = "lualine" },
-        neotest = true,
-        neotree = true,
-        noice = true,
-        notify = true,
-        semantic_tokens = true,
-        snacks = true,
-        telescope = true,
-        treesitter = true,
-        treesitter_context = true,
-        which_key = true,
-      },
-    },
-  },
+  -- {
+  --   "catppuccin/nvim",
+  --   enabled = false,
+  --   lazy = true,
+  --   name = "catppuccin",
+  --   opts = {
+  --     flavour = "frappe",
+  --     integrations = {
+  --       aerial = true,
+  --       alpha = true,
+  --       blink_cmp = true,
+  --       cmp = true,
+  --       dashboard = true,
+  --       flash = true,
+  --       fzf = true,
+  --       grug_far = true,
+  --       gitsigns = true,
+  --       headlines = true,
+  --       illuminate = true,
+  --       indent_blankline = { enabled = true },
+  --       leap = true,
+  --       lsp_trouble = true,
+  --       mason = true,
+  --       markdown = true,
+  --       mini = true,
+  --       native_lsp = {
+  --         enabled = true,
+  --         underlines = {
+  --           errors = { "undercurl" },
+  --           hints = { "undercurl" },
+  --           warnings = { "undercurl" },
+  --           information = { "undercurl" },
+  --         },
+  --       },
+  --       navic = { enabled = true, custom_bg = "lualine" },
+  --       neotest = true,
+  --       neotree = true,
+  --       noice = true,
+  --       notify = true,
+  --       semantic_tokens = true,
+  --       snacks = true,
+  --       telescope = true,
+  --       treesitter = true,
+  --       treesitter_context = true,
+  --       which_key = true,
+  --     },
+  --   },
+  -- },
 }

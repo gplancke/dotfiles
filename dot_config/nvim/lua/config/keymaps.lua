@@ -20,7 +20,8 @@ map({ "n", "i" }, "<C-q>", function()
   Snacks.bufdelete()
 end, { desc = "Delete Buffer" })
 map({ "n" }, "<C-e>", function()
-  vim.cmd("Neotree toggle")
+  -- vim.cmd("Neotree toggle")
+  Snacks.explorer()
 end, { desc = "Toggle file tree" })
 
 if vim.env.TMUX then

@@ -297,7 +297,9 @@ __kill_port() {
 chth() {
   theme="${1:=eighties}"
 
-	if command -v flavours >/dev/null 2>&1; then
+	if command -v tinty >/dev/null 2>&1; then
+		tinty apply "base16-${theme}"
+	elif command -v flavours >/dev/null 2>&1; then
 		flavours --config "$HOME/.config/flavours/config.toml" apply "$theme"
 	elif command -v base16-manager >/dev/null 2>&1; then
 		sway="/home/georgio/.local/share/base16-manager/rkubosz/base16-sway/themes/base16-${theme}.config"

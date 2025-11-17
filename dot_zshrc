@@ -65,8 +65,7 @@ if [ -f ~/.config/antigen/antigen.zsh ]; then
   # antigen theme robbyrussell/oh-my-zsh themes/agnoster
   # antigen theme robbyrussell/oh-my-zsh themes/arrow
   # antigen theme robbyrussell/oh-my-zsh themes/cloud
-  # Tell antigen that you're done.
-  antigen bundle chisui/zsh-nix-shell
+  # antigen bundle chisui/zsh-nix-shell
   antigen apply
 fi
 
@@ -97,8 +96,8 @@ command_not_found_handler() {
 
   if [[ -n "$cmd" ]]; then
     print "[llm] $cmd"
-    read -r "?Run this command? [y/N] " reply
-    if [[ "$reply" == [Yy]* ]]; then
+    read -r "?Run this command? [Y/n] " reply
+    if [[ "$reply" == [Yy]* ]] || [[ -z "$reply" ]]; then
       eval "$cmd"
     fi
     return 0

@@ -8,6 +8,7 @@ tap "pomdtr/tap"
 tap "pulumi/tap"
 tap "sst/tap"
 tap "supabase/tap"
+tap "tinted-theming/tinted"
 tap "trycua/lume"
 # Simple, modern, secure file encryption
 brew "age"
@@ -53,8 +54,6 @@ brew "node"
 brew "emscripten"
 # Simple, fast and user-friendly alternative to find
 brew "fd"
-# Easy to use base16 scheme manager that integrates with any workflow
-brew "flavours"
 # Distributed software configuration management
 brew "fossil"
 # Command-line fuzzy finder written in Go
@@ -164,6 +163,8 @@ brew "oven-sh/bun/bun"
 brew "pomdtr/tap/sunbeam"
 # The AI coding agent built for the terminal.
 brew "sst/tap/opencode"
+# Change the theme of your terminal, text editor and anything else with one command.
+brew "tinted-theming/tinted/tinty"
 # CLI and local API server to run macOS and Linux VMs on Apple Silicon
 brew "trycua/lume/lume"
 # AeroSpace is an i3-like tiling window manager for macOS
@@ -217,7 +218,6 @@ vscode "jnoortheen.nix-ide"
 vscode "koog1000.fossil"
 vscode "mechatroner.rainbow-csv"
 vscode "mhutchie.git-graph"
-vscode "mkhl.direnv"
 vscode "moalamri.inline-fold"
 vscode "mohsen1.prettify-json"
 vscode "mrmlnc.vscode-json5"

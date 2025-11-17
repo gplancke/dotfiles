@@ -13,6 +13,15 @@ return {
       })
     end,
   },
+  {
+    "tinted-theming/tinted-nvim",
+    config = function()
+      require("tinted-colorscheme").setup()
+    end,
+  },
+  -- {
+  --   "landerson02/ghostty-theme-sync.nvim",
+  -- },
   -- {
   --   "chriskempson/base16-vim",
   -- },
