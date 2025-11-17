@@ -1,0 +1,31 @@
+
+[[items]]
+path = "https://github.com/tinted-theming/tinted-terminal"
+name = "tinted-terminal"
+themes-dir = "themes/ghostty"
+hook = "command cp -f %f ~/.config/ghostty/themes/tinted-theming"
+supported-systems = ["base16", "base24"]
+
+# [[items]]
+# path = "https://github.com/tinted-theming/tinted-terminal"
+# name = "tinted-terminal"
+# themes-dir = "themes/alacritty"
+# hook = "cp -f %f ~/.config/alacritty/colors.toml && touch ~/.config/alacritty/alacritty.toml"
+# supported-systems = ["base16", "base24"]
+
+[[items]]
+path = "https://github.com/tinted-theming/tinted-shell"
+name = "tinted-shell"
+themes-dir = "scripts"
+hook = ". %f"
+
+[[items]]
+path = "https://github.com/tinted-theming/base16-vim"
+name = "base16-vim"
+themes-dir = "colors"
+
+[[items]]
+path = "https://github.com/tinted-theming/tinted-tmux"
+name = "tinted-tmux"
+hook = "tmux source-file ~/.tmux.conf 2>/dev/null"
+themes-dir = "colors"
