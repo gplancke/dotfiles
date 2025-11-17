@@ -294,11 +294,26 @@ __kill_port() {
 ################################################################################
 ################################################################################
 
+edit_cursor() {
+	theme="${1:=eighties}"
+
+	file="$HOME/Library/Application Support/Cursor/User/settings.json"
+	tmp="$(mktemp)"
+
+	if command -v jc >/dev/null 2>&1; then
+		cat "$file" \
+			| jc --json json  \
+			| jq --arg t "base16-${theme}" '.["workbench.colorScheme"]=$t' \
+			> "$tmp" && cat $tmp && rm "$tmp"
+	fi
+}
+
 chth() {
   theme="${1:=eighties}"
 
 	if command -v tinty >/dev/null 2>&1; then
 		tinty apply "base16-${theme}"
+		# edit_cursor $theme
 	elif command -v flavours >/dev/null 2>&1; then
 		flavours --config "$HOME/.config/flavours/config.toml" apply "$theme"
 	elif command -v base16-manager >/dev/null 2>&1; then
