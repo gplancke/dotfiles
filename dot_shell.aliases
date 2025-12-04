@@ -313,7 +313,10 @@ chth() {
 
 	if command -v tinty >/dev/null 2>&1; then
 		tinty apply "base16-${theme}"
-		# edit_cursor $theme
+		# local tinty_data_dir="${XDG_DATA_HOME:-$HOME/.local/share}/tinted-theming/tinty"
+		# while read -r script; do
+		# 	. "$script"
+		# done < <(find "$tinty_data_dir" -maxdepth 1 -type f -o -type l -name "*.sh" -newer "$newer_file")
 	elif command -v flavours >/dev/null 2>&1; then
 		flavours --config "$HOME/.config/flavours/config.toml" apply "$theme"
 	elif command -v base16-manager >/dev/null 2>&1; then

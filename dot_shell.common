@@ -62,13 +62,13 @@ export TMUX_POWERLINE_DEFAULT_FOREGROUND_COLOR='255'
 ##########################
 # Themes
 ##########################
-[ -f "${HOME}/.base16_theme" ] \
-  && [ -z "$SSH_TTY" ] \
-  && [ -z "$IN_NIX_SHELL" ] \
-  && [ "$TERM_PROGRAM" != "vscode" ] \
-  && echo '. "${HOME}/.base16_theme"'
-
-[ -f "${HOME}/.fzf.colors" ] && . "${HOME}/.fzf.colors"
+# [ -f "${HOME}/.base16_theme" ] \
+#   && [ -z "$SSH_TTY" ] \
+#   && [ -z "$IN_NIX_SHELL" ] \
+#   && [ "$TERM_PROGRAM" != "vscode" ] \
+#   && echo '. "${HOME}/.base16_theme"'
+#
+# [ -f "${HOME}/.fzf.colors" ] && . "${HOME}/.fzf.colors"
 
 ##########################
 # Path
