@@ -102,13 +102,15 @@ brew "mkcert"
 # CLI tool for saving complete web pages as a single HTML file
 brew "monolith"
 # Ambitious Vim-fork focused on extensibility and agility
-brew "neovim"
+brew "neovim", args: ["HEAD"]
 # Port scanning utility for large networks
 brew "nmap"
 # Libraries for security-enabled client and server applications
 brew "nss"
 # Modern shell for the GitHub era
 brew "nushell"
+# Search tool like grep and The Silver Searcher
+brew "ripgrep"
 # AI coding agent, built for the terminal
 brew "opencode"
 # Data loading tool for PostgreSQL
@@ -127,8 +129,6 @@ brew "pygobject3"
 brew "python@3.11"
 # Generic machine emulator and virtualizer
 brew "qemu"
-# Search tool like grep and The Silver Searcher
-brew "ripgrep"
 # SOcket CAT: netcat on steroids
 brew "socat"
 # Data wrangler with jq-like query language
@@ -187,6 +187,8 @@ cask "slack"
 cask "tailscale-app"
 # Multimedia player
 cask "vlc"
+# Terminal emulator
+cask "wave"
 vscode "adpyke.codesnap"
 vscode "alefragnani.project-manager"
 vscode "anysphere.cursorpyright"

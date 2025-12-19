@@ -1,15 +1,33 @@
 title = Ghostty
+window-decoration = true
+maximize = true
+
+theme = tinted-theming
+shell-integration = none
+quit-after-last-window-closed = true
+confirm-close-surface = false
+
 font-family = FiraMono Nerd Font
 font-style = Bold
 font-size = 10
 font-thicken = true
 adjust-cell-width = -8%
 adjust-cell-height = 11%
-window-decoration = false
-theme = tinted-theming
-confirm-close-surface = false
-quit-after-last-window-closed = true
-shell-integration = none
-maximize = true
 
 # keybind = global:ctrl+grave_accent=toggle_quick_terminal
+# keybind = ctrl+a>c=new_tab
+# keybind = ctrl+a>shift+x=close_tab
+#
+# keybind = ctrl+a>shift+five=new_split:right
+# keybind = ctrl+a>shift+quote=new_split:down
+# keybind = ctrl+a>x=close_surface
+#
+# keybind = ctrl+a>h=goto_split:left
+# keybind = ctrl+a>j=goto_split:down
+# keybind = ctrl+a>k=goto_split:up
+# keybind = ctrl+a>l=goto_split:right
+#
+# keybind = ctrl+a>shift+h=resize_split:left,20
+# keybind = ctrl+a>shift+j=resize_split:down,20
+# keybind = ctrl+a>shift+k=resize_split:up,20
+# keybind = ctrl+a>shift+l=resize_split:right,20
