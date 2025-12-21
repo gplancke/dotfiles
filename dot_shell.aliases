@@ -5,8 +5,9 @@
 ##########################
 TMUX_POPUP_NAME="popup-session"
 
-alias lim='nvim'
-alias vim='NVIM_APPNAME=nvim.bak nvim'
+alias vim='nvim'
+alias lvim='NVIM_APPNAME=lazyvim nvim'
+alias mvim='NVIM_APPNAME=minivim nvim'
 
 ################################################################################
 ################################################################################

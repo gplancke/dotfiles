@@ -44,7 +44,6 @@ local plugins = {
 
 	-- LSP
 	"https://github.com/williamboman/mason.nvim",
-	"https://github.com/mistweaverco/zana.nvim",
 
 	-- Git
 	"https://github.com/lewis6991/gitsigns.nvim",
