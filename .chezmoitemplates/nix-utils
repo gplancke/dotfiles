@@ -47,12 +47,11 @@ load_homemanager() {
 
 #############################################
 # Load Devbox environment
+# DEPRECATED: devbox loading has been disabled
 #############################################
 load_devbox() {
-	if command -v devbox >/dev/null 2>&1; then
-		printf '...Loading devbox environment\n'
-		eval "$(devbox global shellenv)"
-	fi
+	printf '...Skipping devbox environment (disabled)\n'
+	return 0
 }
 
 #############################################
@@ -88,14 +87,11 @@ install_homemanager() {
 
 #############################################
 # Install Devbox
+# DEPRECATED: devbox installation has been disabled
 #############################################
 install_devbox() {
-	printf '[DEVBOX] Installing Devbox...\n'
-	load_nix
-	if ! command -v devbox >/dev/null 2>&1; then
-		printf '...Installing via https://get.jetify.com/devbox\n'
-		curl -fsSL https://get.jetify.com/devbox | bash -s -- --force
-	fi
+	printf '[DEVBOX] DEPRECATED: devbox installation has been disabled\n'
+	return 0
 }
 
 #############################################
@@ -119,13 +115,13 @@ install_nix_bins() {
 		home-manager switch
 	fi
 
-	# Devbox
-	if command -v devbox >/dev/null 2>&1; then
-		local db_path
-		db_path="$(devbox global path)"
-		if [ -f "$db_path/devbox.json" ]; then
-			printf '...Installing Devbox packages from %s/devbox.json\n' "$db_path"
-			devbox global install
-		fi
-	fi
+	# Devbox - disabled
+	# if command -v devbox >/dev/null 2>&1; then
+	# 	local db_path
+	# 	db_path="$(devbox global path)"
+	# 	if [ -f "$db_path/devbox.json" ]; then
+	# 		printf '...Installing Devbox packages from %s/devbox.json\n' "$db_path"
+	# 		devbox global install
+	# 	fi
+	# fi
 }
