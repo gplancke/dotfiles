@@ -6,7 +6,6 @@
 -- Capture startup time
 local start_time = vim.loop.hrtime()
 
-
 --------------------------------------------------------------------------------
 -- Globals
 --------------------------------------------------------------------------------
@@ -37,10 +36,7 @@ local plugins = {
 	"https://github.com/folke/which-key.nvim",
 
 	-- -- Treesitter (base)
-	-- "https://github.com/nvim-treesitter/nvim-treesitter",
-	-- -- Treesitter extensions: load=false to defer loading until after treesitter setup
-	-- { src = "https://github.com/nvim-treesitter/nvim-treesitter-textobjects", name = "nvim-treesitter-textobjects" },
-	-- { src = "https://github.com/nvim-treesitter/nvim-treesitter-context", name = "nvim-treesitter-context" },
+	"https://github.com/nvim-treesitter/nvim-treesitter",
 
 	-- LSP
 	"https://github.com/williamboman/mason.nvim",
@@ -283,6 +279,39 @@ vim.api.nvim_create_autocmd("PackChanged", {
 	end,
 })
 
+--------------------------------------------------------------------------------
+-- Enable Treesitter features via autocommands
+--------------------------------------------------------------------------------
+vim.api.nvim_create_autocmd("FileType", {
+	group = augroup,
+	callback = function(args)
+		local bufnr = args.buf
+		local ft = vim.bo[bufnr].filetype
+
+		-- Skip for certain UI filetypes
+		if vim.tbl_contains(no_cursor_ft, ft) then return end
+
+		-- Check if a parser exists for this filetype
+		local ok, _ = pcall(vim.treesitter.get_parser, bufnr)
+		if not ok then return end
+
+		-- 1. Highlighting (with 100KB performance guard)
+		local max_filesize = 100 * 1024
+		local stats = vim.uv.fs_stat(vim.api.nvim_buf_get_name(bufnr))
+		if not (stats and stats.size > max_filesize) then
+			vim.treesitter.start(bufnr)
+		end
+
+		-- 2. Indentation (experimental but improved)
+		vim.bo[bufnr].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+
+		-- 3. Folding
+		vim.wo.foldmethod = "expr"
+		vim.wo.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+		vim.wo.foldlevel = 99
+	end,
+})
+
 -- ============================================================================
 -- ============================================================================
 -- Plugin Installation
@@ -298,11 +327,16 @@ vim.pack.add(plugins)
 -- ============================================================================
 
 -- Helper to safely require and setup plugins
-local function setup(name, opts)
+local function setup(name, opts, config)
 	local ok, mod = pcall(require, name)
 	if ok and mod and mod.setup then
 		mod.setup(opts or {})
 	end
+
+	if config and ok and mod then
+		config(mod, opts)
+	end
+
 	return ok and mod or nil
 end
 
@@ -352,6 +386,17 @@ setup("mini.bufremove")
 
 -- Treesitter extensions
 setup('mini.ai')
+
+-- Treesitter (syntax highlighting, indentation, folding)
+setup("nvim-treesitter", {
+	install_dir = vim.fs.joinpath(vim.fn.stdpath("data"), "site"),
+}, function (ts)
+	ts.install({
+		"svelte", "typescript", "javascript", "python", "dart", "ruby", "rust",
+		"c", "cpp", "yaml", "json", "html", "css", "vue", "tsx", "zig",
+		"lua", "vim", "vimdoc", "query", "markdown", "markdown_inline",
+	})
+end)
 
 -- Snacks (collection of utilities)
 setup("snacks", {
@@ -535,67 +580,65 @@ setup("copilot", {
 })
 
 -- Blink.cmp (completion)
-pcall(function()
-	require("blink.cmp").setup({
-		-- Keymap preset: 'default' (C-y to accept), 'super-tab', or 'enter'
-		keymap = {
-			preset = "enter",
-			["<C-e>"] = { "hide" },
-			["<C-p>"] = { "select_prev", "fallback" },
-			["<C-n>"] = { "select_next", "fallback" },
-			["<C-b>"] = { "scroll_documentation_up", "fallback" },
-			["<C-f>"] = { "scroll_documentation_down", "fallback" },
-			["<Tab>"] = { "select_and_accept", "snippet_forward", "fallback" },
-			["<S-Tab>"] = { "select_prev", "snippet_backward", "fallback" },
-			["<CR>"] = { "accept", "fallback" },
-		},
+setup("blink.cmp", {
+	-- Keymap preset: 'default' (C-y to accept), 'super-tab', or 'enter'
+	keymap = {
+		preset = "enter",
+		["<C-e>"] = { "hide" },
+		["<C-p>"] = { "select_prev", "fallback" },
+		["<C-n>"] = { "select_next", "fallback" },
+		["<C-b>"] = { "scroll_documentation_up", "fallback" },
+		["<C-f>"] = { "scroll_documentation_down", "fallback" },
+		["<Tab>"] = { "select_and_accept", "snippet_forward", "fallback" },
+		["<S-Tab>"] = { "select_prev", "snippet_backward", "fallback" },
+		["<CR>"] = { "accept", "fallback" },
+	},
 
-		appearance = {
-			use_nvim_cmp_as_default = false,
-			nerd_font_variant = "mono",
-		},
+	appearance = {
+		use_nvim_cmp_as_default = false,
+		nerd_font_variant = "mono",
+	},
 
-		completion = {
-			accept = {
-				auto_brackets = { enabled = true },
+	completion = {
+		accept = {
+			auto_brackets = { enabled = true },
+		},
+		documentation = {
+			auto_show = true,
+			auto_show_delay_ms = 200,
+		},
+		ghost_text = { enabled = true },
+		list = {
+			selection = { preselect = true, auto_insert = false },
+		},
+		menu = {
+			draw = {
+				columns = { { "kind_icon" }, { "label", "label_description", gap = 1 }, { "source_name" } },
 			},
-			documentation = {
-				auto_show = true,
-				auto_show_delay_ms = 200,
-			},
-			ghost_text = { enabled = true },
-			list = {
-				selection = { preselect = true, auto_insert = false },
-			},
-			menu = {
-				draw = {
-					columns = { { "kind_icon" }, { "label", "label_description", gap = 1 }, { "source_name" } },
+		},
+	},
+
+	signature = { enabled = true },
+
+	sources = {
+		default = { "copilot", "lsp", "path", "snippets", "buffer" },
+		providers = {
+			copilot = {
+				name = "copilot",
+				module = "blink-copilot",
+				score_offset = 100, -- Prioritize copilot suggestions
+				async = true,
+				opts = {
+					max_completions = 3,
+					max_attempts = 4,
 				},
 			},
 		},
+	},
 
-		signature = { enabled = true },
-
-		sources = {
-			default = { "copilot", "lsp", "path", "snippets", "buffer" },
-			providers = {
-				copilot = {
-					name = "copilot",
-					module = "blink-copilot",
-					score_offset = 100, -- Prioritize copilot suggestions
-					async = true,
-					opts = {
-						max_completions = 3,
-						max_attempts = 4,
-					},
-				},
-			},
-		},
-
-		-- Use Rust implementation if available, otherwise fall back to Lua
-		fuzzy = { implementation = "prefer_rust" },
-	})
-end)
+	-- Use Rust implementation if available, otherwise fall back to Lua
+	fuzzy = { implementation = "prefer_rust" },
+})
 
 -- Navic (breadcrumbs) - store reference for later use
 local navic = (function()
