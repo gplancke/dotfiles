@@ -98,6 +98,7 @@ setup_ttyd() {
 	local font_name=$(detect_mono_font)
 
 	# Build ttyd arguments as an array to preserve quoted strings
+	local ttyd_theme='{"background": "#303446", "foreground": "#c6d0f5", "cursor": "#f2d5cf", "black": "#51576d", "blue": "#8caaee", "red": "#e78284", "green": "#a6d189", "yellow": "#e5c890", "magenta": "#f4b8e4", "cyan": "#81c8be", "white": "#b5bfe2", "brightBlack": "#626880", "brightWhite": "#a5adce", "brightBlue": "#8caaee", "brightRed": "#e78284", "brightGreen": "#a6d189", "brightYellow": "#e5c890", "brightMagenta": "#f4b8e4", "brightCyan": "#81c8be"}'
 	local ttyd_args=(
 		"--writable"
 		"--interface" "127.0.0.1"
@@ -107,8 +108,8 @@ setup_ttyd() {
 		"--client-option" "fontSize=10"
 		"--client-option" "fontWeight=600"
 		"--client-option" "fontFamily='$font_name'"
-		"--client-option" "theme='{"background": "#303446", "foreground": "#c6d0f5", "cursor": "#f2d5cf", "black": "#51576d", "blue": "#8caaee", "red": "#e78284", "green": "#a6d189", "yellow": "#e5c890", "magenta": "#f4b8e4", "cyan": "#81c8be", "white": "#b5bfe2", "brightBlack": "#626880", "brightWhite": "#a5adce", "brightBlue": "#8caaee", "brightRed": "#e78284", "brightGreen": "#a6d189", "brightYellow": "#e5c890", "brightMagenta": "#f4b8e4", "brightCyan": "#81c8be"}'"
-		$shell_cmd
+		"--client-option" "theme='$ttyd_theme'"
+		"$shell_cmd"
 	)
 
 	case "$init_system" in
