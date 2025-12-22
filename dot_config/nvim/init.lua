@@ -312,6 +312,45 @@ vim.api.nvim_create_autocmd("FileType", {
 	end,
 })
 
+--------------------------------------------------------------------------------
+-- Attach LSP server to buffer
+--------------------------------------------------------------------------------
+vim.api.nvim_create_autocmd("LspAttach", {
+	group = vim.api.nvim_create_augroup("UserLspConfig", {}),
+	callback = function(args)
+		local client = vim.lsp.get_client_by_id(args.data.client_id)
+		local bufnr = args.buf
+		local navic = (function()
+			local ok, mod = pcall(require, "nvim-navic")
+			return ok and mod or nil
+		end)()
+
+		-- Attach navic for breadcrumbs
+		if client and navic and client.server_capabilities.documentSymbolProvider then
+			navic.attach(client, bufnr)
+		end
+
+		-- NOTE: blink.cmp handles completion, no need for built-in LSP completion
+
+		-- Auto-format on save if server supports it
+		if client and client:supports_method("textDocument/formatting") then
+			vim.api.nvim_create_autocmd("BufWritePre", {
+				group = vim.api.nvim_create_augroup("LspFormat." .. bufnr, { clear = true }),
+				buffer = bufnr,
+				callback = function()
+					vim.lsp.buf.format({ bufnr = bufnr, id = client.id, timeout_ms = 1000 })
+				end,
+			})
+		end
+
+		-- Create Format command
+		vim.api.nvim_buf_create_user_command(bufnr, "Format", function()
+			vim.lsp.buf.format()
+		end, { desc = "Format current buffer with LSP" })
+	end,
+})
+
+
 -- ============================================================================
 -- ============================================================================
 -- Plugin Installation
@@ -352,7 +391,7 @@ setup("nvim-tmux-navigation", {
 })
 
 -- Noice (command line and messages UI)
-vim.cmd("messages clear") -- Clear all messages before init
+-- vim.cmd("messages clear") -- Clear all messages before init
 setup("noice", {
 	lsp = {
 		override = {
@@ -374,9 +413,9 @@ setup("noice", {
 })
 
 -- Icons
-pcall(function()
+setup('mini.icons', {}, function (mini_icons)
 	package.preload["nvim-web-devicons"] = function()
-		require("mini.icons").mock_nvim_web_devicons()
+		mini_icons.mock_nvim_web_devicons()
 		return package.loaded["nvim-web-devicons"]
 	end
 end)
@@ -640,12 +679,6 @@ setup("blink.cmp", {
 	fuzzy = { implementation = "prefer_rust" },
 })
 
--- Navic (breadcrumbs) - store reference for later use
-local navic = (function()
-	local ok, mod = pcall(require, "nvim-navic")
-	return ok and mod or nil
-end)()
-
 -- Image.nvim
 setup("image", {
 	backend = "kitty",
@@ -661,20 +694,27 @@ require("tinted-colorscheme").setup()
 -- =============================================================================
 -- =============================================================================
 
-local git_blame = (function()
-	local ok, mod = pcall(require, "gitblame")
-	return ok and mod or nil
-end)()
-
-local function breadcrumbs()
-	if navic and navic.is_available() then
-		return navic.get_location()
-	end
-	return ""
-end
-
 pcall(function()
+	local git_blame = (function()
+		local ok, mod = pcall(require, "gitblame")
+		return ok and mod or nil
+	end)()
+
+	-- Navic (breadcrumbs) - store reference for later use
+	local navic = (function()
+		local ok, mod = pcall(require, "nvim-navic")
+		return ok and mod or nil
+	end)()
+
+	local function breadcrumbs()
+		if navic and navic.is_available() then
+			return navic.get_location()
+		end
+		return ""
+	end
+
 	local lualine_c_section = {}
+
 	if git_blame then
 		table.insert(lualine_c_section, {
 			git_blame.get_current_blame_text,
@@ -691,11 +731,12 @@ pcall(function()
 			symbols = { modified = "  ", readonly = "  ", unnamed = "[ No Name ]" },
 		},
 	}
+
 	if navic then
 		table.insert(lualine_b_section, { breadcrumbs, cond = navic.is_available })
 	end
 
-	require("lualine").setup({
+	setup("lualine", {
 		options = {
 			icons_enabled = true,
 			theme = "auto",
@@ -728,10 +769,10 @@ end)
 -- =============================================================================
 -- =============================================================================
 
-local dap, dapui
 pcall(function()
-	dap = require("dap")
-	dapui = require("dapui")
+	local dap = require("dap")
+	local dapui = require("dapui")
+
 	dapui.setup()
 	require("nvim-dap-virtual-text").setup()
 
@@ -858,38 +899,6 @@ vim.lsp.config("dartls", {
 
 -- Enable all configured LSP servers
 vim.lsp.enable(lsp_servers)
-
--- Attach LSP server to buffer
-vim.api.nvim_create_autocmd("LspAttach", {
-	group = vim.api.nvim_create_augroup("UserLspConfig", {}),
-	callback = function(args)
-		local client = vim.lsp.get_client_by_id(args.data.client_id)
-		local bufnr = args.buf
-
-		-- Attach navic for breadcrumbs
-		if client and navic and client.server_capabilities.documentSymbolProvider then
-			navic.attach(client, bufnr)
-		end
-
-		-- NOTE: blink.cmp handles completion, no need for built-in LSP completion
-
-		-- Auto-format on save if server supports it
-		if client and client:supports_method("textDocument/formatting") then
-			vim.api.nvim_create_autocmd("BufWritePre", {
-				group = vim.api.nvim_create_augroup("LspFormat." .. bufnr, { clear = true }),
-				buffer = bufnr,
-				callback = function()
-					vim.lsp.buf.format({ bufnr = bufnr, id = client.id, timeout_ms = 1000 })
-				end,
-			})
-		end
-
-		-- Create Format command
-		vim.api.nvim_buf_create_user_command(bufnr, "Format", function()
-			vim.lsp.buf.format()
-		end, { desc = "Format current buffer with LSP" })
-	end,
-})
 
 -- Configure Diagnostics
 vim.diagnostic.config({
