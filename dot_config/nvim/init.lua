@@ -1035,7 +1035,6 @@ map("n", "<leader>sk", function() Snacks.picker.keymaps() end, { desc = "Keymaps
 map("n", "<leader>sl", function() Snacks.picker.loclist() end, { desc = "Location List" }, { "snacks" })
 map("n", "<leader>sm", function() Snacks.picker.marks() end, { desc = "Marks" }, { "snacks" })
 map("n", "<leader>sM", function() Snacks.picker.man() end, { desc = "Man Pages" }, { "snacks" })
-map("n", "<leader>sp", function() Snacks.picker.lazy() end, { desc = "Search Plugins Spec" }, { "snacks" })
 map("n", "<leader>sq", function() Snacks.picker.qflist() end, { desc = "Quickfix List" }, { "snacks" })
 map("n", "<leader>sR", function() Snacks.picker.resume() end, { desc = "Resume" }, { "snacks" })
 map({ "n", "x" }, "<leader>sw", function() Snacks.picker.grep_word() end, { desc = "Grep Word" }, { "snacks" })
