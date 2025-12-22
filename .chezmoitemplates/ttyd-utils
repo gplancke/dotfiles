@@ -112,6 +112,9 @@ setup_ttyd() {
 		"$shell_cmd"
 	)
 
+	# Pre-expand ttyd_args for use in heredocs
+	local ttyd_args_str="${ttyd_args[*]}"
+
 	case "$init_system" in
 		launchctl)
 			# macOS launchctl configuration
@@ -120,25 +123,27 @@ setup_ttyd() {
 
 			mkdir -p "$plist_dir"
 
-			cat > "$plist_file" << EOF
+			cat > "$plist_file" << 'PLIST_HEADER'
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
 	<key>Label</key>
-	<string>$ttyd_label</string>
+PLIST_HEADER
+			printf '\t<string>%s</string>\n' "$ttyd_label" >> "$plist_file"
+			cat >> "$plist_file" << 'PLIST_PROGARGS'
 
 	<key>ProgramArguments</key>
 	<array>
-		<string>$ttyd_bin</string>
-EOF
+PLIST_PROGARGS
+			printf '\t\t<string>%s</string>\n' "$ttyd_bin" >> "$plist_file"
 
 			# Add ttyd arguments to plist
 			for arg in "${ttyd_args[@]}"; do
-				printf '		<string>%s</string>\n' "$arg" >> "$plist_file"
+				printf '\t\t<string>%s</string>\n' "$arg" >> "$plist_file"
 			done
 
-			cat >> "$plist_file" << EOF
+			cat >> "$plist_file" << PLIST_FOOTER
 	</array>
 
 	<key>RunAtLoad</key>
@@ -157,7 +162,7 @@ EOF
 	<string>$HOME/Library/Logs/$ttyd_label.log</string>
 </dict>
 </plist>
-EOF
+PLIST_FOOTER
 
 			launchctl load "$plist_file" 2>/dev/null || true
 			printf '...ttyd service installed and loaded on macOS\n'
@@ -167,7 +172,7 @@ EOF
 			# Linux systemd configuration
 			local service_file="/etc/systemd/system/${ttyd_label}.service"
 
-			sudo tee "$service_file" > /dev/null << EOF
+			sudo tee "$service_file" > /dev/null << SYSTEMD_UNIT
 [Unit]
 Description=TTYD Web Terminal
 After=network.target
@@ -176,14 +181,14 @@ After=network.target
 Type=simple
 User=$USER
 Group=$USER
-ExecStart=$ttyd_bin ${ttyd_args[@]}
+ExecStart=$ttyd_bin $ttyd_args_str
 WorkingDirectory=$HOME
 Restart=always
 RestartSec=3
 
 [Install]
 WantedBy=multi-user.target
-EOF
+SYSTEMD_UNIT
 
 			sudo systemctl daemon-reload
 			sudo systemctl enable "$ttyd_label"
@@ -197,17 +202,17 @@ EOF
 			# Alpine OpenRC configuration
 			local init_file="/etc/init.d/$ttyd_label"
 
-			sudo tee "$init_file" > /dev/null << EOF
+			sudo tee "$init_file" > /dev/null << OPENRC_SCRIPT
 #!/sbin/openrc-run
 
 name="TTYD Web Terminal"
 description="TTYD Web Terminal Service"
 command="$ttyd_bin"
-command_args="${ttyd_args[*]}"
+command_args="$ttyd_args_str"
 command_user="$USER:$USER"
 command_background=true
 pidfile="/var/run/\${RC_SVCNAME}.pid"
-EOF
+OPENRC_SCRIPT
 
 			sudo chmod +x "$init_file"
 			sudo rc-update add "$ttyd_label" default
