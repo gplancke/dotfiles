@@ -160,16 +160,17 @@ function install_flutter {
 
 function install_theme_manager {
   if [ ! -d "$HOME/.local/share/base16-manager" ]; then
-		echo "Installing base16 theme manager"
-    mkdir -p "$HOME/.local/share/base16-manager"
-    git clone https://github.com/base16-manager/base16-manager.git \
-      $HOME/.local/share/base16-manager && \
-      cp $HOME/.local/share/base16-manager/base16-manager $HOME/.local/bin/
-    $HOME/.local/bin/base16-manager install chriskempson/base16-shell
-    $HOME/.local/bin/base16-manager install chriskempson/base16-vim
-    $HOME/.local/bin/base16-manager install nicodebo/base16-fzf
-
-    $HOME/.local/bin/base16-manager set ocean
+		echo "NOT Installing base16 theme manager"
+		# echo "Installing base16 theme manager"
+		#   mkdir -p "$HOME/.local/share/base16-manager"
+		#   git clone https://github.com/base16-manager/base16-manager.git \
+		#     $HOME/.local/share/base16-manager && \
+		#     cp $HOME/.local/share/base16-manager/base16-manager $HOME/.local/bin/
+		#   $HOME/.local/bin/base16-manager install chriskempson/base16-shell
+		#   $HOME/.local/bin/base16-manager install chriskempson/base16-vim
+		#   $HOME/.local/bin/base16-manager install nicodebo/base16-fzf
+		#
+		#   $HOME/.local/bin/base16-manager set ocean
   fi
 }
 

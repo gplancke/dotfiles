@@ -1,7 +1,9 @@
 [tools]
+ansible = "latest"
 flutter = "latest"
 java = "latest"
 node = "latest"
+pipx = "latest"
 pnpm = "latest"
 python = "latest"
 ruby = "3.3.5"
