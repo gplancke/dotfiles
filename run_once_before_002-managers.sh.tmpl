@@ -1,0 +1,101 @@
+#!/bin/bash
+# Run ansible bootstrap playbook to install package managers and tools
+
+set -euo pipefail
+
+CHEZMOI_SOURCE="{{ .chezmoi.sourceDir }}"
+PLAYBOOKS_DIR="${CHEZMOI_SOURCE}/.chezmoiplaybooks"
+INSTALL_MODE="{{ .installMode }}"
+
+# Ensure PATH includes ansible location
+export PATH="${HOME}/.local/bin:${PATH}"
+
+#############################################
+# Ensure Ansible is available
+# This is a safety net in case bootstrap failed
+#############################################
+ensure_ansible() {
+  if command -v ansible-playbook >/dev/null 2>&1; then
+    return 0
+  fi
+
+  printf '[MANAGERS] Ansible not found, installing...\n'
+  
+  {{ if eq .chezmoi.os "darwin" -}}
+  # macOS
+  python3 -m pip install --user --break-system-packages ansible 2>/dev/null || \
+    python3 -m pip install --user ansible
+  {{- else -}}
+  # Linux - detect distro
+  if [ -f /etc/os-release ]; then
+    . /etc/os-release
+    case "$ID" in
+      fedora|rhel|centos|rocky|almalinux)
+        sudo dnf install -y python3 python3-pip
+        python3 -m pip install --user ansible
+        ;;
+      arch|manjaro|endeavouros|garuda|cachyos)
+        sudo pacman -S --noconfirm python python-pip ansible
+        ;;
+      ubuntu|debian|pop|elementary|linuxmint)
+        sudo apt-get update -y
+        sudo apt-get install -y python3 python3-pip python3-venv
+        python3 -m pip install --user --break-system-packages ansible 2>/dev/null || \
+          python3 -m pip install --user ansible
+        ;;
+      alpine)
+        sudo apk add python3 py3-pip ansible
+        ;;
+    esac
+  fi
+  {{- end }}
+
+  # Verify installation
+  export PATH="${HOME}/.local/bin:${PATH}"
+  if ! command -v ansible-playbook >/dev/null 2>&1; then
+    printf '[MANAGERS] ERROR: Failed to install Ansible\n'
+    exit 1
+  fi
+
+  # Install collections if needed
+  if [ -f "${PLAYBOOKS_DIR}/requirements.yml" ]; then
+    ansible-galaxy collection install -r "${PLAYBOOKS_DIR}/requirements.yml"
+  fi
+}
+
+#############################################
+# Run Ansible playbook
+#############################################
+run_playbook() {
+  printf '[MANAGERS] Running bootstrap playbook (mode: %s)\n' "$INSTALL_MODE"
+  
+  cd "${PLAYBOOKS_DIR}"
+  
+  # Set feature flags based on install mode
+  case "$INSTALL_MODE" in
+    container)
+      # Minimal install for containers
+      ansible-playbook playbooks/site.yml \
+        -e "install_docker=false" \
+        -e "install_nix=false" \
+        -e "install_devbox=false"
+      ;;
+    server)
+      # Server install (no desktop apps)
+      ansible-playbook playbooks/site.yml \
+        -e "install_desktop_apps=false"
+      ;;
+    desktop)
+      # Full desktop install
+      ansible-playbook playbooks/site.yml \
+        -e "install_desktop_apps=true"
+      ;;
+    *)
+      # Default to server mode
+      ansible-playbook playbooks/site.yml
+      ;;
+  esac
+}
+
+ensure_ansible
+run_playbook

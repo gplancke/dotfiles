@@ -112,6 +112,13 @@ install_ansible_collections() {
   # Ensure PATH includes pip install location
   export PATH="${HOME}/.local/bin:${PATH}"
   
+  # Verify ansible-galaxy is available
+  if ! command -v ansible-galaxy >/dev/null 2>&1; then
+    printf '...Warning: ansible-galaxy not found in PATH\n'
+    printf '...PATH is: %s\n' "$PATH"
+    return 1
+  fi
+  
   if [ -f "${PLAYBOOKS_DIR}/requirements.yml" ]; then
     ansible-galaxy collection install -r "${PLAYBOOKS_DIR}/requirements.yml"
   fi
