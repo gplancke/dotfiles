@@ -424,14 +424,14 @@ $pkg
             
             if [ "$is_macos_only" = true ]; then
               echo "  + $pkg (macOS-only)"
-              # Insert before the "end" line (inside if OS.mac? block)
+              # Insert before the "end" line (inside if OS.mac? block), indented
               sed -i '' "/^end$/i\\
-  $pkg
+\  $pkg
 " "$brewfile"
             else
               echo "  + $pkg (common)"
-              # Insert before the "# macOS-only" comment
-              sed -i '' "/^# macOS-only/i\\
+              # Insert before the "# macOS-only packages" section header
+              sed -i '' "/^# macOS-only packages$/i\\
 $pkg
 " "$brewfile"
             fi

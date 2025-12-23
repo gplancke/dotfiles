@@ -1,7 +1,4 @@
 # Homebrew Bundle
-# Use `chez re-add` to see new packages, then merge manually
-brew "jless"
-# macOS-only packages are in the `if OS.mac?` block at the bottom
 
 tap "homebrew/bundle"
 tap "homebrew/services"
@@ -72,7 +69,6 @@ brew "wget"
 brew "zoxide"
 brew "zsh"
 
-brew "jless"
 # macOS-only packages
 if OS.mac?
   tap "coder/coder"
@@ -85,7 +81,7 @@ if OS.mac?
   tap "tinted-theming/tinted"
   tap "trycua/lume"
 
-	brew "cocoapods"
+  brew "cocoapods"
   brew "coder/coder/coder"
   brew "displayplacer"
   brew "koekeishiya/formulae/skhd", args: ["HEAD"]
