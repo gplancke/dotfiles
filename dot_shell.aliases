@@ -354,7 +354,7 @@ chez() {
   if [ "$1" = "re-add" ]; then
     mkdir -p "$HOME/.config/brew"
     brew bundle dump \
-      --all --describe --force \
+      --brews --taps --vscode --describe --force \
       --file "$HOME/.config/brew/Brewfile"
   fi
   command chezmoi "$@"
