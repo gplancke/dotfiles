@@ -95,4 +95,3 @@ if OS.mac?
   brew "tinted-theming/tinted/tinty"
   brew "trycua/lume/lume"
 end
-brew "fake-package-test"
