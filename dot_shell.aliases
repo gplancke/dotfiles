@@ -366,19 +366,30 @@ chez() {
       local new_packages
       new_packages=$(grep -E '^(brew|tap) "' "$tmpfile" | sort)
       
-      # Show what's new
-      local added
+      local added removed
       added=$(comm -23 <(echo "$new_packages") <(echo "$current_packages"))
-      local removed
       removed=$(comm -13 <(echo "$new_packages") <(echo "$current_packages"))
       
-      if [ -n "$added" ] || [ -n "$removed" ]; then
-        [ -n "$added" ] && echo "=== New packages ===" && echo "$added" && echo ""
-        [ -n "$removed" ] && echo "=== Removed packages ===" && echo "$removed" && echo ""
+      # Auto-remove uninstalled packages from Brewfile
+      if [ -n "$removed" ]; then
+        echo "=== Removing uninstalled packages ==="
+        while IFS= read -r pkg; do
+          [ -z "$pkg" ] && continue
+          echo "  - $pkg"
+          # Escape special chars for sed and remove the line (handles indentation)
+          local escaped
+          escaped=$(echo "$pkg" | sed 's/[[\.*^$()+?{|]/\\&/g')
+          sed -i '' "/^[[:space:]]*${escaped}$/d" "$brewfile"
+        done <<< "$removed"
+        echo ""
+      fi
+      
+      if [ -n "$added" ]; then
+        echo "=== New packages to add ===" && echo "$added" && echo ""
         echo "New dump saved to: $tmpfile"
-        echo "Merge new packages into $brewfile manually (respect if OS.mac? blocks)."
+        echo "Add new packages to $brewfile manually (put macOS-only ones in 'if OS.mac?' block)."
       else
-        echo "No changes detected."
+        echo "Brewfile is up to date."
         rm -f "$tmpfile"
       fi
     else
