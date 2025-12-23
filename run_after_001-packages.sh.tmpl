@@ -52,42 +52,8 @@ run_playbook() {
   
   cd "${PLAYBOOKS_DIR}"
   
-  # Build extra vars based on OS and mode
-  local extra_vars=""
-  extra_vars="-e install_mode=${INSTALL_MODE}"
-  extra_vars="${extra_vars} -e brewfile_path=${HOME}/.config/brew/Brewfile"
-  
-  # Add OS-specific package lists
-  {{ if eq .chezmoi.os "darwin" -}}
-  extra_vars="${extra_vars} -e '{\"brew_packages\": {{ .packages.darwin.brews | toJson }}}'"
-  extra_vars="${extra_vars} -e '{\"brew_casks\": {{ .packages.darwin.casks | toJson }}}'"
-  {{- else -}}
-  # Detect distro and set packages
-  if [ -f /etc/os-release ]; then
-    . /etc/os-release
-    case "$ID" in
-      fedora|rhel|centos|rocky|almalinux)
-        extra_vars="${extra_vars} -e '{\"native_packages\": {{ .packages.fedora.native | toJson }}}'"
-        extra_vars="${extra_vars} -e '{\"brew_packages\": {{ .packages.fedora.brews | toJson }}}'"
-        ;;
-      arch|manjaro|endeavouros|garuda|cachyos)
-        extra_vars="${extra_vars} -e '{\"native_packages\": {{ .packages.arch.native | toJson }}}'"
-        extra_vars="${extra_vars} -e '{\"brew_packages\": {{ .packages.arch.brews | toJson }}}'"
-        ;;
-      ubuntu|debian|pop|elementary|linuxmint)
-        extra_vars="${extra_vars} -e '{\"native_packages\": {{ .packages.debian.native | toJson }}}'"
-        extra_vars="${extra_vars} -e '{\"brew_packages\": {{ .packages.debian.brews | toJson }}}'"
-        ;;
-      alpine)
-        extra_vars="${extra_vars} -e '{\"native_packages\": {{ .packages.alpine.native | toJson }}}'"
-        extra_vars="${extra_vars} -e '{\"brew_packages\": {{ .packages.alpine.brews | toJson }}}'"
-        ;;
-    esac
-  fi
-  {{- end }}
-  
-  # Run the playbook
-  eval ansible-playbook playbooks/packages.yml ${extra_vars}
+  # Pass install mode to ansible - all package logic is now in the role vars
+  ansible-playbook playbooks/packages.yml -e "install_mode=${INSTALL_MODE}"
 }
 
 #############################################

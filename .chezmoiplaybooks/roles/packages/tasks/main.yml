@@ -1,5 +1,83 @@
 ---
-# Packages role - Install user packages via native package managers, homebrew, nix, and mise
+# Packages role - Install user packages via native package managers, homebrew, nix, flatpak, and mise
+#
+# Installation order:
+# 1. Set mode-based configuration facts
+# 2. Install native OS packages (required dependencies)
+# 3. Install GUI apps (casks on macOS, Flatpak on Linux)
+# 4. Install Homebrew packages/formulae
+# 5. Run brew bundle (Brewfile)
+# 6. Run Nix/home-manager
+# 7. Run Mise
+
+###############################################################################
+# Step 1: Set mode-based configuration
+###############################################################################
+
+- name: Set current install mode
+  ansible.builtin.set_fact:
+    current_mode: "{{ install_mode | default('server') }}"
+
+- name: Set mode configuration facts
+  ansible.builtin.set_fact:
+    pkg_install_gui_apps: "{{ mode_config[current_mode].install_gui_apps | default(false) }}"
+    pkg_install_native: "{{ mode_config[current_mode].install_native | default(true) }}"
+    pkg_install_brew: "{{ mode_config[current_mode].install_brew_packages | default(true) }}"
+    pkg_run_brew_bundle: "{{ mode_config[current_mode].run_brew_bundle | default(true) }}"
+    pkg_install_flatpak: "{{ mode_config[current_mode].install_flatpak | default(false) }}"
+    pkg_run_nix: "{{ mode_config[current_mode].run_nix | default(true) }}"
+    pkg_run_mise: "{{ mode_config[current_mode].run_mise | default(true) }}"
+
+- name: Display package installation plan
+  ansible.builtin.debug:
+    msg: |
+      Package installation plan for mode '{{ current_mode }}':
+        - Native packages: {{ pkg_install_native }}
+        - GUI apps: {{ pkg_install_gui_apps }}
+        - Homebrew packages: {{ pkg_install_brew }}
+        - Brew bundle: {{ pkg_run_brew_bundle }}
+        - Flatpak (Linux): {{ pkg_install_flatpak }}
+        - Nix/home-manager: {{ pkg_run_nix }}
+        - Mise tools: {{ pkg_run_mise }}
+
+###############################################################################
+# Step 2: Determine OS-specific package lists
+###############################################################################
+
+- name: Set OS family key for package lookups
+  ansible.builtin.set_fact:
+    os_key: "{{ 'darwin' if ansible_os_family == 'Darwin' else ansible_distribution | lower }}"
+    os_family_key: "{{ 'darwin' if ansible_os_family == 'Darwin' else 'linux' }}"
+
+# Build native package list: common + mode-specific
+- name: Build native package list
+  ansible.builtin.set_fact:
+    native_packages_to_install: >-
+      {{
+        (native_packages[os_key]['common'] | default([])) +
+        (native_packages[os_key][current_mode] | default([]))
+      }}
+  when: pkg_install_native
+
+# Build brew package list: common + mode-specific  
+- name: Build brew package list
+  ansible.builtin.set_fact:
+    brew_packages_to_install: >-
+      {{
+        (brew_packages[os_family_key]['common'] | default([])) +
+        (brew_packages[os_family_key][current_mode] | default([]))
+      }}
+  when: pkg_install_brew
+
+# Build GUI apps list for current mode
+- name: Build GUI apps list
+  ansible.builtin.set_fact:
+    gui_apps_to_install: "{{ gui_apps[os_family_key][current_mode] | default([]) }}"
+  when: pkg_install_gui_apps
+
+###############################################################################
+# Step 3: Install native OS packages
+###############################################################################
 
 - name: Include OS-specific native package tasks
   ansible.builtin.include_tasks: "{{ item }}"
@@ -8,16 +86,64 @@
         - "{{ ansible_distribution | lower }}.yml"
         - "{{ ansible_os_family | lower }}.yml"
       skip: true
-  when: native_packages is defined and native_packages | length > 0
+  vars:
+    native_packages: "{{ native_packages_to_install | default([]) }}"
+  when:
+    - pkg_install_native
+    - native_packages_to_install is defined
+    - native_packages_to_install | length > 0
+
+###############################################################################
+# Step 4: Install GUI apps
+###############################################################################
+
+# macOS: Install GUI apps via Homebrew casks
+- name: Install GUI apps via Homebrew casks (macOS)
+  ansible.builtin.include_tasks: gui_casks.yml
+  when:
+    - pkg_install_gui_apps
+    - ansible_os_family == 'Darwin'
+    - gui_apps_to_install is defined
+    - gui_apps_to_install | length > 0
+
+# Linux: Install GUI apps via Flatpak
+- name: Install GUI apps via Flatpak (Linux)
+  ansible.builtin.include_tasks: flatpak.yml
+  when:
+    - pkg_install_gui_apps
+    - pkg_install_flatpak
+    - ansible_os_family != 'Darwin'
+    - gui_apps_to_install is defined
+    - gui_apps_to_install | length > 0
+
+###############################################################################
+# Step 5: Install Homebrew packages
+###############################################################################
 
 - name: Install Homebrew packages
   ansible.builtin.include_tasks: brew.yml
-  when: brew_packages is defined or brew_casks is defined or brewfile_path is defined
+  vars:
+    brew_packages: "{{ brew_packages_to_install | default([]) }}"
+    brew_casks: []
+    brewfile_path: "{{ (target_home + '/.config/brew/Brewfile') if pkg_run_brew_bundle else '' }}"
+  when: pkg_install_brew or pkg_run_brew_bundle
+
+###############################################################################
+# Step 6: Install Nix packages
+###############################################################################
 
 - name: Install Nix packages
   ansible.builtin.include_tasks: nix.yml
-  when: install_nix_packages | default(true) | bool
+  when:
+    - pkg_run_nix
+    - install_nix | default(true) | bool
+
+###############################################################################
+# Step 7: Install Mise tools
+###############################################################################
 
 - name: Install Mise tools
   ansible.builtin.include_tasks: mise.yml
-  when: install_mise_tools | default(true) | bool
+  when:
+    - pkg_run_mise
+    - install_mise | default(true) | bool

@@ -77,8 +77,7 @@ brew "libimobiledevice"
 brew "ideviceinstaller"
 # Database of common MIME types
 brew "shared-mime-info"
-# Tools and libraries to manipulate images in many formats
-brew "imagemagick"
+# imagemagick - installed via native_packages in packages playbook
 # CLI client for interacting with Incus
 brew "incus"
 # Serializes the output of command-line tools to structured JSON output
@@ -89,8 +88,7 @@ brew "jq"
 brew "lazydocker"
 # Simple terminal UI for git commands
 brew "lazygit"
-# Conversion library
-brew "libiconv"
+# libiconv - installed via native_packages in packages playbook
 # Postgres C API library
 brew "libpq"
 # Next-gen compiler infrastructure
@@ -175,16 +173,13 @@ cask "bluetility"
 # Open source IDE for exploring and testing APIs
 cask "bruno"
 cask "font-hack-nerd-font"
-# Terminal emulator that uses platform-native UI and GPU acceleration
-cask "ghostty"
+# ghostty - installed via gui_apps in packages playbook
 # VPN client for secure internet access and private browsing
 cask "nordvpn"
-# Knowledge base that works on top of a local folder of plain text Markdown files
-cask "obsidian"
+# obsidian - installed via gui_apps in packages playbook
 # Team communication and collaboration software
 cask "slack"
-# Mesh VPN based on WireGuard
-cask "tailscale-app"
+# tailscale - installed via gui_apps in packages playbook
 # Multimedia player
 cask "vlc"
 # Terminal emulator
