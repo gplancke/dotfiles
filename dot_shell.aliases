@@ -347,19 +347,32 @@ clean_workspaces() {
 ################################################################################
 ################################################################################
 # Chezmoi wrapper - dump Brewfile on re-add
-# Note: Brewfile uses `if OS.mac?` conditionals for platform-specific packages
-# After running `chez re-add`, move any new macOS-only packages into the
-# `if OS.mac?` block manually
+# Preserves the `if OS.mac?` structure by dumping to a temp file and showing diff
 ################################################################################
 ################################################################################
 
 chez() {
   if [ "$1" = "re-add" ]; then
+    local brewfile="$HOME/.config/brew/Brewfile"
+    local tmpfile="$HOME/.config/brew/Brewfile.new"
+    
     mkdir -p "$HOME/.config/brew"
-    brew bundle dump \
-      --brews --taps --describe --force \
-      --file "$HOME/.config/brew/Brewfile"
-    echo "Brewfile updated. Check for new macOS-only packages to move into 'if OS.mac?' block."
+    brew bundle dump --brews --taps --describe --force --file "$tmpfile"
+    
+    if [ -f "$brewfile" ]; then
+      # Show what's new (packages in new dump but not in current Brewfile)
+      echo "=== New packages to add ==="
+      comm -23 <(grep '^brew\|^tap' "$tmpfile" | sort) <(grep '^brew\|^tap' "$brewfile" | sort) || true
+      echo ""
+      echo "=== Packages removed ==="
+      comm -13 <(grep '^brew\|^tap' "$tmpfile" | sort) <(grep '^brew\|^tap' "$brewfile" | sort) || true
+      echo ""
+      echo "New dump saved to: $tmpfile"
+      echo "Current Brewfile preserved. Merge manually if needed."
+    else
+      mv "$tmpfile" "$brewfile"
+      echo "Brewfile created at $brewfile"
+    fi
   fi
   command chezmoi "$@"
 }
