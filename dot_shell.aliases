@@ -376,7 +376,6 @@ chez() {
         while IFS= read -r pkg; do
           [ -z "$pkg" ] && continue
           echo "  - $pkg"
-          # Escape special chars for sed and remove the line (handles indentation)
           local escaped
           escaped=$(echo "$pkg" | sed 's/[[\.*^$()+?{|]/\\&/g')
           sed -i '' "/^[[:space:]]*${escaped}$/d" "$brewfile"
@@ -384,13 +383,69 @@ chez() {
         echo ""
       fi
       
+      # Auto-add new packages to the right section
       if [ -n "$added" ]; then
-        echo "=== New packages to add ===" && echo "$added" && echo ""
-        echo "New dump saved to: $tmpfile"
-        echo "Add new packages to $brewfile manually (put macOS-only ones in 'if OS.mac?' block)."
-      else
+        echo "=== Adding new packages ==="
+        while IFS= read -r pkg; do
+          [ -z "$pkg" ] && continue
+          
+          # Check if it's a tap or brew
+          if [[ "$pkg" =~ ^tap ]]; then
+            # For taps, check if any formula from this tap is macOS-only
+            # For now, add taps to common section (they're harmless on Linux)
+            echo "  + $pkg (common)"
+            # Insert before the "# macOS-only" comment
+            sed -i '' "/^# macOS-only/i\\
+$pkg
+" "$brewfile"
+          else
+            # Extract formula name
+            local formula
+            formula=$(echo "$pkg" | sed 's/brew "\([^"]*\)".*/\1/')
+            
+            # Query brew for platform info
+            local is_macos_only=false
+            local json_info
+            json_info=$(brew info --json=v2 "$formula" 2>/dev/null)
+            
+            if [ -n "$json_info" ]; then
+              local bottle_keys
+              bottle_keys=$(echo "$json_info" | jq -r '.formulae[0].bottle.stable.files // {} | keys[]' 2>/dev/null)
+              
+              if echo "$bottle_keys" | grep -qE "(linux|^all$)"; then
+                is_macos_only=false
+              else
+                is_macos_only=true
+              fi
+            else
+              # Can't query (maybe a cask or tap formula) - default to macOS
+              is_macos_only=true
+            fi
+            
+            if [ "$is_macos_only" = true ]; then
+              echo "  + $pkg (macOS-only)"
+              # Insert before the "end" line (inside if OS.mac? block)
+              sed -i '' "/^end$/i\\
+  $pkg
+" "$brewfile"
+            else
+              echo "  + $pkg (common)"
+              # Insert before the "# macOS-only" comment
+              sed -i '' "/^# macOS-only/i\\
+$pkg
+" "$brewfile"
+            fi
+          fi
+        done <<< "$added"
+        echo ""
+      fi
+      
+      rm -f "$tmpfile"
+      
+      if [ -z "$added" ] && [ -z "$removed" ]; then
         echo "Brewfile is up to date."
-        rm -f "$tmpfile"
+      else
+        echo "Brewfile updated."
       fi
     else
       mv "$tmpfile" "$brewfile"

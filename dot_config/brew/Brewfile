@@ -1,5 +1,6 @@
 # Homebrew Bundle
 # Use `chez re-add` to see new packages, then merge manually
+brew "jless"
 # macOS-only packages are in the `if OS.mac?` block at the bottom
 
 tap "homebrew/bundle"
@@ -71,6 +72,7 @@ brew "wget"
 brew "zoxide"
 brew "zsh"
 
+brew "jless"
 # macOS-only packages
 if OS.mac?
   tap "coder/coder"
