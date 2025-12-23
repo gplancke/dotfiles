@@ -3,7 +3,7 @@
 
 - name: Set Homebrew paths based on OS
   ansible.builtin.set_fact:
-    homebrew_prefix: "{{ '/opt/homebrew' if ansible_architecture == 'arm64' else '/usr/local' }}"
+    homebrew_prefix: "{{ '/opt/homebrew' if ansible_facts['architecture'] == 'arm64' else '/usr/local' }}"
 
 - name: Check if Homebrew is installed
   ansible.builtin.stat:
@@ -22,4 +22,4 @@
     - gui_apps_to_install is defined
     - gui_apps_to_install | length > 0
   environment:
-    PATH: "{{ homebrew_prefix }}/bin:{{ ansible_env.PATH }}"
+    PATH: "{{ homebrew_prefix }}/bin:{{ ansible_facts['env']['PATH'] }}"

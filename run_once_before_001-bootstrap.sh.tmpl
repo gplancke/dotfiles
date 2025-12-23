@@ -41,7 +41,6 @@ PLAYBOOKS_DIR="${CHEZMOI_SOURCE}/.chezmoiplaybooks"
 # Create minimal directory structure
 #############################################
 setup_directories() {
-  printf '[BOOTSTRAP] Creating essential directories\n'
   mkdir -p "${HOME}/.local/bin"
   mkdir -p "${HOME}/.local/share"
 }
@@ -50,77 +49,72 @@ setup_directories() {
 # Install Ansible
 #############################################
 install_ansible() {
-  printf '[BOOTSTRAP] Installing Ansible\n'
   local distro=$1
 
   if command -v ansible-playbook >/dev/null 2>&1; then
-    printf '...Ansible already installed\n'
     return 0
   fi
 
+  printf '[BOOTSTRAP] Installing Ansible...'
+
   case "$distro" in
     debian)
-      printf '...Installing Ansible on Debian/Ubuntu\n'
-      sudo apt-get update -y
-      sudo apt-get install -y python3 python3-pip python3-venv
-      python3 -m pip install --user --break-system-packages ansible 2>/dev/null || \
-        python3 -m pip install --user ansible
+      sudo apt-get update -qq
+      sudo apt-get install -qq -y python3 python3-pip python3-venv >/dev/null
+      python3 -m pip install --user --break-system-packages -q ansible 2>/dev/null || \
+        python3 -m pip install --user -q ansible
       ;;
     fedora)
-      printf '...Installing Ansible on Fedora/RHEL\n'
-      sudo dnf install -y python3 python3-pip
-      python3 -m pip install --user ansible
+      sudo dnf install -q -y python3 python3-pip >/dev/null
+      python3 -m pip install --user -q ansible
       ;;
     arch)
-      printf '...Installing Ansible on Arch\n'
-      sudo pacman -Syu --noconfirm
-      sudo pacman -S --noconfirm python python-pip ansible
+      sudo pacman -Syu --noconfirm -q >/dev/null 2>&1
+      sudo pacman -S --noconfirm -q python python-pip ansible >/dev/null 2>&1
       ;;
     alpine)
-      printf '...Installing Ansible on Alpine\n'
-      sudo apk update
-      sudo apk add python3 py3-pip ansible
+      sudo apk update -q
+      sudo apk add -q python3 py3-pip ansible
       ;;
     darwin)
       # Check for Xcode CLI tools first
       if ! xcode-select -p &>/dev/null; then
-        printf '...Installing Xcode Command Line Tools...\n'
+        printf '\n[BOOTSTRAP] Installing Xcode Command Line Tools...\n'
         xcode-select --install 2>/dev/null || true
         printf '\n*** Please complete Xcode CLI tools installation and re-run: chezmoi apply ***\n'
         exit 1
       fi
-      printf '...Installing Ansible on macOS\n'
-      python3 -m pip install --user --break-system-packages ansible 2>/dev/null || \
-        python3 -m pip install --user ansible
+      python3 -m pip install --user --break-system-packages -q ansible 2>/dev/null || \
+        python3 -m pip install --user -q ansible
       ;;
     *)
-      printf '...Error: unsupported distribution "%s"\n' "$distro"
+      printf '\n[BOOTSTRAP] Error: unsupported distribution "%s"\n' "$distro"
       return 1
       ;;
   esac
 
   # Add ~/.local/bin to PATH for this session
   export PATH="${HOME}/.local/bin:${PATH}"
+  printf ' done\n'
 }
 
 #############################################
 # Install Ansible collections
 #############################################
 install_ansible_collections() {
-  printf '[BOOTSTRAP] Installing Ansible collections\n'
-  
   # Ensure PATH includes pip install location
   export PATH="${HOME}/.local/bin:${PATH}"
   
   # Verify ansible-galaxy is available
   if ! command -v ansible-galaxy >/dev/null 2>&1; then
-    printf '...Warning: ansible-galaxy not found in PATH\n'
-    printf '...PATH is: %s\n' "$PATH"
+    printf '[BOOTSTRAP] Warning: ansible-galaxy not found in PATH\n'
     return 1
   fi
   
   if [ -f "${PLAYBOOKS_DIR}/requirements.yml" ]; then
-    ansible-galaxy collection install -r "${PLAYBOOKS_DIR}/requirements.yml"
+    printf '[BOOTSTRAP] Installing Ansible collections...'
+    ansible-galaxy collection install -r "${PLAYBOOKS_DIR}/requirements.yml" >/dev/null 2>&1
+    printf ' done\n'
   fi
 }
 
@@ -131,8 +125,6 @@ main() {
   setup_directories
   install_ansible "$DISTRO"
   install_ansible_collections
-  
-  printf '[BOOTSTRAP] Bootstrap complete. Ansible is ready.\n'
 }
 
 main "$@"

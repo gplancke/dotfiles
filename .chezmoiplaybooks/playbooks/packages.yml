@@ -15,7 +15,7 @@
     - name: Display package installation info
       ansible.builtin.debug:
         msg: |
-          OS: {{ ansible_os_family }} ({{ ansible_distribution | default('unknown') }})
+          OS: {{ ansible_facts['os_family'] }} ({{ ansible_facts['distribution'] | default('unknown') }})
           Installing packages for: {{ target_user }}
           Mode: {{ install_mode | default('server') }}
 

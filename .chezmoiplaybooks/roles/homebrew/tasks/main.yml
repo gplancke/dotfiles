@@ -3,7 +3,7 @@
 
 - name: Set Homebrew paths based on OS
   ansible.builtin.set_fact:
-    homebrew_prefix: "{{ '/opt/homebrew' if ansible_os_family == 'Darwin' and ansible_architecture == 'arm64' else '/usr/local' if ansible_os_family == 'Darwin' else '/home/linuxbrew/.linuxbrew' }}"
+    homebrew_prefix: "{{ '/opt/homebrew' if ansible_facts['os_family'] == 'Darwin' and ansible_facts['architecture'] == 'arm64' else '/usr/local' if ansible_facts['os_family'] == 'Darwin' else '/home/linuxbrew/.linuxbrew' }}"
     homebrew_install_script: "https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh"
 
 - name: Check if Homebrew is already installed
@@ -27,10 +27,10 @@
         cmd: /bin/bash /tmp/homebrew-install.sh
       environment:
         NONINTERACTIVE: "1"
-      when: ansible_os_family == 'Darwin'
+      when: ansible_facts['os_family'] == 'Darwin'
 
     - name: Install Linuxbrew (Linux)
-      when: ansible_os_family != 'Darwin'
+      when: ansible_facts['os_family'] != 'Darwin'
       block:
         - name: Create linuxbrew directory
           become: true
@@ -64,7 +64,7 @@
           eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
       fi
     mode: "0644"
-  when: ansible_os_family != 'Darwin'
+  when: ansible_facts['os_family'] != 'Darwin'
 
 - name: Verify Homebrew installation
   become: true

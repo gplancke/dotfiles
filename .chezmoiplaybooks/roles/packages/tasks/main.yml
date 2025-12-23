@@ -46,8 +46,8 @@
 
 - name: Set OS family key for package lookups
   ansible.builtin.set_fact:
-    os_key: "{{ 'darwin' if ansible_os_family == 'Darwin' else ansible_distribution | lower }}"
-    os_family_key: "{{ 'darwin' if ansible_os_family == 'Darwin' else 'linux' }}"
+    os_key: "{{ 'darwin' if ansible_facts['os_family'] == 'Darwin' else ansible_facts['distribution'] | lower }}"
+    os_family_key: "{{ 'darwin' if ansible_facts['os_family'] == 'Darwin' else 'linux' }}"
 
 # Build native package list: common + mode-specific
 - name: Build native package list
@@ -83,8 +83,8 @@
   ansible.builtin.include_tasks: "{{ item }}"
   with_first_found:
     - files:
-        - "{{ ansible_distribution | lower }}.yml"
-        - "{{ ansible_os_family | lower }}.yml"
+        - "{{ ansible_facts['distribution'] | lower }}.yml"
+        - "{{ ansible_facts['os_family'] | lower }}.yml"
       skip: true
   vars:
     native_packages: "{{ native_packages_to_install | default([]) }}"
@@ -102,7 +102,7 @@
   ansible.builtin.include_tasks: gui_casks.yml
   when:
     - pkg_install_gui_apps
-    - ansible_os_family == 'Darwin'
+    - ansible_facts['os_family'] == 'Darwin'
     - gui_apps_to_install is defined
     - gui_apps_to_install | length > 0
 
@@ -112,7 +112,7 @@
   when:
     - pkg_install_gui_apps
     - pkg_install_flatpak
-    - ansible_os_family != 'Darwin'
+    - ansible_facts['os_family'] != 'Darwin'
     - gui_apps_to_install is defined
     - gui_apps_to_install | length > 0
 
