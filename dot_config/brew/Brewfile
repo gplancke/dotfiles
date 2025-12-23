@@ -1,8 +1,5 @@
 # Homebrew Bundle
 
-tap "homebrew/bundle"
-tap "homebrew/services"
-
 # Cross-platform packages
 brew "age"
 brew "bat"
