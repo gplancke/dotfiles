@@ -360,15 +360,27 @@ chez() {
     brew bundle dump --brews --taps --describe --force --file "$tmpfile"
     
     if [ -f "$brewfile" ]; then
-      # Show what's new (packages in new dump but not in current Brewfile)
-      echo "=== New packages to add ==="
-      comm -23 <(grep '^brew\|^tap' "$tmpfile" | sort) <(grep '^brew\|^tap' "$brewfile" | sort) || true
-      echo ""
-      echo "=== Packages removed ==="
-      comm -13 <(grep '^brew\|^tap' "$tmpfile" | sort) <(grep '^brew\|^tap' "$brewfile" | sort) || true
-      echo ""
-      echo "New dump saved to: $tmpfile"
-      echo "Current Brewfile preserved. Merge manually if needed."
+      # Extract all brew/tap lines from current file (ignoring if/end blocks)
+      local current_packages
+      current_packages=$(grep -E '^[[:space:]]*(brew|tap) "' "$brewfile" | sed 's/^[[:space:]]*//' | sort)
+      local new_packages
+      new_packages=$(grep -E '^(brew|tap) "' "$tmpfile" | sort)
+      
+      # Show what's new
+      local added
+      added=$(comm -23 <(echo "$new_packages") <(echo "$current_packages"))
+      local removed
+      removed=$(comm -13 <(echo "$new_packages") <(echo "$current_packages"))
+      
+      if [ -n "$added" ] || [ -n "$removed" ]; then
+        [ -n "$added" ] && echo "=== New packages ===" && echo "$added" && echo ""
+        [ -n "$removed" ] && echo "=== Removed packages ===" && echo "$removed" && echo ""
+        echo "New dump saved to: $tmpfile"
+        echo "Merge new packages into $brewfile manually (respect if OS.mac? blocks)."
+      else
+        echo "No changes detected."
+        rm -f "$tmpfile"
+      fi
     else
       mv "$tmpfile" "$brewfile"
       echo "Brewfile created at $brewfile"
