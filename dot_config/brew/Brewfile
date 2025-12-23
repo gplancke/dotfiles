@@ -12,7 +12,6 @@ brew "bat"
 brew "biome"
 brew "ca-certificates"
 brew "cairo"
-brew "cocoapods"
 brew "curl"
 brew "diff-so-fancy"
 brew "direnv"
@@ -86,6 +85,7 @@ if OS.mac?
   tap "tinted-theming/tinted"
   tap "trycua/lume"
 
+	brew "cocoapods"
   brew "coder/coder/coder"
   brew "displayplacer"
   brew "koekeishiya/formulae/skhd", args: ["HEAD"]
