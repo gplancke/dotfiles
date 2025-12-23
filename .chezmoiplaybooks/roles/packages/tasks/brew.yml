@@ -35,16 +35,46 @@
   environment:
     PATH: "{{ homebrew_prefix }}/bin:{{ ansible_facts['env']['PATH'] }}"
 
-- name: Install from Brewfile
+- name: Install from Brewfile.common (cross-platform)
   ansible.builtin.shell:
-    cmd: "{{ homebrew_prefix }}/bin/brew bundle --file={{ brewfile_path }}"
+    cmd: "{{ homebrew_prefix }}/bin/brew bundle --file={{ brewfile_common }}"
   args:
     executable: /bin/bash
   when:
     - homebrew_check.stat.exists
-    - brewfile_path is defined
-    - brewfile_path | length > 0
+    - brewfile_common is defined
+    - brewfile_common | length > 0
   environment:
     PATH: "{{ homebrew_prefix }}/bin:{{ ansible_facts['env']['PATH'] }}"
-  register: brew_bundle
-  changed_when: "'Installing' in brew_bundle.stdout or 'Upgrading' in brew_bundle.stdout"
+  register: brew_bundle_common
+  changed_when: "'Installing' in brew_bundle_common.stdout or 'Upgrading' in brew_bundle_common.stdout"
+
+- name: Install from Brewfile.darwin (macOS-only)
+  ansible.builtin.shell:
+    cmd: "{{ homebrew_prefix }}/bin/brew bundle --file={{ brewfile_darwin }}"
+  args:
+    executable: /bin/bash
+  when:
+    - homebrew_check.stat.exists
+    - ansible_facts['os_family'] == 'Darwin'
+    - brewfile_darwin is defined
+    - brewfile_darwin | length > 0
+  environment:
+    PATH: "{{ homebrew_prefix }}/bin:{{ ansible_facts['env']['PATH'] }}"
+  register: brew_bundle_darwin
+  changed_when: "'Installing' in brew_bundle_darwin.stdout or 'Upgrading' in brew_bundle_darwin.stdout"
+
+- name: Install from Brewfile.linux (Linux-only)
+  ansible.builtin.shell:
+    cmd: "{{ homebrew_prefix }}/bin/brew bundle --file={{ brewfile_linux }}"
+  args:
+    executable: /bin/bash
+  when:
+    - homebrew_check.stat.exists
+    - ansible_facts['os_family'] != 'Darwin'
+    - brewfile_linux is defined
+    - brewfile_linux | length > 0
+  environment:
+    PATH: "{{ homebrew_prefix }}/bin:{{ ansible_facts['env']['PATH'] }}"
+  register: brew_bundle_linux
+  changed_when: "'Installing' in brew_bundle_linux.stdout or 'Upgrading' in brew_bundle_linux.stdout"

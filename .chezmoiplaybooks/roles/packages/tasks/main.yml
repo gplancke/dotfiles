@@ -125,7 +125,9 @@
   vars:
     brew_packages: "{{ brew_packages_to_install | default([]) }}"
     brew_casks: []
-    brewfile_path: "{{ (target_home + '/.config/brew/Brewfile') if pkg_run_brew_bundle else '' }}"
+    brewfile_common: "{{ (target_home + '/.config/brew/Brewfile.common') if pkg_run_brew_bundle else '' }}"
+    brewfile_darwin: "{{ (target_home + '/.config/brew/Brewfile.darwin') if pkg_run_brew_bundle else '' }}"
+    brewfile_linux: "{{ (target_home + '/.config/brew/Brewfile.linux') if pkg_run_brew_bundle else '' }}"
   when: pkg_install_brew or pkg_run_brew_bundle
 
 ###############################################################################
