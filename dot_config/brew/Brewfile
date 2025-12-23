@@ -69,7 +69,6 @@ brew "wget"
 brew "zoxide"
 brew "zsh"
 
-brew "jless"
 # macOS-only packages
 if OS.mac?
   tap "coder/coder"
