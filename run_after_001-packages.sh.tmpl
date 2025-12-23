@@ -52,8 +52,18 @@ run_playbook() {
   
   cd "${PLAYBOOKS_DIR}"
   
+  # Determine if we need sudo (-K flag)
+  # - macOS: No sudo needed (Homebrew runs as user)
+  # - Linux desktop: Needs sudo for native packages and Flatpak
+  # - Linux server/container: May need sudo for native packages
+  local ansible_opts=""
+  {{ if ne .chezmoi.os "darwin" -}}
+  # Linux may need sudo for native packages and flatpak
+  ansible_opts="-K"
+  {{- end }}
+  
   # Pass install mode to ansible - all package logic is now in the role vars
-  ansible-playbook playbooks/packages.yml -e "install_mode=${INSTALL_MODE}"
+  ansible-playbook ${ansible_opts} playbooks/packages.yml -e "install_mode=${INSTALL_MODE}"
 }
 
 #############################################

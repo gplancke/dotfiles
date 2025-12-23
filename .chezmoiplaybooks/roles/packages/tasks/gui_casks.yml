@@ -11,8 +11,6 @@
   register: homebrew_check
 
 - name: Install GUI apps via Homebrew casks
-  become: true
-  become_user: "{{ target_user }}"
   community.general.homebrew_cask:
     name: "{{ gui_apps_to_install }}"
     state: present

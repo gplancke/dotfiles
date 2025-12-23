@@ -76,27 +76,28 @@ run_playbook() {
   cd "${PLAYBOOKS_DIR}"
   
   # Set feature flags based on install mode
+  # Use -K to ask for sudo password upfront (site.yml requires sudo for system setup)
   case "$INSTALL_MODE" in
     container)
       # Minimal install for containers
-      ansible-playbook playbooks/site.yml \
+      ansible-playbook -K playbooks/site.yml \
         -e "install_docker=false" \
         -e "install_nix=false" \
         -e "install_devbox=false"
       ;;
     server)
       # Server install (no desktop apps)
-      ansible-playbook playbooks/site.yml \
+      ansible-playbook -K playbooks/site.yml \
         -e "install_desktop_apps=false"
       ;;
     desktop)
       # Full desktop install
-      ansible-playbook playbooks/site.yml \
+      ansible-playbook -K playbooks/site.yml \
         -e "install_desktop_apps=true"
       ;;
     *)
       # Default to server mode
-      ansible-playbook playbooks/site.yml
+      ansible-playbook -K playbooks/site.yml
       ;;
   esac
 }

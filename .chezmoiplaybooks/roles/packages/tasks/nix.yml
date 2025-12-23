@@ -7,8 +7,6 @@
   register: nix_check
 
 - name: Check if home-manager is available
-  become: true
-  become_user: "{{ target_user }}"
   ansible.builtin.shell:
     cmd: |
       if [ -f /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]; then
@@ -23,8 +21,6 @@
   when: nix_check.stat.exists
 
 - name: Run home-manager switch
-  become: true
-  become_user: "{{ target_user }}"
   ansible.builtin.shell:
     cmd: |
       if [ -f /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]; then

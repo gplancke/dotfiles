@@ -2,8 +2,6 @@
 # Mise tool installation
 
 - name: Check if mise is available
-  become: true
-  become_user: "{{ target_user }}"
   ansible.builtin.shell:
     cmd: |
       export PATH="{{ target_home }}/.local/bin:$PATH"
@@ -15,8 +13,6 @@
   failed_when: false
 
 - name: Run mise install (install tools from config)
-  become: true
-  become_user: "{{ target_user }}"
   ansible.builtin.shell:
     cmd: |
       export PATH="{{ target_home }}/.local/bin:$PATH"
@@ -32,8 +28,6 @@
   failed_when: false
 
 - name: Trust mise config
-  become: true
-  become_user: "{{ target_user }}"
   ansible.builtin.shell:
     cmd: |
       export PATH="{{ target_home }}/.local/bin:$PATH"
