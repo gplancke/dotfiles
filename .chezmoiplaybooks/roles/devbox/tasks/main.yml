@@ -1,0 +1,62 @@
+---
+# Devbox role - Install Jetpack's Devbox
+
+- name: Check if Devbox is already installed
+  ansible.builtin.command:
+    cmd: which devbox
+  register: devbox_check
+  changed_when: false
+  failed_when: false
+
+- name: Install Devbox
+  when: devbox_check.rc != 0
+  block:
+    - name: Download Devbox installer
+      ansible.builtin.get_url:
+        url: https://get.jetify.com/devbox
+        dest: /tmp/devbox-install.sh
+        mode: "0755"
+
+    - name: Run Devbox installer
+      become: true
+      become_user: "{{ target_user }}"
+      ansible.builtin.shell:
+        cmd: /tmp/devbox-install.sh -f
+      args:
+        executable: /bin/bash
+      environment:
+        FORCE: "1"
+
+    - name: Clean up installer
+      ansible.builtin.file:
+        path: /tmp/devbox-install.sh
+        state: absent
+
+- name: Check Devbox installation location
+  become: true
+  become_user: "{{ target_user }}"
+  ansible.builtin.shell:
+    cmd: |
+      export PATH="{{ target_home }}/.local/bin:$PATH"
+      which devbox || echo "not found"
+  args:
+    executable: /bin/bash
+  register: devbox_path
+  changed_when: false
+
+- name: Verify Devbox installation
+  become: true
+  become_user: "{{ target_user }}"
+  ansible.builtin.shell:
+    cmd: |
+      export PATH="{{ target_home }}/.local/bin:$PATH"
+      devbox version
+  args:
+    executable: /bin/bash
+  register: devbox_version
+  changed_when: false
+  failed_when: false
+
+- name: Display Devbox status
+  ansible.builtin.debug:
+    msg: "{{ 'Devbox installed: ' + devbox_version.stdout if devbox_version.rc == 0 else 'Devbox installation may require shell restart' }}"

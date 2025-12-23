@@ -1,0 +1,23 @@
+---
+# Packages role - Install user packages via native package managers, homebrew, nix, and mise
+
+- name: Include OS-specific native package tasks
+  ansible.builtin.include_tasks: "{{ item }}"
+  with_first_found:
+    - files:
+        - "{{ ansible_distribution | lower }}.yml"
+        - "{{ ansible_os_family | lower }}.yml"
+      skip: true
+  when: native_packages is defined and native_packages | length > 0
+
+- name: Install Homebrew packages
+  ansible.builtin.include_tasks: brew.yml
+  when: brew_packages is defined or brew_casks is defined or brewfile_path is defined
+
+- name: Install Nix packages
+  ansible.builtin.include_tasks: nix.yml
+  when: install_nix_packages | default(true) | bool
+
+- name: Install Mise tools
+  ansible.builtin.include_tasks: mise.yml
+  when: install_mise_tools | default(true) | bool

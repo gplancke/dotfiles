@@ -1,0 +1,56 @@
+---
+# Homebrew package installation
+
+- name: Set Homebrew paths based on OS
+  ansible.builtin.set_fact:
+    homebrew_prefix: "{{ '/opt/homebrew' if ansible_os_family == 'Darwin' and ansible_architecture == 'arm64' else '/usr/local' if ansible_os_family == 'Darwin' else '/home/linuxbrew/.linuxbrew' }}"
+
+- name: Check if Homebrew is installed
+  ansible.builtin.stat:
+    path: "{{ homebrew_prefix }}/bin/brew"
+  register: homebrew_check
+
+- name: Install Homebrew packages
+  become: true
+  become_user: "{{ target_user }}"
+  community.general.homebrew:
+    name: "{{ brew_packages }}"
+    state: present
+    path: "{{ homebrew_prefix }}/bin"
+  when:
+    - homebrew_check.stat.exists
+    - brew_packages is defined
+    - brew_packages | length > 0
+  environment:
+    PATH: "{{ homebrew_prefix }}/bin:{{ ansible_env.PATH }}"
+
+- name: Install Homebrew casks (macOS only)
+  become: true
+  become_user: "{{ target_user }}"
+  community.general.homebrew_cask:
+    name: "{{ brew_casks }}"
+    state: present
+    path: "{{ homebrew_prefix }}/bin"
+  when:
+    - homebrew_check.stat.exists
+    - ansible_os_family == 'Darwin'
+    - brew_casks is defined
+    - brew_casks | length > 0
+  environment:
+    PATH: "{{ homebrew_prefix }}/bin:{{ ansible_env.PATH }}"
+
+- name: Install from Brewfile
+  become: true
+  become_user: "{{ target_user }}"
+  ansible.builtin.shell:
+    cmd: "{{ homebrew_prefix }}/bin/brew bundle --file={{ brewfile_path }}"
+  args:
+    executable: /bin/bash
+  when:
+    - homebrew_check.stat.exists
+    - brewfile_path is defined
+    - brewfile_path | length > 0
+  environment:
+    PATH: "{{ homebrew_prefix }}/bin:{{ ansible_env.PATH }}"
+  register: brew_bundle
+  changed_when: "'Installing' in brew_bundle.stdout or 'Upgrading' in brew_bundle.stdout"

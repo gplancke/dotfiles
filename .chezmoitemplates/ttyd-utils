@@ -1,7 +1,0 @@
-# TTYD utility functions for chezmoi scripts
-# DEPRECATED: ttyd setup has been disabled
-
-setup_ttyd() {
-	printf '[TTYD] DEPRECATED: ttyd service setup has been disabled\n'
-	return 0
-}

@@ -1,7 +1,19 @@
+{{- $installMode := "server" -}}
+{{- if hasKey . "installMode" -}}
+{{-   $installMode = .installMode -}}
+{{- else -}}
+{{-   $installMode = promptChoiceOnce . "installMode" "Select installation mode" (list "server" "desktop" "container") -}}
+{{- end -}}
+
 encryption = "age"
+
+[data]
+    installMode = {{ $installMode | quote }}
+
 [age]
     identity = "~/.config/chezmoi/key.txt"
     recipient = "age18948d9cjp3teqz57kc92gcwrj75dmxjzvvr5phvu58j3l8ndjghqk68hd5"
+
 [git]
     autoCommit = true
     autoPush = true

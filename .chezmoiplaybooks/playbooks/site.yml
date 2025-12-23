@@ -1,0 +1,89 @@
+---
+# Chezmoi Bootstrap Playbook
+# Called from chezmoi's run_onchange_before script to install system dependencies
+#
+# Usage (from chezmoi scripts):
+#   ansible-playbook .chezmoiplaybooks/playbooks/site.yml
+
+- name: Chezmoi System Bootstrap
+  hosts: localhost
+  connection: local
+  gather_facts: true
+
+  pre_tasks:
+    - name: Display target configuration
+      ansible.builtin.debug:
+        msg: |
+          OS: {{ ansible_os_family }} ({{ ansible_distribution | default('unknown') }})
+          User: {{ target_user }}
+          Home: {{ target_home }}
+          Features:
+            - Docker: {{ install_docker }}
+            - Nix: {{ install_nix }}
+            - Devbox: {{ install_devbox }}
+            - Mise: {{ install_mise }}
+            - Homebrew: {{ install_homebrew }}
+
+  roles:
+    # Install essential packages and git
+    - role: essentials
+      tags: [essentials, git]
+
+    # Create required directories
+    - role: directories
+      tags: [directories]
+
+    # Install Docker
+    - role: docker
+      when: install_docker | bool
+      tags: [docker]
+
+    # Install Homebrew/Linuxbrew
+    - role: homebrew
+      when: install_homebrew | bool
+      tags: [homebrew, brew]
+
+    # Install Nix
+    - role: nix
+      when: install_nix | bool
+      tags: [nix]
+
+    # Install Devbox
+    - role: devbox
+      when: install_devbox | bool
+      tags: [devbox]
+
+    # Install Mise
+    - role: mise
+      when: install_mise | bool
+      tags: [mise]
+
+    # Set zsh as default shell
+    - role: shell
+      tags: [shell, zsh]
+
+  post_tasks:
+    - name: Display completion message
+      ansible.builtin.debug:
+        msg: |
+          Bootstrap complete!
+          
+          System ready with:
+          - Required directories created
+          {% if install_docker %}
+          - Docker installed
+          {% endif %}
+          {% if install_homebrew %}
+          - Homebrew installed
+          {% endif %}
+          {% if install_nix %}
+          - Nix installed
+          {% endif %}
+          {% if install_devbox %}
+          - Devbox installed
+          {% endif %}
+          {% if install_mise %}
+          - Mise installed
+          {% endif %}
+          
+          Chezmoi will now continue with dotfile deployment.

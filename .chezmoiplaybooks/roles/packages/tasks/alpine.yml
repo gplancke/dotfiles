@@ -1,0 +1,9 @@
+---
+# Native package installation for Alpine Linux
+
+- name: Install native packages (apk)
+  become: true
+  community.general.apk:
+    name: "{{ native_packages }}"
+    state: present
+  when: native_packages | length > 0

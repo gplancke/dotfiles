@@ -1,0 +1,25 @@
+---
+# Directories role - Create required directory structure
+
+- name: Create user directories
+  become: true
+  become_user: "{{ target_user }}"
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ target_user }}"
+    group: "{{ target_group }}"
+    mode: "0755"
+  loop: "{{ user_directories }}"
+
+- name: Ensure .local/bin is in PATH (create profile.d script)
+  become: true
+  ansible.builtin.copy:
+    dest: /etc/profile.d/local-bin.sh
+    content: |
+      # Add ~/.local/bin to PATH
+      if [ -d "$HOME/.local/bin" ]; then
+          export PATH="$HOME/.local/bin:$PATH"
+      fi
+    mode: "0644"
+  when: ansible_os_family != 'Darwin'

@@ -1,0 +1,29 @@
+---
+# Chezmoi Packages Playbook
+# Called from chezmoi's run_onchange_after script to install user packages
+# This runs after dotfiles are deployed, so package lists are available
+#
+# Usage (from chezmoi scripts):
+#   ansible-playbook .chezmoiplaybooks/playbooks/packages.yml
+
+- name: Chezmoi Package Installation
+  hosts: localhost
+  connection: local
+  gather_facts: true
+
+  pre_tasks:
+    - name: Display package installation info
+      ansible.builtin.debug:
+        msg: |
+          OS: {{ ansible_os_family }} ({{ ansible_distribution | default('unknown') }})
+          Installing packages for: {{ target_user }}
+          Mode: {{ install_mode | default('server') }}
+
+  roles:
+    - role: packages
+      tags: [packages]
+
+  post_tasks:
+    - name: Display completion message
+      ansible.builtin.debug:
+        msg: "Package installation complete!"

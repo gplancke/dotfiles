@@ -1,0 +1,97 @@
+#!/bin/bash
+# Run ansible packages playbook to install user packages
+# This runs after dotfiles are deployed
+
+set -euo pipefail
+
+CHEZMOI_SOURCE="{{ .chezmoi.sourceDir }}"
+PLAYBOOKS_DIR="${CHEZMOI_SOURCE}/.chezmoiplaybooks"
+INSTALL_MODE="{{ .installMode }}"
+
+#############################################
+# Load package manager environments
+# This is needed on first run before dotfiles
+# have been sourced by a new shell
+#############################################
+load_package_manager_envs() {
+  # Add ~/.local/bin to PATH (for mise, ansible, etc.)
+  export PATH="${HOME}/.local/bin:${PATH}"
+
+  # Nix
+  if [ -f /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]; then
+    . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+  fi
+
+  # Homebrew (macOS ARM64)
+  if [ -d /opt/homebrew ]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+  # Homebrew (macOS Intel)
+  elif [ -d /usr/local/Homebrew ]; then
+    eval "$(/usr/local/bin/brew shellenv)"
+  # Linuxbrew
+  elif [ -d /home/linuxbrew/.linuxbrew ]; then
+    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+  fi
+
+  # Mise
+  if [ -f "${HOME}/.local/bin/mise" ]; then
+    eval "$("${HOME}/.local/bin/mise" activate bash)"
+  fi
+
+  # Devbox (uses nix, so load after nix)
+  if command -v devbox &>/dev/null; then
+    eval "$(devbox global shellenv)"
+  fi
+}
+
+#############################################
+# Run Ansible packages playbook
+#############################################
+run_playbook() {
+  printf '[PACKAGES] Running packages playbook (mode: %s)\n' "$INSTALL_MODE"
+  
+  cd "${PLAYBOOKS_DIR}"
+  
+  # Build extra vars based on OS and mode
+  local extra_vars=""
+  extra_vars="-e install_mode=${INSTALL_MODE}"
+  extra_vars="${extra_vars} -e brewfile_path=${HOME}/.config/brew/Brewfile"
+  
+  # Add OS-specific package lists
+  {{ if eq .chezmoi.os "darwin" -}}
+  extra_vars="${extra_vars} -e '{\"brew_packages\": {{ .packages.darwin.brews | toJson }}}'"
+  extra_vars="${extra_vars} -e '{\"brew_casks\": {{ .packages.darwin.casks | toJson }}}'"
+  {{- else -}}
+  # Detect distro and set packages
+  if [ -f /etc/os-release ]; then
+    . /etc/os-release
+    case "$ID" in
+      fedora|rhel|centos|rocky|almalinux)
+        extra_vars="${extra_vars} -e '{\"native_packages\": {{ .packages.fedora.native | toJson }}}'"
+        extra_vars="${extra_vars} -e '{\"brew_packages\": {{ .packages.fedora.brews | toJson }}}'"
+        ;;
+      arch|manjaro|endeavouros|garuda|cachyos)
+        extra_vars="${extra_vars} -e '{\"native_packages\": {{ .packages.arch.native | toJson }}}'"
+        extra_vars="${extra_vars} -e '{\"brew_packages\": {{ .packages.arch.brews | toJson }}}'"
+        ;;
+      ubuntu|debian|pop|elementary|linuxmint)
+        extra_vars="${extra_vars} -e '{\"native_packages\": {{ .packages.debian.native | toJson }}}'"
+        extra_vars="${extra_vars} -e '{\"brew_packages\": {{ .packages.debian.brews | toJson }}}'"
+        ;;
+      alpine)
+        extra_vars="${extra_vars} -e '{\"native_packages\": {{ .packages.alpine.native | toJson }}}'"
+        extra_vars="${extra_vars} -e '{\"brew_packages\": {{ .packages.alpine.brews | toJson }}}'"
+        ;;
+    esac
+  fi
+  {{- end }}
+  
+  # Run the playbook
+  eval ansible-playbook playbooks/packages.yml ${extra_vars}
+}
+
+#############################################
+# Main
+#############################################
+load_package_manager_envs
+run_playbook
