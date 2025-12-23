@@ -7,7 +7,6 @@ tap "homebrew/services"
 
 # Cross-platform packages
 brew "age"
-brew "aider"
 brew "bat"
 brew "biome"
 brew "ca-certificates"
@@ -96,3 +95,4 @@ if OS.mac?
   brew "tinted-theming/tinted/tinty"
   brew "trycua/lume/lume"
 end
+brew "fake-package-test"
