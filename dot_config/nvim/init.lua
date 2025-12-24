@@ -264,7 +264,7 @@ vim.api.nvim_create_autocmd("PackChanged", {
 		-- Build blink.cmp fuzzy matcher (requires Rust nightly)
 		if name == "blink.cmp" and (kind == "install" or kind == "update") then
 			vim.notify("Building blink.cmp fuzzy matcher (requires Rust nightly)...", vim.log.levels.INFO)
-			local obj = vim.system({ "rustup", "run", "nightly", "cargo", "build", "--release" }, { cwd = ev.data.path }):wait()
+			local obj = vim.system({ "cargo", "build", "--release" }, { cwd = ev.data.path }):wait()
 			if obj.code == 0 then
 				vim.notify("blink.cmp build complete!", vim.log.levels.INFO)
 			else
@@ -675,7 +675,6 @@ setup("blink.cmp", {
 		},
 	},
 
-	-- Use Rust implementation if available, otherwise fall back to Lua
 	fuzzy = { implementation = "prefer_rust" },
 })
 
