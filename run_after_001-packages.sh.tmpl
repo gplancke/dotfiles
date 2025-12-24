@@ -14,9 +14,6 @@ INSTALL_MODE="{{ .installMode }}"
 # have been sourced by a new shell
 #############################################
 load_package_manager_envs() {
-  # Add ~/.local/bin to PATH (for mise, ansible, etc.)
-  export PATH="${HOME}/.local/bin:${PATH}"
-
   # Nix
   if [ -f /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]; then
     . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
@@ -63,5 +60,7 @@ run_playbook() {
 #############################################
 # Main
 #############################################
+
+export PATH="${HOME}/.local/bin:${PATH}"
 # load_package_manager_envs
 run_playbook
