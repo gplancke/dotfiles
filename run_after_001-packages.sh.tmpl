@@ -49,9 +49,9 @@ load_package_manager_envs() {
 #############################################
 run_playbook() {
   printf '[PACKAGES] Running packages playbook (mode: %s)\n' "$INSTALL_MODE"
-  
+
   cd "${PLAYBOOKS_DIR}"
-  
+
   # No sudo needed - packages.yml only installs user-level packages:
   # - Homebrew packages/bundle (runs as user)
   # - Nix/home-manager (runs as user)
@@ -63,5 +63,5 @@ run_playbook() {
 #############################################
 # Main
 #############################################
-load_package_manager_envs
+# load_package_manager_envs
 run_playbook
