@@ -1,7 +1,9 @@
 [tools]
 ansible = "latest"
+bun = "latest"
 cargo = "latest"
 flutter = "latest"
+go = "latest"
 java = "latest"
 node = "latest"
 pipx = "latest"
