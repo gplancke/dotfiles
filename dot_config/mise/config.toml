@@ -1,5 +1,6 @@
 [tools]
 ansible = "latest"
+cargo = "latest"
 flutter = "latest"
 java = "latest"
 node = "latest"

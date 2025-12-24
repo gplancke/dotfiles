@@ -49,9 +49,9 @@
       tags: [nix]
 
     # Install Devbox
-    - role: devbox
-      when: install_devbox | bool
-      tags: [devbox]
+    # - role: devbox
+    #   when: install_devbox | bool
+    #   tags: [devbox]
 
     # Install Mise
     - role: mise
@@ -67,7 +67,7 @@
       ansible.builtin.debug:
         msg: |
           Bootstrap complete!
-          
+
           System ready with:
           - Required directories created
           {% if install_docker %}
@@ -85,5 +85,5 @@
           {% if install_mise %}
           - Mise installed
           {% endif %}
-          
+
           Chezmoi will now continue with dotfile deployment.

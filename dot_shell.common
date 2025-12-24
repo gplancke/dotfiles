@@ -29,9 +29,7 @@ export WORK_DIR="$HOME/Workspace/Projects"
 export NIXPKGS_ALLOW_UNFREE=1
 export HOMEBREW_NO_AUTO_UPDATE=1
 
-# export NIX_PATH=darwin-config="$HOME/.nixpkgs/darwin-configuration.nix:$HOME/.nix-defexpr/channels" # ${NIX_PATH:+:}$NIX_PATH
 export NIX_DIR="$HOME/.nix-profile"
-export ASDF_DIR="$HOME/.local/share/asdf"
 
 export FZF_HOME="$HOME/.fzf"
 export EMACS_HOME="$HOME/.emacs.d"
@@ -55,9 +53,7 @@ export DART_HOME="$HOME/.pub-cache"              # Dart
 # Tmux
 export TMUX_POWERLINE_DEFAULT_BACKGROUND_COLOR='0'
 export TMUX_POWERLINE_DEFAULT_FOREGROUND_COLOR='255'
-
 [ -z "$TMUX" ] && export TERM="xterm-256color"
-[ -z "$BASE16_SHELL" ] && export BASE16_SHELL="$HOME/.local/share/base16-manager/chriskempson/base16-shell/"
 
 ##########################
 # Themes
@@ -67,8 +63,8 @@ export TMUX_POWERLINE_DEFAULT_FOREGROUND_COLOR='255'
 #   && [ -z "$IN_NIX_SHELL" ] \
 #   && [ "$TERM_PROGRAM" != "vscode" ] \
 #   && echo '. "${HOME}/.base16_theme"'
-#
-# [ -f "${HOME}/.fzf.colors" ] && . "${HOME}/.fzf.colors"
+
+[ -f "${HOME}/.fzf.colors" ] && . "${HOME}/.fzf.colors"
 
 ##########################
 # Path
@@ -78,20 +74,10 @@ export TMUX_POWERLINE_DEFAULT_FOREGROUND_COLOR='255'
 [ -d "${FZF_HOME}/bin" ] && PATH="${FZF_HOME}/bin:${PATH}"
 # Emacs
 [ -d "${EMACS_HOME}/bin" ] && PATH="${EMACS_HOME}/bin:${PATH}"
-# FNM
-# command -v fnm >/dev/null 2>&1 && eval "$(fnm env)"
-# ASDF
-# [ -f "${ASDF_DIR}/asdf.sh" ] && . "${ASDF_DIR}/asdf.sh"
 # Nix
-# { [ -f "${NIX_DIR}/etc/profile.d/nix.sh" ] && . "${NIX_DIR}/etc/profile.d/nix.sh"; } ||
-# 	{ [ -f "/nix/var/nix/profiles/default/etc/profile.d/nix.sh" ] && . "/nix/var/nix/profiles/default/etc/profile.d/nix.sh"; }
-# [ -f "/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh" ] && . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
-# { [ -f "/etc/profiles/per-user/$USER/etc/profile.d/hm-session-vars.sh" ] && . "/etc/profiles/per-user/$USER/etc/profile.d/hm-session-vars.sh"; } ||
-# 	{ [ -f "$HOME/.local/state/nix/profiles/profile/etc/profile.d/hm-session-vars.sh" ] && . "$HOME/.local/state/nix/profiles/profile/etc/profile.d/hm-session-vars.sh"; } ||
-# 	{ [ -n "${NIX_DIR:-}" ] && [ -f "$NIX_DIR/etc/profile.d/hm-session-vars.sh" ] && . "$NIX_DIR/etc/profile.d/hm-session-vars.sh"; }
-# [ -d "${NIX_DIR}" ] && PATH="${NIX_DIR}/bin:${PATH}"
-# Devbox
-# command -v devbox >/dev/null 2>&1 && eval "$(devbox global shellenv)"
+{ [ -f "${NIX_DIR}/etc/profile.d/nix.sh" ] && . "${NIX_DIR}/etc/profile.d/nix.sh"; } ||
+	{ [ -f "/nix/var/nix/profiles/default/etc/profile.d/nix.sh" ] && . "/nix/var/nix/profiles/default/etc/profile.d/nix.sh"; }
+[ -d "${NIX_DIR}" ] && PATH="${NIX_DIR}/bin:${PATH}"
 # Brew
 [ "$LINUX" = "1" ] && [ -d "/home/linuxbrew/.linuxbrew" ] && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 [ "$MACOS" = "1" ] && [ -f "/opt/homebrew/bin/brew" ] && eval "$(/opt/homebrew/bin/brew shellenv)"
@@ -146,7 +132,3 @@ fi
 if type install_tmux_manager >/dev/null 2>&1; then
 	install_tmux_manager
 fi
-
-# install_rust
-# install_cocoa_pods
-# install_flutter

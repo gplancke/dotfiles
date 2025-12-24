@@ -108,7 +108,6 @@ command_not_found_handler() {
 
 # ##############################
 echo "${SOURCED}" | tr ':' ' -> '
-[ -f ~/.fzf.colors ] && source ~/.fzf.colors
 
 # Added by Antigravity
 export PATH="/Users/georgio/.antigravity/antigravity/bin:$PATH"
