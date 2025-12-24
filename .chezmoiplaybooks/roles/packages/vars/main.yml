@@ -1,83 +1,7 @@
 ---
 # Package definitions for the packages role
-# Organized by OS family and install mode (server, desktop, container)
-
-###############################################################################
-# GUI Applications
-# These are installed BEFORE brew bundle runs
-# - macOS: installed via homebrew casks
-# - Linux: installed via Flatpak (Flathub)
-###############################################################################
-
-gui_apps:
-  darwin:
-    # Desktop mode - full GUI experience
-    desktop:
-      - bitwarden
-      - obsidian
-      - tailscale-app
-      - raycast
-      - ghostty
-      - alt-tab
-      - orbstack
-      # TODO: Add your favorite GUI apps here
-    # Server mode - minimal or no GUI
-    server: []
-    # Container mode - no GUI
-    container: []
-
-  linux:
-    # Desktop mode - GUI apps via Flatpak
-    desktop:
-      - com.bitwarden.desktop
-      - md.obsidian.Obsidian
-      # TODO: Add your favorite Linux GUI apps here (use Flatpak app IDs)
-    server: []
-    container: []
-
-###############################################################################
-# Native Packages (OS package manager)
-# Packages that MUST be installed regardless of brew bundle
-# These are typically system dependencies or packages not available in Homebrew
-###############################################################################
-
-native_packages:
-  darwin:
-    common:
-      - libiconv
-      - imagemagick
-    desktop: []
-    server: []
-    container: []
-
-  debian:
-    common:
-      - libffi-dev
-    desktop:
-      - flatpak
-    server: []
-    container: []
-
-  fedora:
-    common: []
-    desktop:
-      - flatpak
-    server: []
-    container: []
-
-  arch:
-    common: []
-    desktop:
-      - flatpak
-    server: []
-    container: []
-
-  alpine:
-    common: []
-    desktop:
-      - flatpak
-    server: []
-    container: []
+# NOTE: Native packages and GUI apps have been moved to the system-packages role
+# This role only handles: Homebrew packages, Nix, and Mise
 
 ###############################################################################
 # Homebrew Packages
@@ -106,35 +30,19 @@ brew_packages:
 
 mode_config:
   desktop:
-    install_gui_apps: true
-    install_native: true
     install_brew_packages: true
     run_brew_bundle: true
-    install_flatpak: true
     run_nix: true
     run_mise: true
 
   server:
-    install_gui_apps: false
-    install_native: true
     install_brew_packages: true
     run_brew_bundle: true
-    install_flatpak: false
     run_nix: true
     run_mise: true
 
   container:
-    install_gui_apps: false
-    install_native: true
     install_brew_packages: false
     run_brew_bundle: false
-    install_flatpak: false
     run_nix: false
     run_mise: false
-
-###############################################################################
-# Flatpak Configuration (Linux only)
-###############################################################################
-
-flatpak_remote: flathub
-flatpak_remote_url: https://flathub.org/repo/flathub.flatpakrepo

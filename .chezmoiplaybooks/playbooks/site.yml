@@ -62,6 +62,11 @@
     - role: shell
       tags: [shell, zsh]
 
+    # Install system packages (native packages + GUI apps)
+    # These require sudo on Linux, so they're part of bootstrap
+    - role: system-packages
+      tags: [system-packages, native, gui]
+
   post_tasks:
     - name: Display completion message
       ansible.builtin.debug:
@@ -85,5 +90,6 @@
           {% if install_mise %}
           - Mise installed
           {% endif %}
+          - System packages installed (native + GUI apps)
 
           Chezmoi will now continue with dotfile deployment.

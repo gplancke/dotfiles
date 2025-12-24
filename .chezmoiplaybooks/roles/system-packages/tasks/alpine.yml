@@ -4,6 +4,6 @@
 - name: Install native packages (apk)
   become: true
   community.general.apk:
-    name: "{{ native_packages }}"
+    name: "{{ native_pkgs }}"
     state: present
-  when: native_packages | length > 0
+  when: native_pkgs | length > 0

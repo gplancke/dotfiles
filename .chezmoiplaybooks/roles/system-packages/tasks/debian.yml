@@ -10,6 +10,6 @@
 - name: Install native packages (apt)
   become: true
   ansible.builtin.apt:
-    name: "{{ native_packages }}"
+    name: "{{ native_pkgs }}"
     state: present
-  when: native_packages | length > 0
+  when: native_pkgs | length > 0
