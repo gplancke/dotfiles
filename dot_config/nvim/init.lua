@@ -44,7 +44,7 @@ local plugins = {
 	-- Git
 	"https://github.com/lewis6991/gitsigns.nvim",
 	"https://github.com/f-person/git-blame.nvim",
-	"https://github.com/esmuellert/vscode-diff.nvim",
+	"https://github.com/sindrets/diffview.nvim",
 
 	-- LSP extras
 	"https://github.com/SmiteshP/nvim-navic",
@@ -120,7 +120,7 @@ local no_line_ft = {
 
 local lsp_servers = {
 	"lua_ls",
-	"ts_ls",
+	"vtsls",
 	"svelte",
 	"cssls",
 	"pyright",
@@ -132,7 +132,7 @@ local lsp_servers = {
 
 local mason_ensure_installed = {
 	"lua-language-server",
-	"typescript-language-server",
+	"vtsls",
 	"svelte-language-server",
 	"css-lsp",
 	"pyright",
@@ -520,7 +520,8 @@ setup("which-key", {
 		{ "<leader>g",  group = "Git" },
 		{ "<leader>q",  group = "Quit" },
 		{ "<leader>s",  group = "Search" },
-		{ "<leader>sn", group = "Noice" },
+		{ "<leader>t",  group = "Tab" },
+		{ "<leader>n",	group = "Notification" },
 		{ "<leader>u",  group = "UI" },
 		{ "<leader>w",  group = "Window" },
 		{ "<leader>x",  group = "Diagnostics" },
@@ -826,12 +827,49 @@ vim.lsp.config("lua_ls", {
 	},
 })
 
--- TypeScript/JavaScript
-vim.lsp.config("ts_ls", {
-	cmd = { "typescript-language-server", "--stdio" },
-	filetypes = { "javascript", "javascriptreact", "typescript", "typescriptreact" },
+-- TypeScript/JavaScript (using vtsls - better inlay hints support)
+vim.lsp.config("vtsls", {
+	cmd = { "vtsls", "--stdio" },
+	filetypes = { "javascript", "javascriptreact", "javascript.jsx", "typescript", "typescriptreact", "typescript.tsx" },
 	root_markers = { "tsconfig.json", "jsconfig.json", "package.json" },
-	single_file_support = false,
+	single_file_support = true,
+	settings = {
+		complete_function_calls = true,
+		vtsls = {
+			enableMoveToFileCodeAction = true,
+			autoUseWorkspaceTsdk = true,
+			experimental = {
+				maxInlayHintLength = 30,
+				completion = {
+					enableServerSideFuzzyMatch = true,
+				},
+			},
+		},
+		typescript = {
+			updateImportsOnFileMove = { enabled = "always" },
+			suggest = { completeFunctionCalls = true },
+			inlayHints = {
+				enumMemberValues = { enabled = true },
+				functionLikeReturnTypes = { enabled = true },
+				parameterNames = { enabled = "literals" },
+				parameterTypes = { enabled = true },
+				propertyDeclarationTypes = { enabled = true },
+				variableTypes = { enabled = false },
+			},
+		},
+		javascript = {
+			updateImportsOnFileMove = { enabled = "always" },
+			suggest = { completeFunctionCalls = true },
+			inlayHints = {
+				enumMemberValues = { enabled = true },
+				functionLikeReturnTypes = { enabled = true },
+				parameterNames = { enabled = "literals" },
+				parameterTypes = { enabled = true },
+				propertyDeclarationTypes = { enabled = true },
+				variableTypes = { enabled = false },
+			},
+		},
+	},
 })
 
 -- Svelte
@@ -922,6 +960,17 @@ vim.diagnostic.config({
 -- =============================================================================
 -- =============================================================================
 -- Keybindings
+--------------------------------------------------------------------------------
+-- NOTE: Default LSP keymaps in nvim 0.11+ (no need to set manually)
+-- grn -> vim.lsp.buf.rename()
+-- grr -> vim.lsp.buf.references()
+-- gri -> vim.lsp.buf.implementation()
+-- gra -> vim.lsp.buf.code_action() (normal and visual mode)
+-- grt -> vim.lsp.buf.type_definition()
+-- gO  -> vim.lsp.buf.document_symbol()
+-- K   -> vim.lsp.buf.hover()
+-- CTRL-S (insert) -> vim.lsp.buf.signature_help()
+-- [d, ]d -> vim.diagnostic.jump() (navigate diagnostics)
 -- =============================================================================
 -- =============================================================================
 
@@ -960,16 +1009,19 @@ map("v", "<A-k>", ":<C-u>execute \"'<,'>move '<-\" . (v:count1 + 1)<cr>gv=gv", {
 map("v", "<", "<gv", { desc = "Outdent" })
 map("v", ">", ">gv", { desc = "Indent" })
 
--- Clear search with <esc>
-map({ "i", "n" }, "<esc>", "<cmd>noh<cr><esc>", { desc = "Escape and Clear hlsearch" })
+-- Clear search and flash with <esc>
+map("n", "<Esc>", function()
+	vim.cmd("nohlsearch")
+	-- Clear flash highlights
+	for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+		pcall(vim.api.nvim_buf_clear_namespace, buf, vim.api.nvim_get_namespaces()["flash"] or -1, 0, -1)
+	end
+end, { desc = "Clear hlsearch and Flash", silent = true })
 
 -- Save file
 map({ "i", "x", "n", "s" }, "<C-s>", "<cmd>w<cr><esc>", { desc = "Save File" })
 
--- Quit all
-map("n", "<leader>qq", "<cmd>qa<cr>", { desc = "Quit All" })
-
--- Neo-tree (file explorer)
+-- Filetree (file explorer)
 map("n", "<C-e>", "<cmd>Neotree toggle<cr>", { desc = "Explorer NeoTree (root dir)" }, { "neo-tree" })
 
 -- Top-level pickers
@@ -978,11 +1030,22 @@ map("n", "<leader>/", function() Snacks.picker.grep() end, { desc = "Grep" }, { 
 map("n", "<leader>:", function() Snacks.picker.command_history() end, { desc = "Command History" }, { "snacks" })
 map("n", "<leader>n", function() Snacks.picker.notifications() end, { desc = "Notification History" }, { "snacks" })
 
+-- Windows
+map("n", "<leader>w-", "<C-W>s", { desc = "Split Window Below" })
+map("n", "<leader>w|", "<C-W>v", { desc = "Split Window Right" })
+map("n", "<leader>wd", "<C-W>c", { desc = "Delete Window" })
+
+-- Tab
+map("n", "[t", "<cmd>tabprev<cr>", { desc = "Prev Tab" })
+map("n", "]t", "<cmd>tabnext<cr>", { desc = "Next Tab" })
+map("n", "<leader>tc", "<cmd>tabclose<cr>", { desc = "Close Tab" })
+map("n", "<leader>tp", "<cmd>tabprev<cr>", { desc = "Prev Tab" })
+map("n", "<leader>tn", "<cmd>tabnext<cr>", { desc = "Next Tab" })
+
 -- Buffers
+map("n", "<C-q>", function() require("mini.bufremove").delete() end, { desc = "Delete Buffer" }, { "mini.bufremove" })
 map("n", "[b", "<cmd>bprevious<cr>", { desc = "Prev Buffer" })
 map("n", "]b", "<cmd>bnext<cr>", { desc = "Next Buffer" })
-map("n", "<C-q>", function() require("mini.bufremove").delete() end, { desc = "Delete Buffer" }, { "mini.bufremove" })
-
 map("n", "<leader>bb", function() Snacks.picker.buffers() end, { desc = "Buffers" }, { "snacks" })
 map("n", "<leader>bd", function() require("mini.bufremove").delete() end, { desc = "Delete Buffer" },
 	{ "mini.bufremove" })
@@ -1038,11 +1101,6 @@ map("n", "<leader>sq", function() Snacks.picker.qflist() end, { desc = "Quickfix
 map("n", "<leader>sR", function() Snacks.picker.resume() end, { desc = "Resume" }, { "snacks" })
 map({ "n", "x" }, "<leader>sw", function() Snacks.picker.grep_word() end, { desc = "Grep Word" }, { "snacks" })
 
--- Windows
-map("n", "<leader>w-", "<C-W>s", { desc = "Split Window Below" })
-map("n", "<leader>w|", "<C-W>v", { desc = "Split Window Right" })
-map("n", "<leader>wd", "<C-W>c", { desc = "Delete Window" })
-
 -- Quickfix
 map("n", "<leader>xl", "<cmd>lopen<cr>", { desc = "Location List" })
 map("n", "<leader>xq", "<cmd>copen<cr>", { desc = "Quickfix List" })
@@ -1083,14 +1141,10 @@ map("n", "<leader>xQ", "<cmd>Trouble qflist toggle<cr>", { desc = "Quickfix List
 map("n", "<leader>gb", "<cmd>GitBlameToggle<cr>", { desc = "Git Blame Line" }, { "gitblame" })
 
 -- Noice
-map("n", "<leader>snd", function() require("noice").cmd("dismiss") end, { desc = "Dismiss All" }, { "noice" })
-map("n", "<leader>snh", function() require("noice").cmd("history") end, { desc = "Noice History" }, { "noice" })
-map("n", "<leader>snl", function() require("noice").cmd("last") end, { desc = "Noice Last Message" }, { "noice" })
-map("n", "<leader>un", function() require("noice").cmd("dismiss") end, { desc = "Dismiss All Notifications" },
-	{ "noice" })
-
--- Undo tree
-map("n", "<leader>su", "<cmd>Undotree<cr>", { desc = "Undotree" })
+map("n", "<leader>nd", function() require("noice").cmd("dismiss") end, { desc = "Dismiss All" }, { "noice" })
+map("n", "<leader>nh", function() require("noice").cmd("history") end, { desc = "Noice History" }, { "noice" })
+map("n", "<leader>nl", function() require("noice").cmd("last") end, { desc = "Noice Last Message" }, { "noice" })
+map("n", "<leader>nu", function() require("noice").cmd("dismiss") end, { desc = "Dismiss All Notifications" }, { "noice" })
 
 -- DAP (Debug)
 map("n", "<leader>db", function() require("dap").toggle_breakpoint() end, { desc = "Toggle Breakpoint" }, { "dap" })
@@ -1111,21 +1165,18 @@ map({ "n", "x" }, "<leader>de", function() require("dapui").eval() end, { desc =
 -- LSP keymaps - Snacks picker overrides gd, gD, gI, gy, gr below
 map("n", "K", vim.lsp.buf.hover, { desc = "Hover" })
 map("n", "gK", vim.lsp.buf.signature_help, { desc = "Signature Help" })
-map("i", "<c-k>", vim.lsp.buf.signature_help, { desc = "Signature Help" })
 map("n", "gd", function() Snacks.picker.lsp_definitions() end, { desc = "Goto Definition" }, { "snacks" })
 map("n", "gD", function() Snacks.picker.lsp_declarations() end, { desc = "Goto Declaration" }, { "snacks" })
 map("n", "gr", function() Snacks.picker.lsp_references() end, { nowait = true, desc = "References" }, { "snacks" })
 map("n", "gI", function() Snacks.picker.lsp_implementations() end, { desc = "Goto Implementation" }, { "snacks" })
 map("n", "gy", function() Snacks.picker.lsp_type_definitions() end, { desc = "Goto T[y]pe Definition" }, { "snacks" })
 map("n", "<leader>ss", function() Snacks.picker.lsp_symbols() end, { desc = "LSP Symbols" }, { "snacks" })
-map("n", "<leader>sS", function() Snacks.picker.lsp_workspace_symbols() end, { desc = "LSP Workspace Symbols" },
-	{ "snacks" })
+map("n", "<leader>sS", function() Snacks.picker.lsp_workspace_symbols() end, { desc = "LSP Workspace Symbols" }, { "snacks" })
 
 -- Code actions
-map("n", "<leader>cr", vim.lsp.buf.rename, { desc = "Rename" })
 map({ "n", "x" }, "<leader>ca", vim.lsp.buf.code_action, { desc = "Code Action" })
-map("n", "<leader>cf", function() vim.lsp.buf.format() end, { desc = "Format" })
-map("x", "<leader>cf", function() vim.lsp.buf.format() end, { desc = "Format" })
+map({ "n", "x" }, "<leader>cf", function() vim.lsp.buf.format() end, { desc = "Format" })
+map("n", "<leader>cr", vim.lsp.buf.rename, { desc = "Rename" })
 map("n", "<leader>cl", function()
 	local clients = vim.lsp.get_clients({ bufnr = 0 })
 	if #clients == 0 then
@@ -1139,18 +1190,10 @@ map("n", "<leader>cl", function()
 	vim.notify(table.concat(lines, "\n"), vim.log.levels.INFO)
 end, { desc = "Lsp Info" })
 
---------------------------------------------------------------------------------
--- NOTE: Default LSP keymaps in nvim 0.11+ (no need to set manually)
--- grn -> vim.lsp.buf.rename()
--- grr -> vim.lsp.buf.references()
--- gri -> vim.lsp.buf.implementation()
--- gra -> vim.lsp.buf.code_action() (normal and visual mode)
--- grt -> vim.lsp.buf.type_definition()
--- gO  -> vim.lsp.buf.document_symbol()
--- K   -> vim.lsp.buf.hover()
--- CTRL-S (insert) -> vim.lsp.buf.signature_help()
--- [d, ]d -> vim.diagnostic.jump() (navigate diagnostics)
---------------------------------------------------------------------------------
+-- UI Toggles
+map("n", "<leader>uh", function()
+	vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({ bufnr = 0 }))
+end, { desc = "Toggle Inlay Hints" })
 
 -- =============================================================================
 -- =============================================================================
