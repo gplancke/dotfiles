@@ -79,4 +79,5 @@ if OS.mac?
   brew "koekeishiya/formulae/yabai"
   brew "libiconv"
   brew "trycua/lume/lume"
+  brew "mole"
 end
