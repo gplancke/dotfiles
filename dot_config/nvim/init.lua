@@ -269,7 +269,7 @@ vim.api.nvim_create_autocmd("PackChanged", {
 		-- Build blink.cmp fuzzy matcher (requires Rust nightly)
 		if name == "blink.cmp" and (kind == "install" or kind == "update") then
 			vim.notify("Building blink.cmp fuzzy matcher (requires Rust nightly)...", vim.log.levels.INFO)
-			local obj = vim.system({ "cargo", "build", "--release" }, { cwd = ev.data.path }):wait()
+			local obj = vim.system({ "rustup", "run", "nightly", "cargo", "build", "--release" }, { cwd = ev.data.path }):wait()
 			if obj.code == 0 then
 				vim.notify("blink.cmp build complete!", vim.log.levels.INFO)
 			else
@@ -418,7 +418,7 @@ setup("noice", {
 })
 
 -- Icons
-setup('mini.icons', {}, function (mini_icons)
+setup('mini.icons', {}, function(mini_icons)
 	package.preload["nvim-web-devicons"] = function()
 		mini_icons.mock_nvim_web_devicons()
 		return package.loaded["nvim-web-devicons"]
@@ -434,7 +434,7 @@ setup('mini.ai')
 -- Treesitter (syntax highlighting, indentation, folding)
 setup("nvim-treesitter", {
 	install_dir = vim.fs.joinpath(vim.fn.stdpath("data"), "site"),
-}, function (ts)
+}, function(ts)
 	ts.install({
 		"svelte", "typescript", "javascript", "python", "dart", "ruby", "rust",
 		"c", "cpp", "yaml", "json", "html", "css", "vue", "tsx", "zig",
@@ -518,18 +518,18 @@ setup("which-key", {
 		align = "right",
 	},
 	spec = {
-		{ "<leader>b",  group = "Buffer" },
-		{ "<leader>c",  group = "Code" },
-		{ "<leader>d",  group = "Debug" },
-		{ "<leader>f",  group = "Find" },
-		{ "<leader>g",  group = "Git" },
-		{ "<leader>q",  group = "Quit" },
-		{ "<leader>s",  group = "Search" },
-		{ "<leader>t",  group = "Tab" },
-		{ "<leader>n",	group = "Notification" },
-		{ "<leader>u",  group = "UI" },
-		{ "<leader>w",  group = "Window" },
-		{ "<leader>x",  group = "Diagnostics" },
+		{ "<leader>b", group = "Buffer" },
+		{ "<leader>c", group = "Code" },
+		{ "<leader>d", group = "Debug" },
+		{ "<leader>f", group = "Find" },
+		{ "<leader>g", group = "Git" },
+		{ "<leader>q", group = "Quit" },
+		{ "<leader>s", group = "Search" },
+		{ "<leader>t", group = "Tab" },
+		{ "<leader>n", group = "Notification" },
+		{ "<leader>u", group = "UI" },
+		{ "<leader>w", group = "Window" },
+		{ "<leader>x", group = "Diagnostics" },
 	},
 })
 
@@ -1121,7 +1121,8 @@ map("n", "<leader>sm", function() Snacks.picker.marks() end, { desc = "Marks" },
 map("n", "<leader>sq", function() Snacks.picker.qflist() end, { desc = "Quickfix List" }, { "snacks" })
 map("n", "<leader>sR", function() Snacks.picker.resume() end, { desc = "Resume" }, { "snacks" })
 map("n", "<leader>ss", function() Snacks.picker.lsp_symbols() end, { desc = "LSP Symbols" }, { "snacks" })
-map("n", "<leader>sS", function() Snacks.picker.lsp_workspace_symbols() end, { desc = "LSP Workspace Symbols" }, { "snacks" })
+map("n", "<leader>sS", function() Snacks.picker.lsp_workspace_symbols() end, { desc = "LSP Workspace Symbols" },
+	{ "snacks" })
 -- map({ "n", "x" }, "<leader>sw", function() Snacks.picker.grep_word() end, { desc = "Grep Word" }, { "snacks" })
 
 -- ========================================================
@@ -1153,7 +1154,8 @@ map("n", "]q", "<cmd>cnext<cr>", { desc = "Next Quickfix" })
 map("n", "<leader>xl", "<cmd>lopen<cr>", { desc = "Location List" })
 map("n", "<leader>xq", "<cmd>copen<cr>", { desc = "Quickfix List" })
 map("n", "<leader>xx", "<cmd>Trouble diagnostics toggle<cr>", { desc = "Diagnostics (Trouble)" }, { "trouble" })
-map("n", "<leader>xX", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>", { desc = "Buffer Diagnostics (Trouble)" }, { "trouble" })
+map("n", "<leader>xX", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>", { desc = "Buffer Diagnostics (Trouble)" },
+	{ "trouble" })
 -- map("n", "<leader>cs", "<cmd>Trouble symbols toggle<cr>", { desc = "Symbols (Trouble)" }, { "trouble" })
 -- map("n", "<leader>cS", "<cmd>Trouble lsp toggle<cr>", { desc = "LSP references/definitions/... (Trouble)" }, { "trouble" })
 -- map("n", "<leader>xL", "<cmd>Trouble loclist toggle<cr>", { desc = "Location List (Trouble)" }, { "trouble" })
@@ -1164,7 +1166,8 @@ map("n", "<leader>xX", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>", { des
 map("n", "<leader>nd", function() require("noice").cmd("dismiss") end, { desc = "Dismiss All" }, { "noice" })
 map("n", "<leader>nh", function() require("noice").cmd("history") end, { desc = "Noice History" }, { "noice" })
 map("n", "<leader>nl", function() require("noice").cmd("last") end, { desc = "Noice Last Message" }, { "noice" })
-map("n", "<leader>nu", function() require("noice").cmd("dismiss") end, { desc = "Dismiss All Notifications" }, { "noice" })
+map("n", "<leader>nu", function() require("noice").cmd("dismiss") end, { desc = "Dismiss All Notifications" },
+	{ "noice" })
 
 -- ========================================================
 -- DAP (Debug)

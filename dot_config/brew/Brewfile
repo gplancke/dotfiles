@@ -67,6 +67,7 @@ brew "watch"
 brew "wget"
 brew "zoxide"
 brew "zsh"
+brew "tree-sitter-cli"
 # macOS-only packages
 if OS.mac?
   tap "koekeishiya/formulae"
@@ -80,4 +81,5 @@ if OS.mac?
   brew "libiconv"
   brew "trycua/lume/lume"
   brew "mole"
+  brew "tree-sitter"
 end
