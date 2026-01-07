@@ -62,5 +62,12 @@ run_playbook() {
 #############################################
 
 export PATH="${HOME}/.local/bin:${PATH}"
+
+# macOS system Python installs to ~/Library/Python/X.Y/bin, not ~/.local/bin
+if command -v python3 >/dev/null 2>&1; then
+  PYTHON_USER_BIN="$(python3 -c 'import sysconfig; print(sysconfig.get_path("scripts", "posix_user"))')"
+  export PATH="${PYTHON_USER_BIN}:${PATH}"
+fi
+
 load_package_manager_envs
 run_playbook
