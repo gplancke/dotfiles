@@ -18,7 +18,8 @@
     - name: Run Nix installer
       become: true
       ansible.builtin.command:
-        cmd: /tmp/nix-installer.sh install --no-confirm
+        # --volume-encrypt=false: Skip Nix volume encryption on macOS since FileVault already encrypts the disk
+        cmd: /tmp/nix-installer.sh install --no-confirm {{ '--volume-encrypt=false' if ansible_os_family == 'Darwin' else '' }}
       environment:
         NIX_INSTALLER_NO_CONFIRM: "true"
       register: nix_install
