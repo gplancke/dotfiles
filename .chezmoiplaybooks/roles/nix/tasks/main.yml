@@ -7,34 +7,28 @@
   register: nix_check
 
 # macOS: Manual installation required due to APFS volume issues with automated installer
-- name: Display macOS Nix installation instructions
+- name: Show macOS Nix installation instructions
   when:
     - ansible_os_family == 'Darwin'
     - not nix_check.stat.exists
-  block:
-    - name: Show macOS Nix installation instructions
-      ansible.builtin.debug:
-        msg: |
-          ============================================================
-          MANUAL NIX INSTALLATION REQUIRED FOR macOS
-          ============================================================
+  ansible.builtin.debug:
+    msg: |
+      ============================================================
+      MANUAL NIX INSTALLATION REQUIRED FOR macOS
+      ============================================================
 
-          The automated Nix installer has known issues on macOS Sequoia
-          with FileVault enabled. Please install Nix manually using the
-          official graphical installer:
+      The automated Nix installer has known issues on macOS Sequoia
+      with FileVault enabled. Please install Nix manually using the
+      official graphical installer:
 
-          1. Download the installer:
-             https://install.determinate.systems/determinate-pkg/stable/Universal
+      1. Download the installer:
+         https://install.determinate.systems/determinate-pkg/stable/Universal
 
-          2. Run the downloaded .pkg file and follow the prompts
+      2. Run the downloaded .pkg file and follow the prompts
 
-          3. After installation completes, re-run: chezmoi apply
+      3. After installation completes, re-run: chezmoi apply
 
-          ============================================================
-
-    - name: Fail with instructions for macOS
-      ansible.builtin.fail:
-        msg: "Nix must be installed manually on macOS. See instructions above."
+      ============================================================
 
 # Linux: Automated installation
 - name: Install Nix on Linux
