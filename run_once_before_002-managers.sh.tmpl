@@ -7,63 +7,29 @@ CHEZMOI_SOURCE="{{ .chezmoi.sourceDir }}"
 PLAYBOOKS_DIR="${CHEZMOI_SOURCE}/.chezmoiplaybooks"
 INSTALL_MODE="{{ .installMode }}"
 
-# Ensure PATH includes ansible location
 export PATH="${HOME}/.local/bin:${PATH}"
 
-#############################################
-# Ensure Ansible is available
-# This is a safety net in case bootstrap failed
-#############################################
-ensure_ansible() {
-  if command -v ansible-playbook >/dev/null 2>&1; then
-    return 0
-  fi
+# macOS system Python uses ~/Library/Python/X.Y/bin, Linux uses ~/.local/bin
+if command -v python3 >/dev/null 2>&1; then
+  PYTHON_USER_BIN="$(python3 -c 'import sysconfig; print(sysconfig.get_path("scripts", "posix_user"))')"
+  export PATH="${PYTHON_USER_BIN}:${HOME}/.local/bin:${PATH}"
+fi
 
-  printf '[MANAGERS] Ansible not found, installing...'
-  
-  {{ if eq .chezmoi.os "darwin" -}}
-  # macOS
-  python3 -m pip install --user --break-system-packages -q ansible 2>/dev/null || \
-    python3 -m pip install --user -q ansible
-  {{- else -}}
-  # Linux - detect distro
-  if [ -f /etc/os-release ]; then
-    . /etc/os-release
-    case "$ID" in
-      fedora|rhel|centos|rocky|almalinux)
-        sudo dnf install -q -y python3 python3-pip >/dev/null
-        python3 -m pip install --user -q ansible
-        ;;
-      arch|manjaro|endeavouros|garuda|cachyos)
-        sudo pacman -S --noconfirm -q python python-pip ansible >/dev/null 2>&1
-        ;;
-      ubuntu|debian|pop|elementary|linuxmint)
-        sudo apt-get update -qq
-        sudo apt-get install -qq -y python3 python3-pip python3-venv >/dev/null
-        python3 -m pip install --user --break-system-packages -q ansible 2>/dev/null || \
-          python3 -m pip install --user -q ansible
-        ;;
-      alpine)
-        sudo apk add -q python3 py3-pip ansible
-        ;;
-    esac
-  fi
-  {{- end }}
-
-  # Verify installation
-  export PATH="${HOME}/.local/bin:${PATH}"
+#############################################
+# Verify Ansible is available
+# Bootstrap should have installed it
+#############################################
+verify_ansible() {
   if ! command -v ansible-playbook >/dev/null 2>&1; then
-    printf ' failed\n'
-    printf '[MANAGERS] ERROR: Failed to install Ansible\n'
+    printf '[MANAGERS] ERROR: ansible-playbook not found in PATH.\n'
+    printf '[MANAGERS] Bootstrap may have failed. Please re-run: chezmoi apply\n'
     exit 1
   fi
-  printf ' done\n'
 
-  # Install collections if needed
-  if [ -f "${PLAYBOOKS_DIR}/requirements.yml" ]; then
-    printf '[MANAGERS] Installing Ansible collections...'
-    ansible-galaxy collection install -r "${PLAYBOOKS_DIR}/requirements.yml" >/dev/null 2>&1
-    printf ' done\n'
+  if ! command -v ansible-galaxy >/dev/null 2>&1; then
+    printf '[MANAGERS] ERROR: ansible-galaxy not found in PATH.\n'
+    printf '[MANAGERS] Bootstrap may have failed. Please re-run: chezmoi apply\n'
+    exit 1
   fi
 }
 
@@ -72,9 +38,9 @@ ensure_ansible() {
 #############################################
 run_playbook() {
   printf '[MANAGERS] Installing package managers (mode: %s)\n' "$INSTALL_MODE"
-  
+
   cd "${PLAYBOOKS_DIR}"
-  
+
   # Set feature flags based on install mode
   # Use -K to ask for sudo password upfront (site.yml requires sudo for system setup)
   case "$INSTALL_MODE" in
@@ -102,5 +68,5 @@ run_playbook() {
   esac
 }
 
-ensure_ansible
+verify_ansible
 run_playbook

@@ -2,6 +2,7 @@
 # Bootstrap script - runs once before first chezmoi apply
 # - Creates essential directories
 # - Installs Ansible
+# - Installs Ansible Galaxy
 # - Installs Ansible collections
 
 set -euo pipefail
@@ -86,6 +87,9 @@ install_ansible() {
       fi
       python3 -m pip install --user --break-system-packages -q ansible 2>/dev/null || \
         python3 -m pip install --user -q ansible
+      # macOS system Python installs to ~/Library/Python/X.Y/bin, not ~/.local/bin
+      PYTHON_USER_BIN="$(python3 -c 'import sysconfig; print(sysconfig.get_path("scripts", "posix_user"))')"
+      export PATH="${PYTHON_USER_BIN}:${PATH}"
       ;;
     *)
       printf '\n[BOOTSTRAP] Error: unsupported distribution "%s"\n' "$distro"
@@ -93,7 +97,7 @@ install_ansible() {
       ;;
   esac
 
-  # Add ~/.local/bin to PATH for this session
+  # Add ~/.local/bin to PATH for this session (Linux distros use this path)
   export PATH="${HOME}/.local/bin:${PATH}"
   printf ' done\n'
 }
@@ -102,15 +106,20 @@ install_ansible() {
 # Install Ansible collections
 #############################################
 install_ansible_collections() {
-  # Ensure PATH includes pip install location
   export PATH="${HOME}/.local/bin:${PATH}"
-  
+
+  # macOS system Python uses ~/Library/Python/X.Y/bin, Linux uses ~/.local/bin
+  if command -v python3 >/dev/null 2>&1; then
+    PYTHON_USER_BIN="$(python3 -c 'import sysconfig; print(sysconfig.get_path("scripts", "posix_user"))')"
+    export PATH="${PYTHON_USER_BIN}:${HOME}/.local/bin:${PATH}"
+  fi
+
   # Verify ansible-galaxy is available
   if ! command -v ansible-galaxy >/dev/null 2>&1; then
     printf '[BOOTSTRAP] Warning: ansible-galaxy not found in PATH\n'
     return 1
   fi
-  
+
   if [ -f "${PLAYBOOKS_DIR}/requirements.yml" ]; then
     printf '[BOOTSTRAP] Installing Ansible collections...'
     ansible-galaxy collection install -r "${PLAYBOOKS_DIR}/requirements.yml" >/dev/null 2>&1
