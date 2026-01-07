@@ -6,8 +6,41 @@
     path: /nix
   register: nix_check
 
-- name: Install Nix
-  when: not nix_check.stat.exists
+# macOS: Manual installation required due to APFS volume issues with automated installer
+- name: Display macOS Nix installation instructions
+  when:
+    - ansible_os_family == 'Darwin'
+    - not nix_check.stat.exists
+  block:
+    - name: Show macOS Nix installation instructions
+      ansible.builtin.debug:
+        msg: |
+          ============================================================
+          MANUAL NIX INSTALLATION REQUIRED FOR macOS
+          ============================================================
+
+          The automated Nix installer has known issues on macOS Sequoia
+          with FileVault enabled. Please install Nix manually using the
+          official graphical installer:
+
+          1. Download the installer:
+             https://install.determinate.systems/determinate-pkg/stable/Universal
+
+          2. Run the downloaded .pkg file and follow the prompts
+
+          3. After installation completes, re-run: chezmoi apply
+
+          ============================================================
+
+    - name: Fail with instructions for macOS
+      ansible.builtin.fail:
+        msg: "Nix must be installed manually on macOS. See instructions above."
+
+# Linux: Automated installation
+- name: Install Nix on Linux
+  when:
+    - ansible_os_family != 'Darwin'
+    - not nix_check.stat.exists
   block:
     - name: Download Determinate Nix installer
       ansible.builtin.get_url:
@@ -18,8 +51,7 @@
     - name: Run Nix installer
       become: true
       ansible.builtin.command:
-        # --volume-encrypt=false: Skip Nix volume encryption on macOS since FileVault already encrypts the disk
-        cmd: /tmp/nix-installer.sh install --no-confirm {{ '--volume-encrypt=false' if ansible_os_family == 'Darwin' else '' }}
+        cmd: /tmp/nix-installer.sh install --no-confirm
       environment:
         NIX_INSTALLER_NO_CONFIRM: "true"
       register: nix_install
@@ -30,6 +62,7 @@
         state: absent
 
 - name: Verify Nix installation
+  when: nix_check.stat.exists or ansible_os_family != 'Darwin'
   become: true
   become_user: "{{ target_user }}"
   ansible.builtin.shell:
@@ -45,5 +78,6 @@
   failed_when: false
 
 - name: Display Nix status
+  when: nix_check.stat.exists or ansible_os_family != 'Darwin'
   ansible.builtin.debug:
     msg: "{{ 'Nix installed: ' + nix_version.stdout if nix_version.rc == 0 else 'Nix installation pending shell restart' }}"
