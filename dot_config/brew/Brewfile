@@ -68,6 +68,7 @@ brew "wget"
 brew "zoxide"
 brew "zsh"
 brew "tree-sitter-cli"
+tap "psviderski/tap"
 # macOS-only packages
 if OS.mac?
   tap "koekeishiya/formulae"
@@ -82,4 +83,5 @@ if OS.mac?
   brew "trycua/lume/lume"
   brew "mole"
   brew "tree-sitter"
+  brew "psviderski/tap/uncloud"
 end

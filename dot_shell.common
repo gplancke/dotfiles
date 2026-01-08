@@ -115,7 +115,7 @@ function setup_link() {
 	fi
 }
 
-for bin in docker-buildx docker-compose; do
+for bin in docker-buildx docker-compose docker-pussh; do
 	if [ "$MACOS" = "1" ] || [ "$LINUX" = "1" ]; then
 		setup_link $bin
 	fi
