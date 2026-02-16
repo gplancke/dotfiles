@@ -21,6 +21,8 @@ uv = "latest"
 "npm:@tailwindcss/language-server" = "latest"
 "pipx:pyright" = "latest"
 "pipx:ruff" = "latest"
+lua-language-server = "latest"
+"npm:@vtsls/language-server" = "latest"
 
 [env]
 MISE_LOADED = 1

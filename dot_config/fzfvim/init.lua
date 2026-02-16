@@ -1,7 +1,14 @@
+---@diagnostic disable: undefined-global
 -- ============================================================================
 -- Modern Neovim Configuration (v0.12+)
 -- Uses: vim.pack (built-in package manager), vim.lsp.config/enable (new LSP API)
 -- ============================================================================
+--
+-- PSA:
+-- 1. We need tree-sitter-cli for nvim treesitter to compile things (which in turn needs gcc)
+-- 2. We need rust, with rust nightly to compile blink.cmp
+-- 3. We need to authenticate to Github for copilot to work
+-- 4. We need to install lsp server separately (Done via mise)
 
 -- Capture startup time
 local start_time = vim.loop.hrtime()
@@ -59,7 +66,7 @@ local plugins = {
 	"https://github.com/fang2hou/blink-copilot",
 
 	-- Images (kitty terminal)
-	"https://github.com/3rd/image.nvim",
+	-- "https://github.com/3rd/image.nvim",
 
 	-- DAP (Debug Adapter Protocol)
 	-- "https://github.com/mfussenegger/nvim-dap",
@@ -125,17 +132,6 @@ local lsp_servers = {
 	"clangd",
 	"ansiblels",
 	"dartls",
-}
-
-local mason_ensure_installed = {
-	"lua-language-server",
-	"vtsls",
-	"svelte-language-server",
-	"css-lsp",
-	"pyright",
-	"rust-analyzer",
-	"clangd",
-	"ansible-language-server",
 }
 
 --------------------------------------------------------------------------------
@@ -373,6 +369,78 @@ vim.pack.add(plugins)
 -- ============================================================================
 -- ============================================================================
 
+local function system_open(filepath)
+	local cmd
+	if vim.fn.has("mac") == 1 then
+		cmd = { "open", filepath }
+	elseif vim.fn.has("unix") == 1 then
+		cmd = { "xdg-open", filepath }
+	elseif vim.fn.has("win32") == 1 then
+		cmd = { "cmd", "/c", "start", "", filepath }
+	end
+	if cmd then vim.fn.jobstart(cmd, { detach = true }) end
+end
+
+local binary_extensions = {
+	-- images
+	png = true,
+	jpg = true,
+	jpeg = true,
+	gif = true,
+	bmp = true,
+	webp = true,
+	ico = true,
+	tiff = true,
+	-- documents
+	pdf = true,
+	doc = true,
+	docx = true,
+	xls = true,
+	xlsx = true,
+	ppt = true,
+	pptx = true,
+	-- media
+	mp3 = true,
+	mp4 = true,
+	avi = true,
+	mkv = true,
+	mov = true,
+	flac = true,
+	wav = true,
+	ogg = true,
+	webm = true,
+	-- archives
+	zip = true,
+	tar = true,
+	gz = true,
+	bz2 = true,
+	xz = true,
+	["7z"] = true,
+	rar = true,
+	-- binaries
+	exe = true,
+	dll = true,
+	so = true,
+	dylib = true,
+	o = true,
+	a = true,
+	-- fonts
+	ttf = true,
+	otf = true,
+	woff = true,
+	woff2 = true,
+}
+
+local function is_binary(path)
+	local ext = (path:match("%.([^%.]+)$") or ""):lower()
+	if binary_extensions[ext] then return true end
+	local f = io.open(path, "rb")
+	if not f then return false end
+	local bytes = f:read(512)
+	f:close()
+	return bytes ~= nil and bytes:find("\0") ~= nil
+end
+
 -- Helper to safely require and setup plugins
 local function setup(name, opts, config)
 	local ok, mod = pcall(require, name)
@@ -398,28 +466,6 @@ setup("nvim-tmux-navigation", {
 	},
 })
 
--- Noice (command line and messages UI)
--- vim.cmd("messages clear") -- Clear all messages before init
-setup("noice", {
-	lsp = {
-		override = {
-			["vim.lsp.util.convert_input_to_markdown_lines"] = true,
-			["vim.lsp.util.stylize_markdown"] = true,
-		},
-	},
-	presets = {
-		bottom_search = true,
-		command_palette = true,
-		long_message_to_split = true,
-		inc_rename = false,
-		lsp_doc_border = false,
-	},
-	routes = {
-		-- Hide written messages
-		{ filter = { event = "msg_show", kind = "", find = "written" }, opts = { skip = true } },
-	},
-})
-
 -- Icons
 setup('nvim-web-devicons')
 
@@ -441,7 +487,35 @@ end)
 setup("fzf-lua", {
 	fzf_colors = true,
 	winopts = { border = "rounded" },
-})
+}, function(fzf)
+	-- Add ctrl-q to send selections to quickfix (extends defaults, doesn't replace)
+	fzf.config.defaults.actions.files["ctrl-q"] = fzf.actions.file_sel_to_qf
+	-- Add ctrl-o to open files with OS default app (force-open externally)
+	fzf.config.defaults.actions.files["ctrl-o"] = function(selected)
+		for _, file in ipairs(selected) do
+			system_open(fzf.path.entry_to_file(file).path)
+		end
+	end
+	-- Smart enter: auto-detect binary files and open externally
+	fzf.config.defaults.actions.files["enter"] = function(selected, opts)
+		local to_open_externally = {}
+		local to_edit = {}
+		for _, sel in ipairs(selected) do
+			local path = fzf.path.entry_to_file(sel).path
+			if is_binary(path) then
+				table.insert(to_open_externally, path)
+			else
+				table.insert(to_edit, sel)
+			end
+		end
+		for _, path in ipairs(to_open_externally) do
+			system_open(path)
+		end
+		if #to_edit > 0 then
+			fzf.actions.file_edit_or_qf(to_edit, opts)
+		end
+	end
+end)
 
 -- Simple setups
 setup("nvim-surround")
@@ -477,7 +551,26 @@ setup("which-key", {
 setup("neo-tree", {
 	close_if_last_window = true,
 	popup_border_style = "rounded",
+	commands = {
+		system_open = function(state)
+			local node = state.tree:get_node()
+			if node and node.type == "file" then
+				system_open(node.path)
+			end
+		end,
+	},
 	filesystem = {
+		commands = {
+			open = function(state)
+				local node = state.tree:get_node()
+				if not node then return end
+				if node.type == "file" and is_binary(node.path) then
+					system_open(node.path)
+				else
+					require("neo-tree.sources.filesystem.commands").open(state)
+				end
+			end,
+		},
 		follow_current_file = { enabled = true },
 		use_libuv_file_watcher = true,
 		filtered_items = {
@@ -489,6 +582,7 @@ setup("neo-tree", {
 		width = 35,
 		mappings = {
 			["<space>"] = "none", -- disable space so it doesn't conflict with leader
+			["gx"] = "system_open", -- open with OS default app
 		},
 	},
 	default_component_configs = {
@@ -517,17 +611,25 @@ setup("gitsigns", {
 	},
 })
 
--- VSCode-style diff
-setup("codediff")
+-- VSCode-style diff (lazy: loads on first :CodeDiff)
+vim.api.nvim_create_user_command("CodeDiff", function(args)
+	require("codediff").setup()
+	vim.cmd("CodeDiff " .. (args.args or ""))
+end, { nargs = "?" })
 
--- Copilot (disable suggestion/panel since we use blink-copilot)
-setup("copilot", {
-	suggestion = { enabled = false },
-	panel = { enabled = false },
-	filetypes = {
-		markdown = true,
-		help = true,
-	},
+-- Copilot (lazy: loads on first InsertEnter)
+vim.api.nvim_create_autocmd("InsertEnter", {
+	once = true,
+	callback = function()
+		require("copilot").setup({
+			suggestion = { enabled = false },
+			panel = { enabled = false },
+			filetypes = {
+				markdown = true,
+				help = true,
+			},
+		})
+	end,
 })
 
 -- Blink.cmp (completion)
@@ -590,11 +692,6 @@ setup("blink.cmp", {
 	fuzzy = { implementation = "prefer_rust" },
 })
 
--- Image.nvim
-setup("image", {
-	backend = "kitty",
-	processor = "magick_cli",
-})
 
 -- -- Colorscheme
 require("tinted-nvim").setup({
@@ -605,9 +702,9 @@ require("tinted-nvim").setup({
 		cmd = "tinty current",
 	},
 	ui = {
-    transparent = true,
-    dim_inactive = false,
-  },
+		transparent = true,
+		dim_inactive = false,
+	},
 })
 
 -- =============================================================================
@@ -652,7 +749,7 @@ pcall(function()
 				if bufname == "" then return "[ No Name ]" end
 
 				local manifests = {
-					{ file = "package.json", use_json_name = true },
+					{ file = "package.json",  use_json_name = true },
 					{ file = "Cargo.toml" },
 					{ file = "go.mod" },
 					{ file = "pyproject.toml" },
@@ -1046,6 +1143,7 @@ map("n", "<leader>wd", "<C-W>c", { desc = "Delete Window" })
 -- Tab
 map("n", "[t", "<cmd>tabprev<cr>", { desc = "Prev Tab" })
 map("n", "]t", "<cmd>tabnext<cr>", { desc = "Next Tab" })
+
 map("n", "<leader>tc", "<cmd>tabclose<cr>", { desc = "Close Tab" })
 map("n", "<leader>tp", "<cmd>tabprev<cr>", { desc = "Prev Tab" })
 map("n", "<leader>tn", "<cmd>tabnext<cr>", { desc = "Next Tab" })
@@ -1055,6 +1153,7 @@ map("n", "<leader>tn", "<cmd>tabnext<cr>", { desc = "Next Tab" })
 map("n", "<C-q>", function() require("mini.bufremove").delete() end, { desc = "Delete Buffer" }, { "mini.bufremove" })
 map("n", "[b", "<cmd>bprevious<cr>", { desc = "Prev Buffer" })
 map("n", "]b", "<cmd>bnext<cr>", { desc = "Next Buffer" })
+
 map("n", "<leader>bb", function() require("fzf-lua").buffers() end, { desc = "Buffers" }, { "fzf-lua" })
 map("n", "<leader>bd", function() require("mini.bufremove").delete() end, { desc = "Delete Buffer" },
 	{ "mini.bufremove" })
@@ -1084,7 +1183,8 @@ map("n", "<leader>gl", function() require("fzf-lua").git_commits() end, { desc =
 map("n", "<leader>gL", function() require("fzf-lua").git_bcommits() end, { desc = "Git Log Line" }, { "fzf-lua" })
 map("n", "<leader>gs", function() require("fzf-lua").git_status() end, { desc = "Git Status" }, { "fzf-lua" })
 map("n", "<leader>gS", function() require("fzf-lua").git_stash() end, { desc = "Git Stash" }, { "fzf-lua" })
-map("n", "<leader>gd", function() require("fzf-lua").git_diff({ commit = "HEAD" }) end, { desc = "Git Diff (Hunks)" }, { "fzf-lua" })
+map("n", "<leader>gd", function() require("fzf-lua").git_diff({ commit = "HEAD" }) end, { desc = "Git Diff (Hunks)" },
+	{ "fzf-lua" })
 map("n", "<leader>gf", function() require("fzf-lua").git_bcommits() end, { desc = "Git Log File" }, { "fzf-lua" })
 
 -- ========================================================
@@ -1095,9 +1195,11 @@ map("n", '<leader>s"', function() require("fzf-lua").registers() end, { desc = "
 map("n", "<leader>sc", function() require("fzf-lua").command_history() end, { desc = "Command History" }, { "fzf-lua" })
 map("n", "<leader>sC", function() require("fzf-lua").commands() end, { desc = "Commands" }, { "fzf-lua" })
 map("n", "<leader>sd", function() require("fzf-lua").diagnostics_workspace() end, { desc = "Diagnostics" }, { "fzf-lua" })
-map("n", "<leader>sD", function() require("fzf-lua").diagnostics_document() end, { desc = "Buffer Diagnostics" }, { "fzf-lua" })
+map("n", "<leader>sD", function() require("fzf-lua").diagnostics_document() end, { desc = "Buffer Diagnostics" },
+	{ "fzf-lua" })
 map("n", "<leader>sg", function() require("fzf-lua").live_grep() end, { desc = "Grep Root Files" }, { "fzf-lua" })
-map("n", "<leader>sG", function() require("fzf-lua").live_grep({ grep_open_files = true }) end, { desc = "Grep Open Buffers" }, { "fzf-lua" })
+map("n", "<leader>sG", function() require("fzf-lua").live_grep({ grep_open_files = true }) end,
+	{ desc = "Grep Open Buffers" }, { "fzf-lua" })
 map("n", "<leader>sh", function() require("fzf-lua").helptags() end, { desc = "Help Pages" }, { "fzf-lua" })
 -- map("n", "<leader>sH", function() require("fzf-lua").highlights() end, { desc = "Highlights" }, { "fzf-lua" })
 map("n", "<leader>sj", function() require("fzf-lua").jumps() end, { desc = "Jumps" }, { "fzf-lua" })
@@ -1115,21 +1217,24 @@ map("n", "<leader>sS", function() require("fzf-lua").lsp_workspace_symbols() end
 
 -- ========================================================
 -- Flash
-map({ "n", "o", "x" }, "s", function() require("flash").jump() end, { desc = "Flash" }, { "flash" })
-map({ "n", "o", "x" }, "S", function() require("flash").treesitter() end, { desc = "Flash Treesitter" }, { "flash" })
-map("o", "r", function() require("flash").remote() end, { desc = "Remote Flash" }, { "flash" })
-map({ "o", "x" }, "R", function() require("flash").treesitter_search() end, { desc = "Treesitter Search" }, { "flash" })
-map("c", "<c-s>", function() require("flash").toggle() end, { desc = "Toggle Flash Search" }, { "flash" })
+-- map({ "n", "o", "x" }, "s", function() require("flash").jump() end, { desc = "Flash" }, { "flash" })
+-- map({ "n", "o", "x" }, "S", function() require("flash").treesitter() end, { desc = "Flash Treesitter" }, { "flash" })
+-- map("o", "r", function() require("flash").remote() end, { desc = "Remote Flash" }, { "flash" })
+-- map({ "o", "x" }, "R", function() require("flash").treesitter_search() end, { desc = "Treesitter Search" }, { "flash" })
+-- map("c", "<c-s>", function() require("flash").toggle() end, { desc = "Toggle Flash Search" }, { "flash" })
 
 -- ========================================================
 -- Diagnostics
 map("n", "<leader>cd", vim.diagnostic.open_float, { desc = "Line Diagnostics" })
+
 map("n", "]d", function() vim.diagnostic.jump({ count = 1, float = true }) end, { desc = "Next Diagnostic" })
 map("n", "[d", function() vim.diagnostic.jump({ count = -1, float = true }) end, { desc = "Prev Diagnostic" })
+
 map("n", "]e", function() vim.diagnostic.jump({ count = 1, severity = vim.diagnostic.severity.ERROR, float = true }) end,
 	{ desc = "Next Error" })
 map("n", "[e", function() vim.diagnostic.jump({ count = -1, severity = vim.diagnostic.severity.ERROR, float = true }) end,
 	{ desc = "Prev Error" })
+
 map("n", "]w", function() vim.diagnostic.jump({ count = 1, severity = vim.diagnostic.severity.WARN, float = true }) end,
 	{ desc = "Next Warning" })
 map("n", "[w", function() vim.diagnostic.jump({ count = -1, severity = vim.diagnostic.severity.WARN, float = true }) end,
@@ -1139,23 +1244,16 @@ map("n", "[w", function() vim.diagnostic.jump({ count = -1, severity = vim.diagn
 -- Quickfix/Loclist/Trouble
 map("n", "[q", "<cmd>cprev<cr>", { desc = "Previous Quickfix" })
 map("n", "]q", "<cmd>cnext<cr>", { desc = "Next Quickfix" })
+
 map("n", "<leader>xl", "<cmd>lopen<cr>", { desc = "Location List" })
 map("n", "<leader>xq", "<cmd>copen<cr>", { desc = "Quickfix List" })
-map("n", "<leader>xx", "<cmd>Trouble diagnostics toggle<cr>", { desc = "Diagnostics (Trouble)" }, { "trouble" })
-map("n", "<leader>xX", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>", { desc = "Buffer Diagnostics (Trouble)" },
-	{ "trouble" })
+-- map("n", "<leader>xx", "<cmd>Trouble diagnostics toggle<cr>", { desc = "Diagnostics (Trouble)" }, { "trouble" })
+-- map("n", "<leader>xX", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>", { desc = "Buffer Diagnostics (Trouble)" },
+-- 	{ "trouble" })
 -- map("n", "<leader>cs", "<cmd>Trouble symbols toggle<cr>", { desc = "Symbols (Trouble)" }, { "trouble" })
 -- map("n", "<leader>cS", "<cmd>Trouble lsp toggle<cr>", { desc = "LSP references/definitions/... (Trouble)" }, { "trouble" })
 -- map("n", "<leader>xL", "<cmd>Trouble loclist toggle<cr>", { desc = "Location List (Trouble)" }, { "trouble" })
 -- map("n", "<leader>xQ", "<cmd>Trouble qflist toggle<cr>", { desc = "Quickfix List (Trouble)" }, { "trouble" })
-
--- ========================================================
--- Noice
-map("n", "<leader>nd", function() require("noice").cmd("dismiss") end, { desc = "Dismiss All" }, { "noice" })
-map("n", "<leader>nh", function() require("noice").cmd("history") end, { desc = "Noice History" }, { "noice" })
-map("n", "<leader>nl", function() require("noice").cmd("last") end, { desc = "Noice Last Message" }, { "noice" })
-map("n", "<leader>nu", function() require("noice").cmd("dismiss") end, { desc = "Dismiss All Notifications" },
-	{ "noice" })
 
 -- ========================================================
 -- DAP (Debug)
@@ -1255,46 +1353,21 @@ vim.api.nvim_create_user_command("PackClean", function()
 	end
 end, { desc = "Remove unused plugins from pack/core/opt" })
 
---------------------------------------------------------------------------------
--- Command to install all configured LSP servers: :MasonInstallAll
---------------------------------------------------------------------------------
-vim.api.nvim_create_user_command("MasonInstallAll", function()
-	local registry = require("mason-registry")
-	for _, name in ipairs(mason_ensure_installed) do
-		local ok, pkg = pcall(registry.get_package, name)
-		if ok and not pkg:is_installed() then
-			vim.notify("Mason: Installing " .. name, vim.log.levels.INFO)
-			pkg:install()
-		end
-	end
-end, { desc = "Install all configured Mason packages" })
 
 --------------------------------------------------------------------------------
--- Keeping Vim transparent
+-- Plugin Update Command
 --------------------------------------------------------------------------------
--- vim.api.nvim_create_autocmd("ColorScheme", {
--- 	callback = function()
--- 		vim.api.nvim_set_hl(0, "Normal", { bg = "NONE", ctermbg = "NONE" })
--- 		vim.api.nvim_set_hl(0, "NormalNC", { bg = "NONE", ctermbg = "NONE" })
--- 		vim.api.nvim_set_hl(0, "EndOfBuffer", { bg = "NONE", ctermbg = "NONE" })
--- 	end,
--- })
---
--- vim.api.nvim_create_autocmd("FocusLost", {
--- 	callback = function()
--- 		vim.cmd("mode")
--- 	end,
--- })
---
--- vim.api.nvim_create_autocmd("FocusGained", {
--- 	callback = function()
--- 		vim.cmd("mode")
--- 	end,
--- })
---
--- -- Applique aussi au démarrage avec un léger délai
--- vim.defer_fn(function()
--- 	vim.api.nvim_set_hl(0, "Normal", { bg = "NONE" })
--- 	vim.api.nvim_set_hl(0, "NormalNC", { bg = "NONE" })
--- 	vim.api.nvim_set_hl(0, "EndOfBuffer", { bg = "NONE" })
--- end, 1)
+vim.api.nvim_create_user_command("PackUpdate", function()
+	vim.pack.update()
+end, { desc = "Update all managed plugins" })
+
+-- =============================================================================
+-- =============================================================================
+-- THIS IS THE END
+-- =============================================================================
+-- =============================================================================
+
+vim.defer_fn(function()
+	local ms = (vim.loop.hrtime() - start_time) / 1e6
+	vim.notify(string.format("Startup: %.0fms", ms))
+end, 0)
