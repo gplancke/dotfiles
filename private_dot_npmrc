@@ -1,5 +1,5 @@
 prefix=/Users/georgio/.local/share/node_modules
 @happyend:registry=https://npm.pkg.github.com
 @Happyend:registry=https://npm.pkg.github.com
-//registry.npmjs.org/:_authToken=${NPM_PKG_SECRET}
+//registry.npmjs.org/:_authToken=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
 //npm.pkg.github.com/:_authToken=${GH_PKG_SECRET}

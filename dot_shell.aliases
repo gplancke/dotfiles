@@ -6,6 +6,7 @@
 TMUX_POPUP_NAME="popup-session"
 
 alias vim='nvim'
+alias fvim='NVIM_APPNAME=fzfvim nvim'
 alias lvim='NVIM_APPNAME=lazyvim nvim'
 alias mvim='NVIM_APPNAME=minivim nvim'
 
@@ -355,21 +356,21 @@ chez() {
   if [ "$1" = "re-add" ]; then
     local brewfile="$HOME/.config/brew/Brewfile"
     local tmpfile="$HOME/.config/brew/Brewfile.new"
-    
+
     mkdir -p "$HOME/.config/brew"
     brew bundle dump --brews --taps --describe --force --file "$tmpfile"
-    
+
     if [ -f "$brewfile" ]; then
       # Extract all brew/tap lines from current file (ignoring if/end blocks)
       local current_packages
       current_packages=$(grep -E '^[[:space:]]*(brew|tap) "' "$brewfile" | sed 's/^[[:space:]]*//' | sort)
       local new_packages
       new_packages=$(grep -E '^(brew|tap) "' "$tmpfile" | sort)
-      
+
       local added removed
       added=$(comm -23 <(echo "$new_packages") <(echo "$current_packages"))
       removed=$(comm -13 <(echo "$new_packages") <(echo "$current_packages"))
-      
+
       # Auto-remove uninstalled packages from Brewfile
       if [ -n "$removed" ]; then
         echo "=== Removing uninstalled packages ==="
@@ -382,13 +383,13 @@ chez() {
         done <<< "$removed"
         echo ""
       fi
-      
+
       # Auto-add new packages to the right section
       if [ -n "$added" ]; then
         echo "=== Adding new packages ==="
         while IFS= read -r pkg; do
           [ -z "$pkg" ] && continue
-          
+
           # Check if it's a tap or brew
           if [[ "$pkg" =~ ^tap ]]; then
             # For taps, check if any formula from this tap is macOS-only
@@ -402,16 +403,16 @@ $pkg
             # Extract formula name
             local formula
             formula=$(echo "$pkg" | sed 's/brew "\([^"]*\)".*/\1/')
-            
+
             # Query brew for platform info
             local is_macos_only=false
             local json_info
             json_info=$(brew info --json=v2 "$formula" 2>/dev/null)
-            
+
             if [ -n "$json_info" ]; then
               local bottle_keys
               bottle_keys=$(echo "$json_info" | jq -r '.formulae[0].bottle.stable.files // {} | keys[]' 2>/dev/null)
-              
+
               if echo "$bottle_keys" | grep -qE "(linux|^all$)"; then
                 is_macos_only=false
               else
@@ -421,7 +422,7 @@ $pkg
               # Can't query (maybe a cask or tap formula) - default to macOS
               is_macos_only=true
             fi
-            
+
             if [ "$is_macos_only" = true ]; then
               echo "  + $pkg (macOS-only)"
               # Insert before the "end" line (inside if OS.mac? block), indented
@@ -439,9 +440,9 @@ $pkg
         done <<< "$added"
         echo ""
       fi
-      
+
       rm -f "$tmpfile"
-      
+
       if [ -z "$added" ] && [ -z "$removed" ]; then
         echo "Brewfile is up to date."
       else

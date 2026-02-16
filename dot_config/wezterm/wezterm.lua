@@ -3,7 +3,7 @@ local wezterm = require("wezterm")
 local config = wezterm.config_builder()
 
 -- Theming... Catputccin is now part of the default themes
-config.color_scheme = "Catppuccin Macchiato"
+config.color_scheme = "tinted-theming"
 
 -- Tab Bar
 config.tab_bar_at_bottom = false
@@ -14,7 +14,7 @@ config.window_decorations = "RESIZE"
 
 -- Font
 config.font =
-	wezterm.font("FiraMono Nerd Font Mono", { weight = "Bold", stretch = "Normal", style = "Normal" })
+		wezterm.font("FiraMono Nerd Font Mono", { weight = "Bold", stretch = "Normal", style = "Normal" })
 config.font_size = 11.0
 config.line_height = 1
 config.cell_width = 0.8
@@ -32,9 +32,9 @@ local function is_inside_vim(pane)
 		"sh",
 		"-c",
 		"ps -o state= -o comm= -t"
-			.. wezterm.shell_quote_arg(tty)
-			.. " | "
-			.. "grep -iqE '^[^TXZ ]+ +(\\S+\\/)?g?(view|l?n?vim?x?)(diff)?$'",
+		.. wezterm.shell_quote_arg(tty)
+		.. " | "
+		.. "grep -iqE '^[^TXZ ]+ +(\\S+\\/)?g?(view|l?n?vim?x?)(diff)?$'",
 	})
 
 	return success
@@ -79,17 +79,17 @@ config.keys = {
 		mods = "LEADER",
 		action = wezterm.action({ SplitHorizontal = { domain = "CurrentPaneDomain" } }),
 	},
-	{ key = "o", mods = "LEADER", action = "TogglePaneZoomState" },
-	{ key = "z", mods = "LEADER", action = "TogglePaneZoomState" },
-	{ key = "c", mods = "LEADER", action = wezterm.action({ SpawnTab = "CurrentPaneDomain" }) },
+	{ key = "o", mods = "LEADER",      action = "TogglePaneZoomState" },
+	{ key = "z", mods = "LEADER",      action = "TogglePaneZoomState" },
+	{ key = "c", mods = "LEADER",      action = wezterm.action({ SpawnTab = "CurrentPaneDomain" }) },
 	bind_if(is_outside_vim, "h", "CTRL", a.ActivatePaneDirection("Left")),
 	bind_if(is_outside_vim, "l", "CTRL", a.ActivatePaneDirection("Right")),
 	bind_if(is_outside_vim, "k", "CTRL", a.ActivatePaneDirection("Down")),
 	bind_if(is_outside_vim, "j", "CTRL", a.ActivatePaneDirection("Up")),
-	{ key = "h", mods = "LEADER", action = wezterm.action({ ActivatePaneDirection = "Left" }) },
-	{ key = "j", mods = "LEADER", action = wezterm.action({ ActivatePaneDirection = "Down" }) },
-	{ key = "k", mods = "LEADER", action = wezterm.action({ ActivatePaneDirection = "Up" }) },
-	{ key = "l", mods = "LEADER", action = wezterm.action({ ActivatePaneDirection = "Right" }) },
+	{ key = "h", mods = "LEADER",       action = wezterm.action({ ActivatePaneDirection = "Left" }) },
+	{ key = "j", mods = "LEADER",       action = wezterm.action({ ActivatePaneDirection = "Down" }) },
+	{ key = "k", mods = "LEADER",       action = wezterm.action({ ActivatePaneDirection = "Up" }) },
+	{ key = "l", mods = "LEADER",       action = wezterm.action({ ActivatePaneDirection = "Right" }) },
 	{ key = "H", mods = "LEADER|SHIFT", action = wezterm.action({ AdjustPaneSize = { "Left", 5 } }) },
 	{ key = "J", mods = "LEADER|SHIFT", action = wezterm.action({ AdjustPaneSize = { "Down", 5 } }) },
 	{ key = "K", mods = "LEADER|SHIFT", action = wezterm.action({ AdjustPaneSize = { "Up", 5 } }) },

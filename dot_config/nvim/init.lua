@@ -7,7 +7,7 @@
 local start_time = vim.loop.hrtime()
 
 --------------------------------------------------------------------------------
--- Globals
+--Globals
 --------------------------------------------------------------------------------
 
 local plugins = {
@@ -27,10 +27,10 @@ local plugins = {
 	"https://github.com/kylechui/nvim-surround",
 
 	-- Nice to have utilities
-	"https://github.com/folke/flash.nvim",
 	"https://github.com/gbprod/yanky.nvim",
 	"https://github.com/folke/which-key.nvim",
 	"https://github.com/stevearc/quicker.nvim",
+	"https://github.com/folke/flash.nvim",
 
 	-- UI enhancements
 	"https://github.com/folke/noice.nvim",
@@ -222,6 +222,17 @@ vim.g.gitblame_ignored_filetypes = no_blame_ft
 
 local augroup = vim.api.nvim_create_augroup("UserAutocommands", { clear = true })
 
+-- augroup AutoEqualizeSplits
+--   autocmd!
+--   autocmd FocusGained,FocusLost,VimResized * wincmd =
+-- augroup END
+vim.api.nvim_create_autocmd({ "FocusGained", "FocusLost", "VimResized" }, {
+	group = augroup,
+	callback = function()
+		vim.api.nvim_command("wincmd =")
+	end
+})
+
 --------------------------------------------------------------------------------
 -- Cursor Column
 --------------------------------------------------------------------------------
@@ -251,7 +262,7 @@ vim.api.nvim_create_autocmd({ "WinLeave", "BufLeave", "InsertEnter" }, {
 		vim.wo.cursorline = false
 	end,
 })
-
+---
 --------------------------------------------------------------------------------
 -- Hook for post-install/update actions
 --------------------------------------------------------------------------------
@@ -1022,14 +1033,8 @@ map("v", ">", ">gv", { desc = "Indent" })
 -- Clear search and flash with <esc>
 map("n", "<Esc>", function()
 	vim.cmd("nohlsearch")
-	-- Clear flash highlights (only if the namespace exists)
-	-- local flash_ns = vim.api.nvim_get_namespaces()["flash"]
-	-- if flash_ns then
-	-- 	for _, buf in ipairs(vim.api.nvim_list_bufs()) do
-	-- 		pcall(vim.api.nvim_buf_clear_namespace, buf, flash_ns, 0, -1)
-	-- 	end
-	-- end
-end, { desc = "Clear hlsearch", silent = true })
+	pcall(function() require("noice").cmd("dismiss") end)
+end, { desc = "Clear search and notifications", silent = true })
 
 -- ========================================================
 -- Save file
@@ -1231,24 +1236,22 @@ end, { desc = "Toggle Inlay Hints" })
 --------------------------------------------------------------------------------
 vim.api.nvim_create_user_command("PackClean", function()
 	local pack_path = vim.fn.stdpath("data") .. "/site/pack/core/opt"
-	local lock_path = vim.fn.stdpath("config") .. "/nvim-pack-lock.json"
 	local installed = vim.fn.globpath(pack_path, "*", false, true)
 
-	-- Extract plugin names from the plugins table
+	-- Extract active plugin names from the plugins table
 	local active = {}
 	for _, spec in ipairs(plugins) do
 		local url = type(spec) == "string" and spec or (spec.src or spec[1])
 		local name = spec.name or url:match("([^/]+)$")
-		if name then
-			active[name] = true
-		end
+		if name then active[name] = true end
 	end
 
+	-- Find plugins on disk that are not in the active list
 	local to_remove = {}
 	for _, path in ipairs(installed) do
 		local name = vim.fn.fnamemodify(path, ":t")
 		if not active[name] then
-			table.insert(to_remove, { name = name, path = path })
+			table.insert(to_remove, name)
 		end
 	end
 
@@ -1257,49 +1260,15 @@ vim.api.nvim_create_user_command("PackClean", function()
 		return
 	end
 
-	local names = vim.tbl_map(function(item) return item.name end, to_remove)
 	local confirm = vim.fn.confirm(
-		"Remove " .. #to_remove .. " unused plugin(s)?\n" .. table.concat(names, "\n"),
+		"Remove " .. #to_remove .. " unused plugin(s)?\n" .. table.concat(to_remove, "\n"),
 		"&Yes\n&No",
 		2
 	)
 
 	if confirm == 1 then
-		-- Remove plugin directories
-		for _, item in ipairs(to_remove) do
-			vim.fn.delete(item.path, "rf")
-			vim.notify("Removed: " .. item.name, vim.log.levels.INFO)
-		end
-
-		-- Update lockfile to remove unused plugins
-		if vim.fn.filereadable(lock_path) == 1 then
-			local lock_content = vim.fn.readfile(lock_path)
-			local ok, lock_data = pcall(vim.json.decode, table.concat(lock_content, "\n"))
-			if ok and lock_data and lock_data.plugins then
-				for _, item in ipairs(to_remove) do
-					lock_data.plugins[item.name] = nil
-				end
-				-- Write with proper formatting (vim.pack expects specific format)
-				local lines = { "{", '  "plugins": {' }
-				local plugin_lines = {}
-				for name, data in pairs(lock_data.plugins) do
-					local parts = { string.format('    "%s": {', name) }
-					for k, v in pairs(data) do
-						table.insert(parts, string.format('      "%s": "%s",', k, v))
-					end
-					parts[#parts] = parts[#parts]:gsub(",$", "") -- remove trailing comma
-					table.insert(parts, "    }")
-					table.insert(plugin_lines, table.concat(parts, "\n"))
-				end
-				table.insert(lines, table.concat(plugin_lines, ",\n"))
-				table.insert(lines, "  }")
-				table.insert(lines, "}")
-				vim.fn.writefile(vim.split(table.concat(lines, "\n"), "\n"), lock_path)
-				vim.notify("Updated lockfile", vim.log.levels.INFO)
-			end
-		end
-
-		vim.notify("Cleanup complete! Restart nvim to apply changes.", vim.log.levels.INFO)
+		vim.pack.del(to_remove, { force = true })
+		vim.notify("Cleanup complete! Removed: " .. table.concat(to_remove, ", "), vim.log.levels.INFO)
 	end
 end, { desc = "Remove unused plugins from pack/core/opt" })
 
@@ -1316,3 +1285,33 @@ vim.api.nvim_create_user_command("MasonInstallAll", function()
 		end
 	end
 end, { desc = "Install all configured Mason packages" })
+
+--------------------------------------------------------------------------------
+-- Keeping Vim transparent
+--------------------------------------------------------------------------------
+vim.api.nvim_create_autocmd("ColorScheme", {
+	callback = function()
+		vim.api.nvim_set_hl(0, "Normal", { bg = "NONE", ctermbg = "NONE" })
+		vim.api.nvim_set_hl(0, "NormalNC", { bg = "NONE", ctermbg = "NONE" })
+		vim.api.nvim_set_hl(0, "EndOfBuffer", { bg = "NONE", ctermbg = "NONE" })
+	end,
+})
+
+vim.api.nvim_create_autocmd("FocusLost", {
+	callback = function()
+		vim.cmd("mode")
+	end,
+})
+
+vim.api.nvim_create_autocmd("FocusGained", {
+	callback = function()
+		vim.cmd("mode")
+	end,
+})
+
+-- Applique aussi au démarrage avec un léger délai
+vim.defer_fn(function()
+	vim.api.nvim_set_hl(0, "Normal", { bg = "NONE" })
+	vim.api.nvim_set_hl(0, "NormalNC", { bg = "NONE" })
+	vim.api.nvim_set_hl(0, "EndOfBuffer", { bg = "NONE" })
+end, 1)

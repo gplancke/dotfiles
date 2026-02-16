@@ -6,6 +6,13 @@ themes-dir = "themes/ghostty"
 hook = "mkdir -p ~/.config/ghostty/themes && cp -f %f ~/.config/ghostty/themes/tinted-theming"
 supported-systems = ["base16", "base24"]
 
+[[items]]
+path = "https://github.com/tinted-theming/tinted-terminal"
+name = "tinted-wezterm"
+themes-dir = "themes/wezterm"
+hook = "mkdir -p ~/.config/wezterm/colors && cp -f %f ~/.config/wezterm/colors/tinted-theming"
+supported-systems = ["base16", "base24"]
+
 # [[items]]
 # path = "https://github.com/tinted-theming/tinted-terminal"
 # name = "tinted-terminal"
@@ -23,6 +30,12 @@ hook = ". %f"
 path = "https://github.com/tinted-theming/base16-vim"
 name = "base16-vim"
 themes-dir = "colors"
+
+[[items]]
+path = "https://github.com/tinted-theming/base16-helix"
+name = "base16-helix"
+hook = "mkdir -p ~/.config/helix/themes && cp -f %f ~/.config/helix/themes/tinted.toml"
+themes-dir = "themes"
 
 [[items]]
 path = "https://github.com/tinted-theming/tinted-tmux"

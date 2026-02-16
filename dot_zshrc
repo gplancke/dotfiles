@@ -70,6 +70,14 @@ if [ -f ~/.config/antigen/antigen.zsh ]; then
 fi
 
 # ##############################
+# Behavior inside Vim
+# ##############################
+# Vim
+if [[ -n "$VIM" || -n "$VIMRUNTIME" ]]; then
+    bindkey -e
+fi
+
+# ##############################
 # Launch nushell...
 # ##############################
 # nu
@@ -80,8 +88,6 @@ fi
 # if [[ -z "$TMUX" ]] && [[ "$TERM_PROGRAM" != "vscode" ]] && [[ "$TERM_PROGRAM" != "cursor" ]]; then
 # 	tm main
 # fi
-[ -f $HOME/.fzf.colors ] && source $HOME/.fzf.colors
-
 
 ################################################################################
 ################################################################################
