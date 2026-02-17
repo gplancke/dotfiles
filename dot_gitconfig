@@ -6,34 +6,30 @@
 [pull]
   rebase = true
 [merge]
-  tool = nvim
+	tool = vim
   conflictstyle = diff3
 [mergetool "vscode"]
   cmd = code --wait --merge $REMOTE $LOCAL $BASE $MERGED
-[mergetool "nvim"]
-	cmd = nvim -n -c "DiffviewOpen" "$MERGE"
-[mergetool "fugitive"]
-  cmd = nvim -f -c "Gvdiffsplit!" "$MERGED"
+[mergetool "vim"]
+  cmd = env NVIM_APPNAME=fzfvim nvim -n -f -c "Gvdiffsplit!" "$MERGED"
 [diff]
-  tool = nvimdiff
+  tool = vim
   renameLimit = 10000
   algorithm = patience
 [difftool]
-  tool = nvimdiffview
+  tool = vim
   prompt = false
 [difftool "vscode"]
   cmd = code --wait --diff $LOCAL $REMOTE
-[difftool "nvimdiff"]
-  cmd =  nvim -d $LOCAL $REMOTE
-[difftool "nvimdiffview"]
-  cmd =  nvim -n -c "DiffviewOpen" $LOCAL $REMOTE
+[difftool "vim"]
+  cmd = env NVIM_APPNAME=fzfvim nvim -d -n $LOCAL $REMOTE
 [filter "lfs"]
   clean = git-lfs clean -- %f
   smudge = git-lfs smudge -- %f
   process = git-lfs filter-process
   required = true
 [core]
-  editor = nvim
+  editor = env NVIM_APPNAME=fzfvim nvim
 	# editor = code --wait
   pager = less
   excludesfile = /Users/georgio/.config/git/.gitignore

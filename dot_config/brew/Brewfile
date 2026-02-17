@@ -79,6 +79,7 @@ tap "antoniorodr/memo"
 tap "marcus/tap"
 tap "steipete/tap"
 tap "yakitrak/yakitrak"
+brew "difi"
 # macOS-only packages
 if OS.mac?
   tap "koekeishiya/formulae"

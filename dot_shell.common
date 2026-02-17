@@ -24,7 +24,7 @@ fi
 ##########################
 # Exports
 ##########################
-export EDITOR=nvim
+export EDITOR="nvim"
 export XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-$HOME/.config}
 export WORK_DIR="$HOME/Workspace/Projects"
 

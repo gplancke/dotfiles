@@ -5,8 +5,8 @@
 ##########################
 TMUX_POPUP_NAME="popup-session"
 
-alias vim='nvim'
-alias fvim='NVIM_APPNAME=fzfvim nvim'
+alias vim="$EDITOR"
+alias ovim='NVIM_APPNAME=ovim nvim'
 alias lvim='NVIM_APPNAME=lazyvim nvim'
 alias mvim='NVIM_APPNAME=minivim nvim'
 
