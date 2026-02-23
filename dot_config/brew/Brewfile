@@ -80,6 +80,8 @@ tap "marcus/tap"
 tap "steipete/tap"
 tap "yakitrak/yakitrak"
 brew "difi"
+brew "pdftk-java"
+tap "aaronraimist/tap"
 # macOS-only packages
 if OS.mac?
   tap "koekeishiya/formulae"
@@ -108,4 +110,6 @@ if OS.mac?
   brew "steipete/tap/summarize"
   brew "steipete/tap/wacli"
   brew "yakitrak/yakitrak/obsidian-cli"
+  brew "aaronraimist/tap/gomuks"
+  brew "terminal-notifier"
 end

@@ -11,7 +11,7 @@
 [mergetool "vscode"]
   cmd = code --wait --merge $REMOTE $LOCAL $BASE $MERGED
 [mergetool "vim"]
-  cmd = env NVIM_APPNAME=fzfvim nvim -n -f -c "Gvdiffsplit!" "$MERGED"
+  cmd = nvim -n -f -c "Gvdiffsplit!" "$MERGED"
 [diff]
   tool = vim
   renameLimit = 10000
@@ -22,7 +22,7 @@
 [difftool "vscode"]
   cmd = code --wait --diff $LOCAL $REMOTE
 [difftool "vim"]
-  cmd = env NVIM_APPNAME=fzfvim nvim -d -n $LOCAL $REMOTE
+  cmd = nvim -d -n $LOCAL $REMOTE
 [filter "lfs"]
   clean = git-lfs clean -- %f
   smudge = git-lfs smudge -- %f

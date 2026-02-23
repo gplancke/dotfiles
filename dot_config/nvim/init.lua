@@ -124,6 +124,13 @@ local no_line_ft = {
 	"Avante",
 }
 
+local ts_parsers = {
+	"svelte", "typescript", "javascript", "python", "dart", "ruby", "rust",
+	"c", "cpp", "yaml", "json", "html", "css", "vue", "tsx", "zig",
+	"lua", "vim", "vimdoc", "query", "markdown", "markdown_inline",
+}
+local ts_install_dir = vim.fs.joinpath(vim.fn.stdpath("data"), "site")
+
 local lsp_servers = {
 	"lua_ls",
 	"vtsls",
@@ -287,22 +294,54 @@ vim.api.nvim_create_autocmd("ColorScheme", {
 --------------------------------------------------------------------------------
 -- Cursor Line (only in active window and for certain filetypes)
 --------------------------------------------------------------------------------
-vim.api.nvim_create_autocmd({ "WinEnter", "BufEnter", "InsertLeave" }, {
+vim.api.nvim_create_autocmd({ "WinEnter", "BufEnter", "InsertLeave", "FocusGained" }, {
 	group = augroup,
 	callback = function()
 		if not vim.tbl_contains(no_cursor_ft, vim.bo.filetype) then
 			vim.wo.cursorline = true
+			vim.wo.cursorcolumn = true
 		end
 	end,
 })
 
-vim.api.nvim_create_autocmd({ "WinLeave", "BufLeave", "InsertEnter" }, {
+vim.api.nvim_create_autocmd({ "WinLeave", "BufLeave", "InsertEnter", "FocusLost" }, {
 	group = augroup,
 	callback = function()
 		vim.wo.cursorline = false
+		vim.wo.cursorcolumn = false
 	end,
 })
----
+
+--------------------------------------------------------------------------------
+-- Breadcrumbs in cmdline area when idle
+--------------------------------------------------------------------------------
+do
+	local last_cmd_time = 0
+
+	vim.api.nvim_create_autocmd("CmdlineLeave", {
+		group = vim.api.nvim_create_augroup("NavicCmdline", { clear = true }),
+		callback = function()
+			last_cmd_time = vim.uv.hrtime()
+		end,
+	})
+
+	vim.api.nvim_create_autocmd("CursorHold", {
+		group = "NavicCmdline",
+		callback = function()
+			-- Don't overwrite recent command output (1s grace period)
+			if (vim.uv.hrtime() - last_cmd_time) / 1e9 < 1 then return end
+
+			local ok, navic = pcall(require, "nvim-navic")
+			if ok and navic.is_available() then
+				local loc = navic.get_location()
+				if loc and loc ~= "" then
+					vim.api.nvim_echo({ { loc, "Comment" } }, false, {})
+				end
+			end
+		end,
+	})
+end
+
 --------------------------------------------------------------------------------
 -- Hook for post-install/update actions
 --------------------------------------------------------------------------------
@@ -475,14 +514,8 @@ setup('nvim-web-devicons')
 setup('mini.bufremove')
 
 -- Treesitter (syntax highlighting, indentation, folding)
-setup("nvim-treesitter", {
-	install_dir = vim.fs.joinpath(vim.fn.stdpath("data"), "site"),
-}, function(ts)
-	ts.install({
-		"svelte", "typescript", "javascript", "python", "dart", "ruby", "rust",
-		"c", "cpp", "yaml", "json", "html", "css", "vue", "tsx", "zig",
-		"lua", "vim", "vimdoc", "query", "markdown", "markdown_inline",
-	})
+setup("nvim-treesitter", { install_dir = ts_install_dir }, function(ts)
+	ts.install(ts_parsers)
 end)
 
 -- fzf-lua (fuzzy finder)
@@ -713,19 +746,6 @@ pcall(function()
 		return ok and mod or nil
 	end)()
 
-	-- Navic (breadcrumbs) - store reference for later use
-	local navic = (function()
-		local ok, mod = pcall(require, "nvim-navic")
-		return ok and mod or nil
-	end)()
-
-	local function breadcrumbs()
-		if navic and navic.is_available() then
-			return navic.get_location()
-		end
-		return ""
-	end
-
 	local lualine_c_section = {}
 
 	if git_blame then
@@ -798,10 +818,6 @@ pcall(function()
 			end,
 		},
 	}
-
-	if navic then
-		table.insert(lualine_b_section, { breadcrumbs, cond = navic.is_available })
-	end
 
 	setup("lualine", {
 		options = {
@@ -1355,6 +1371,19 @@ vim.api.nvim_create_user_command("PackUpdate", function()
 	vim.pack.update()
 end, { desc = "Update all managed plugins" })
 
+--------------------------------------------------------------------------------
+-- Resinstall treesitter parsers
+--------------------------------------------------------------------------------
+vim.api.nvim_create_user_command("TSReinstall", function()
+	local parser_dir = vim.fs.joinpath(ts_install_dir, "parser")
+	local files = vim.fn.glob(parser_dir .. "/*.so", false, true)
+	for _, f in ipairs(files) do
+		vim.uv.fs_unlink(f)
+	end
+	vim.notify("Deleted " .. #files .. " parsers. Reinstalling...", vim.log.levels.INFO)
+	require("nvim-treesitter").install(ts_parsers)
+end, { desc = "Delete and reinstall all Treesitter parsers" })
+
 -- =============================================================================
 -- =============================================================================
 -- THIS IS THE END
@@ -1364,4 +1393,7 @@ end, { desc = "Update all managed plugins" })
 vim.defer_fn(function()
 	local ms = (vim.loop.hrtime() - start_time) / 1e6
 	vim.notify(string.format("Startup: %.0fms", ms))
+	vim.defer_fn(function()
+		vim.api.nvim_echo({ { "" } }, false, {})
+	end, 3000)
 end, 0)
