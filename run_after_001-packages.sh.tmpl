@@ -47,6 +47,16 @@ if [ "$INSTALL_MODE" != "container" ]; then
 fi
 
 #############################################
+# Nix flake install (skip in container mode)
+#############################################
+if [ "$INSTALL_MODE" != "container" ]; then
+  FLAKE_DIR="${HOME}/.config/nix"
+  if command -v nix >/dev/null 2>&1 && [ -f "${FLAKE_DIR}/flake.nix" ]; then
+    nix profile install "${FLAKE_DIR}#homies" --impure 2>&1 | tail -5 || true
+  fi
+fi
+
+#############################################
 # Shell installers
 #############################################
 INSTALLERS="${HOME}/.shell.installers"
