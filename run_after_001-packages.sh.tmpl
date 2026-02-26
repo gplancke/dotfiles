@@ -12,55 +12,55 @@ INSTALL_MODE="{{ .installMode }}"
 
 export PATH="${HOME}/.local/bin:${PATH}"
 
-# Homebrew
-if [ -d /opt/homebrew ]; then
-  eval "$(/opt/homebrew/bin/brew shellenv)"
-elif [ -d /usr/local/Homebrew ]; then
-  eval "$(/usr/local/bin/brew shellenv)"
-elif [ -d /home/linuxbrew/.linuxbrew ]; then
-  eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-fi
-
-# Mise
-if [ -f "${HOME}/.local/bin/mise" ]; then
-  eval "$("${HOME}/.local/bin/mise" activate bash)"
-fi
-
 #############################################
 # Brew bundle (skip in container mode)
 #############################################
-if [ "$INSTALL_MODE" != "container" ]; then
-  BREWFILE="${HOME}/.config/brew/Brewfile"
-  if command -v brew >/dev/null 2>&1 && [ -f "$BREWFILE" ]; then
-    brew bundle --file="$BREWFILE" --quiet --no-lock 2>&1 | grep -i "^using\|^installing\|error\|fail" || true
-  fi
-fi
+# Homebrew
+# if [ -d /opt/homebrew ]; then
+#   eval "$(/opt/homebrew/bin/brew shellenv)"
+# elif [ -d /usr/local/Homebrew ]; then
+#   eval "$(/usr/local/bin/brew shellenv)"
+# elif [ -d /home/linuxbrew/.linuxbrew ]; then
+#   eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+# fi
+
+# if [ "$INSTALL_MODE" != "container" ]; then
+#   BREWFILE="${HOME}/.config/brew/Brewfile"
+#   if command -v brew >/dev/null 2>&1 && [ -f "$BREWFILE" ]; then
+#     brew bundle --file="$BREWFILE" --quiet --no-lock 2>&1 | grep -i "^using\|^installing\|error\|fail" || true
+#   fi
+# fi
 
 #############################################
 # Mise install (skip in container mode)
 #############################################
-if [ "$INSTALL_MODE" != "container" ]; then
-  if command -v mise >/dev/null 2>&1; then
-    mise install --yes --quiet 2>/dev/null || true
-    mise trust --all 2>/dev/null || true
-  fi
-fi
+# Mise
+# if [ -f "${HOME}/.local/bin/mise" ]; then
+#   eval "$("${HOME}/.local/bin/mise" activate bash)"
+# fi
+
+# if [ "$INSTALL_MODE" != "container" ]; then
+#   if command -v mise >/dev/null 2>&1; then
+#     mise install --yes --quiet 2>/dev/null || true
+#     mise trust --all 2>/dev/null || true
+#   fi
+# fi
 
 #############################################
 # Nix flake install (skip in container mode)
 #############################################
-if [ "$INSTALL_MODE" != "container" ]; then
-  FLAKE_DIR="${HOME}/.config/nix"
-  if command -v nix >/dev/null 2>&1 && [ -f "${FLAKE_DIR}/flake.nix" ]; then
-    nix profile install "${FLAKE_DIR}#homies" --impure 2>&1 | tail -5 || true
-  fi
-fi
+# if [ "$INSTALL_MODE" != "container" ]; then
+#   FLAKE_DIR="${HOME}/.config/nix"
+#   if command -v nix >/dev/null 2>&1 && [ -f "${FLAKE_DIR}/flake.nix" ]; then
+#     nix profile install "${FLAKE_DIR}#homies" --impure 2>&1 | tail -5 || true
+#   fi
+# fi
 
 #############################################
 # Shell installers
 #############################################
 INSTALLERS="${HOME}/.shell.installers"
-if [ -f "$INSTALLERS" ]; then
+if [ "$INSTALL_MODE" != "container" ] && [ -f "$INSTALLERS" ]; then
   . "$INSTALLERS"
   install_zsh_manager   2>/dev/null || true
   install_tmux_manager  2>/dev/null || true
