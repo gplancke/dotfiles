@@ -103,27 +103,6 @@ export TMUX_POWERLINE_DEFAULT_FOREGROUND_COLOR='255'
 [ -d "${HOME}/.local/bin" ] && PATH="${HOME}/.local/bin:${PATH}"
 
 ##########################
-# Links
-##########################
-function setup_link() {
-	local cli_plugins="${HOME}/.docker/cli-plugins"
-	local bin="$1"
-
-	mkdir -p $cli_plugins
-
-	if which $bin >/dev/null 2>&1 && [ ! -L "${cli_plugins}/$bin" ]; then
-		local bin_path=$(which $bin)
-		ln -sf $(which "${bin}") "${cli_plugins}/${bin}"
-	fi
-}
-
-for bin in docker-buildx docker-compose docker-pussh; do
-	if [ "$MACOS" = "1" ] || [ "$LINUX" = "1" ]; then
-		setup_link $bin
-	fi
-done
-
-##########################
 # Aliases
 ##########################
 [ -f "$HOME/.shell.aliases" ] && . "$HOME/.shell.aliases"
@@ -133,4 +112,7 @@ if type install_theme_manager >/dev/null 2>&1; then
 fi
 if type install_tmux_manager >/dev/null 2>&1; then
 	install_tmux_manager
+fi
+if type install_docker_plugins >/dev/null 2>&1; then
+	install_docker_plugins
 fi

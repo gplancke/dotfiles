@@ -1,4 +1,44 @@
 #############################################
+# Install theme manager
+# Mainly base16 themes
+# However, we tend to use catpuccin as mush as we can now
+#############################################
+
+function install_theme_manager {
+  if [ ! -d "$HOME/.local/share/tinted-theming/tinty/repos" ]; then
+		if command -v tinty >/dev/null 2>&1; then
+			echo "Installing tinted-theming theme manager"
+			tinty install
+		fi
+  fi
+}
+
+
+#############################################
+# Install docker plugins
+#############################################
+
+function install_docker_plugins() {
+	function _setup_docker_link() {
+		local cli_plugins="${HOME}/.docker/cli-plugins"
+		local bin="$1"
+
+		mkdir -p $cli_plugins
+
+		if which $bin >/dev/null 2>&1 && [ ! -L "${cli_plugins}/$bin" ]; then
+			local bin_path=$(which $bin)
+			ln -sf $(which "${bin}") "${cli_plugins}/${bin}"
+		fi
+	}
+
+	for bin in docker-buildx docker-compose docker-pussh; do
+		if [ "$MACOS" = "1" ] || [ "$LINUX" = "1" ]; then
+			_setup_docker_link $bin
+		fi
+	done
+}
+
+#############################################
 # Install zsh plugin manager
 # We want to replace this with a nix flake
 #############################################
@@ -153,22 +193,6 @@ function install_flutter {
 
 
 #############################################
-# Install theme manager
-# Mainly base16 themes
-# However, we tend to use catpuccin as mush as we can now
-#############################################
-
-function install_theme_manager {
-  if [ ! -d "$HOME/.local/share/tinted-theming/tinty/repos" ]; then
-		if command -v tinty >/dev/null 2>&1; then
-			echo "Installing tinted-theming theme manager"
-			tinty install
-		fi
-  fi
-}
-
-
-#############################################
 # Individual package manager update functions
 #############################################
 
@@ -206,14 +230,6 @@ function update_nix {
 	fi
 }
 
-function update_devbox {
-	if command -v devbox >/dev/null 2>&1; then
-		echo "Updating Devbox itself..."
-		devbox version update
-		echo "Devbox updated successfully"
-	fi
-}
-
 function update_mise {
 	if command -v mise >/dev/null 2>&1; then
 		echo "Updating Mise itself..."
@@ -231,9 +247,8 @@ function update_package_managers {
 
 	# Update package managers themselves
 	update_brew
-	update_nix
-	update_devbox
 	update_mise
+	update_nix
 
 	echo "All package manager updates completed!"
 }
