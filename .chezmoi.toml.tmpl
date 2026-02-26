@@ -1,14 +1,4 @@
-{{- $installMode := "server" -}}
-{{- if hasKey . "installMode" -}}
-{{-   $installMode = .installMode -}}
-{{- else -}}
-{{-   $installMode = promptChoiceOnce . "installMode" "Select installation mode" (list "server" "desktop" "container") -}}
-{{- end -}}
-
 encryption = "age"
-
-[data]
-    installMode = {{ $installMode | quote }}
 
 [age]
     identity = "~/.config/chezmoi/key.txt"
