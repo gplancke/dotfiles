@@ -390,7 +390,7 @@ alias tmcolors='print_tmux_colors'
 #################
 
 [ -e "$HOME/.local/bin/dot.sh" ] && alias dot='$HOME/.local/bin/dot.sh'
-[ -e "$HOME/.local/share/dotty/bootstrap.sh" ] && alias dotty='$HOME/.local/share/dotty/bootsrap.sh'
+[ -e "$HOME/.local/share/dotty/bootstrap.sh" ] && alias dotty='$HOME/.local/share/dotty/bootstrap.sh'
 
 #################
 # Remaps
