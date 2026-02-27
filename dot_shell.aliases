@@ -427,7 +427,8 @@ alias devse='devbox search'
 # TUI
 #################
 
-alias ldok="DOCKER_HOST=$(docker context ls --format json | jq '. | select(.Current == true) | .DockerEndpoint') lazydocker"
+# alias ldok="DOCKER_HOST=$(docker context ls --format json | jq '. | select(.Current == true) | .DockerEndpoint') lazydocker"
+alias ldok='lazydoker'
 alias lgit='lazygit'
 
 #################
