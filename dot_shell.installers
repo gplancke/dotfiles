@@ -44,10 +44,11 @@ function install_docker_plugins() {
 #############################################
 
 function install_zsh_manager {
-  if [ ! -f "$HOME/.config/antigen/antigen.zsh" ]; then
-		echo "Installing zsh plugin manager (antigen)"
-    mkdir -p "$HOME/.config/antigen"
-    curl -L git.io/antigen > $HOME/.config/antigen/antigen.zsh
+	local antidote_dir="${XDG_DATA_HOME:-$HOME/.local/share}/antidote"
+
+  if [ ! -d "$antidote_dir" ]; then
+    echo "Installing zsh plugin manager (antidote)"
+    git clone --depth=1 https://github.com/mattmc3/antidote.git "$antidote_dir"
   fi
 }
 
