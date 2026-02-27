@@ -1,0 +1,4 @@
+ohmyzsh/ohmyzsh path:lib
+zsh-users/zsh-completions
+laurenkt/zsh-vimto
+zsh-users/zsh-syntax-highlighting kind:defer
