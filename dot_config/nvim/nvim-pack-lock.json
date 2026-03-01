@@ -9,10 +9,6 @@
       "rev": "9c80820ca77218a8d28e70075d6f44a1609911fe",
       "src": "https://github.com/saghen/blink.indent"
     },
-    "claudecode.nvim": {
-      "rev": "aa9a5cebebdbfa449c1c5ff229ba5d98e66bafed",
-      "src": "https://github.com/coder/claudecode.nvim"
-    },
     "fzf-lua": {
       "rev": "5921997472574fca3880b62949eb8679dc6f5afc",
       "src": "https://github.com/ibhagwan/fzf-lua"
