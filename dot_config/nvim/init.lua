@@ -18,28 +18,65 @@ local start_time = vim.loop.hrtime()
 --------------------------------------------------------------------------------
 
 local plugins = {
+	-- Core utilities
 	"https://github.com/nvim-lua/plenary.nvim",
 	"https://github.com/MunifTanjim/nui.nvim",
+
+	-- Navigation
 	"https://github.com/alexghergh/nvim-tmux-navigation",
+
+	-- Icons
 	"https://github.com/nvim-tree/nvim-web-devicons",
+
+	-- Colorscheme
 	"https://github.com/tinted-theming/tinted-nvim",
+
+	-- Necessary utilities
 	"https://github.com/nvim-mini/mini.bufremove",
 	"https://github.com/mg979/vim-visual-multi",
 	"https://github.com/kylechui/nvim-surround",
 	"https://github.com/ibhagwan/fzf-lua",
+
+	-- Nice to have utilities
 	"https://github.com/folke/which-key.nvim",
 	"https://github.com/stevearc/quicker.nvim",
+
+	-- UI enhancements
 	"https://github.com/nvim-lualine/lualine.nvim",
 	"https://github.com/saghen/blink.indent",
+
+	-- File explorer
 	"https://github.com/nvim-neo-tree/neo-tree.nvim",
+
+	-- Treesitter
 	"https://github.com/nvim-treesitter/nvim-treesitter",
+
+	-- Git
 	"https://github.com/lewis6991/gitsigns.nvim",
 	"https://github.com/f-person/git-blame.nvim",
-	"https://github.com/tpope/vim-fugitive",
+	"https://github.com/tpope/vim-fugitive", -- Still the goat
+
+	-- LSP extras
 	"https://github.com/SmiteshP/nvim-navic",
+
+	-- Completion (blink.cmp)
 	{ src = "https://github.com/saghen/blink.cmp", version = "main" },
+	-- (removed: copilot.lua, blink-copilot)
+
+	-- Images (kitty terminal)
+
+	-- DAP (Debug Adapter Protocol)
+	-- "https://github.com/mfussenegger/nvim-dap",
+	-- "https://github.com/rcarriga/nvim-dap-ui",
+	-- "https://github.com/nvim-neotest/nvim-nio", -- required by nvim-dap-ui
+	-- "https://github.com/theHamsta/nvim-dap-virtual-text",
+	-- "https://github.com/mxsdev/nvim-dap-vscode-js",
+	-- { src = "https://github.com/nicholasjs/vscode-js-debug", name = "vscode-js-debug" }, -- Fork that works with nvim-dap-vscode-js
+
+	-- Terminal
 	"https://github.com/akinsho/toggleterm.nvim",
-	"https://github.com/willothy/flatten.nvim",
+	-- "https://github.com/willothy/flatten.nvim",
+	-- "https://github.com/3rd/image.nvim",
 }
 
 local no_cursor_ft = {
@@ -460,22 +497,23 @@ local function setup(name, opts, config)
 end
 
 -- Flatten (prevent nested neovim - must load early)
-setup("flatten", {
-	window = { open = "alternate" },
-	hooks = {
-		should_block = function(argv)
-			return vim.tbl_contains(argv, "-b")
-		end,
-		post_open = function(_, _, _, is_blocking)
-			if is_blocking then
-				require("toggleterm").toggle(0)
-			end
-		end,
-		block_end = function()
-			require("toggleterm").toggle(0)
-		end,
-	},
-})
+-- setup("flatten", {
+-- 	window = { open = "alternate" },
+-- 	hooks = {
+-- 		should_block = function(argv)
+-- 			return vim.tbl_contains(argv, "-b")
+-- 		end,
+-- 		post_open = function(_, _, _, is_blocking)
+-- 			if is_blocking then
+-- 				require("toggleterm").toggle(0)
+-- 			end
+-- 		end,
+-- 		block_end = function()
+-- 			require("toggleterm").toggle(0)
+-- 		end,
+-- 	},
+-- })
+
 
 -- TMUX navigation
 setup("nvim-tmux-navigation", {
@@ -1151,23 +1189,17 @@ map("n", "<leader>wd", "<C-W>c", { desc = "Delete Window" })
 
 -- Terminal splits
 map("n", "<leader>wh", function()
-	vim.cmd("ToggleTerm direction=vertical")
-	vim.cmd("wincmd H")
-end, { desc = "Terminal Left" }, { "toggleterm" })
+	vim.cmd("leftabove vsplit | terminal")
+end, { desc = "Terminal Left" })
 map("n", "<leader>wj", function()
-	vim.cmd("ToggleTerm direction=horizontal")
-	vim.cmd("wincmd J")
-	vim.cmd("resize " .. math.floor(vim.o.lines / 2))
-end, { desc = "Terminal Below" }, { "toggleterm" })
+	vim.cmd("rightbelow split | terminal")
+end, { desc = "Terminal Below" })
 map("n", "<leader>wk", function()
-	vim.cmd("ToggleTerm direction=horizontal")
-	vim.cmd("wincmd K")
-	vim.cmd("resize " .. math.floor(vim.o.lines / 2))
-end, { desc = "Terminal Above" }, { "toggleterm" })
+	vim.cmd("leftabove split | terminal")
+end, { desc = "Terminal Above" })
 map("n", "<leader>wl", function()
-	vim.cmd("ToggleTerm direction=vertical")
-	vim.cmd("wincmd L")
-end, { desc = "Terminal Right" }, { "toggleterm" })
+	vim.cmd("rightbelow vsplit | terminal")
+end, { desc = "Terminal Right" })
 
 -- ========================================================
 -- Tab
@@ -1180,7 +1212,10 @@ map("n", "<leader>tn", "<cmd>tabnext<cr>", { desc = "Next Tab" })
 
 -- ========================================================
 -- Buffers
-map("n", "<C-q>", function() require("mini.bufremove").delete() end, { desc = "Delete Buffer" }, { "mini.bufremove" })
+map("n", "<C-q>", function()
+	if vim.bo.buftype == "terminal" then return end
+	require("mini.bufremove").delete()
+end, { desc = "Delete Buffer" }, { "mini.bufremove" })
 map("n", "[b", "<cmd>bprevious<cr>", { desc = "Prev Buffer" })
 map("n", "]b", "<cmd>bnext<cr>", { desc = "Next Buffer" })
 
