@@ -516,15 +516,22 @@ end
 
 
 -- TMUX navigation
-setup("nvim-tmux-navigation", {
-	disable_when_zoomed = false,
-	keybindings = {
-		left = "<C-h>",
-		down = "<C-j>",
-		up = "<C-k>",
-		right = "<C-l>",
-	},
-})
+if vim.env.TMUX then
+	setup("nvim-tmux-navigation", {
+		disable_when_zoomed = false,
+		keybindings = {
+			left = "<C-h>",
+			down = "<C-j>",
+			up = "<C-k>",
+			right = "<C-l>",
+		},
+	})
+else
+	vim.keymap.set("n", "<C-h>", "<C-w>h")
+	vim.keymap.set("n", "<C-j>", "<C-w>j")
+	vim.keymap.set("n", "<C-k>", "<C-w>k")
+	vim.keymap.set("n", "<C-l>", "<C-w>l")
+end
 
 -- Icons
 setup('nvim-web-devicons')
