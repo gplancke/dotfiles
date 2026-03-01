@@ -18,65 +18,28 @@ local start_time = vim.loop.hrtime()
 --------------------------------------------------------------------------------
 
 local plugins = {
-	-- Core utilities
 	"https://github.com/nvim-lua/plenary.nvim",
 	"https://github.com/MunifTanjim/nui.nvim",
-
-	-- Navigation
 	"https://github.com/alexghergh/nvim-tmux-navigation",
-
-	-- Icons
 	"https://github.com/nvim-tree/nvim-web-devicons",
-
-	-- Colorscheme
 	"https://github.com/tinted-theming/tinted-nvim",
-
-	-- Necessary utilities
 	"https://github.com/nvim-mini/mini.bufremove",
 	"https://github.com/mg979/vim-visual-multi",
 	"https://github.com/kylechui/nvim-surround",
 	"https://github.com/ibhagwan/fzf-lua",
-
-	-- Nice to have utilities
 	"https://github.com/folke/which-key.nvim",
 	"https://github.com/stevearc/quicker.nvim",
-
-	-- UI enhancements
 	"https://github.com/nvim-lualine/lualine.nvim",
-
-	-- File explorer
+	"https://github.com/saghen/blink.indent",
 	"https://github.com/nvim-neo-tree/neo-tree.nvim",
-
-	-- -- Treesitter
 	"https://github.com/nvim-treesitter/nvim-treesitter",
-
-	-- Git
 	"https://github.com/lewis6991/gitsigns.nvim",
 	"https://github.com/f-person/git-blame.nvim",
-	"https://github.com/tpope/vim-fugitive", -- Still the goat
-	-- "https://github.com/sindrets/diffview.nvim",
-	-- "https://github.com/esmuellert/codediff.nvim",
-
-	-- LSP extras
+	"https://github.com/tpope/vim-fugitive",
 	"https://github.com/SmiteshP/nvim-navic",
-
-	-- Copilot
-	"https://github.com/zbirenbaum/copilot.lua",
-
-	-- Completion (blink.cmp)
 	{ src = "https://github.com/saghen/blink.cmp", version = "main" },
-	"https://github.com/fang2hou/blink-copilot",
-
-	-- Images (kitty terminal)
-	-- "https://github.com/3rd/image.nvim",
-
-	-- DAP (Debug Adapter Protocol)
-	-- "https://github.com/mfussenegger/nvim-dap",
-	-- "https://github.com/rcarriga/nvim-dap-ui",
-	-- "https://github.com/nvim-neotest/nvim-nio", -- required by nvim-dap-ui
-	-- "https://github.com/theHamsta/nvim-dap-virtual-text",
-	-- "https://github.com/mxsdev/nvim-dap-vscode-js",
-	-- { src = "https://github.com/nicholasjs/vscode-js-debug", name = "vscode-js-debug" }, -- Fork that works with nvim-dap-vscode-js
+	"https://github.com/akinsho/toggleterm.nvim",
+	"https://github.com/willothy/flatten.nvim",
 }
 
 local no_cursor_ft = {
@@ -496,6 +459,24 @@ local function setup(name, opts, config)
 	return ok and mod or nil
 end
 
+-- Flatten (prevent nested neovim - must load early)
+setup("flatten", {
+	window = { open = "alternate" },
+	hooks = {
+		should_block = function(argv)
+			return vim.tbl_contains(argv, "-b")
+		end,
+		post_open = function(_, _, _, is_blocking)
+			if is_blocking then
+				require("toggleterm").toggle(0)
+			end
+		end,
+		block_end = function()
+			require("toggleterm").toggle(0)
+		end,
+	},
+})
+
 -- TMUX navigation
 setup("nvim-tmux-navigation", {
 	disable_when_zoomed = false,
@@ -649,6 +630,24 @@ setup("gitsigns", {
 -- Git
 setup('fugitive')
 
+-- Terminal
+setup("toggleterm", {
+	size = function(term)
+		if term.direction == "horizontal" then
+			return 15
+		elseif term.direction == "vertical" then
+			return vim.o.columns * 0.4
+		end
+	end,
+	open_mapping = [[<C-\>]],
+	direction = "float",
+	float_opts = { border = "rounded" },
+})
+
+
+-- Indent guides
+pcall(function() require("blink.indent").setup({}) end)
+
 -- Copilot
 setup("copilot", {
 	suggestion = { enabled = false },
@@ -701,18 +700,18 @@ setup("blink.cmp", {
 	signature = { enabled = true },
 
 	sources = {
-		default = { "copilot", "lsp", "path", "snippets", "buffer" },
+		default = { "lsp", "path", "snippets", "buffer" },
 		providers = {
-			copilot = {
-				name = "copilot",
-				module = "blink-copilot",
-				score_offset = 100, -- Prioritize copilot suggestions
-				async = true,
-				opts = {
-					max_completions = 3,
-					max_attempts = 4,
-				},
-			},
+			-- copilot = {
+			-- 	name = "copilot",
+			-- 	module = "blink-copilot",
+			-- 	score_offset = 100, -- Prioritize copilot suggestions
+			-- 	async = true,
+			-- 	opts = {
+			-- 		max_completions = 3,
+			-- 		max_attempts = 4,
+			-- 	},
+			-- },
 		},
 	},
 
@@ -761,6 +760,7 @@ pcall(function()
 			function()
 				local bufname = vim.api.nvim_buf_get_name(0)
 				if bufname == "" then return "[ No Name ]" end
+				if bufname:match("^%w+://") then return vim.fn.fnamemodify(bufname, ":t") end
 
 				local manifests = {
 					{ file = "package.json",  use_json_name = true },
@@ -1149,6 +1149,26 @@ map("n", "<leader>w-", "<C-W>s", { desc = "Split Window Below" })
 map("n", "<leader>w|", "<C-W>v", { desc = "Split Window Right" })
 map("n", "<leader>wd", "<C-W>c", { desc = "Delete Window" })
 
+-- Terminal splits
+map("n", "<leader>wh", function()
+	vim.cmd("ToggleTerm direction=vertical")
+	vim.cmd("wincmd H")
+end, { desc = "Terminal Left" }, { "toggleterm" })
+map("n", "<leader>wj", function()
+	vim.cmd("ToggleTerm direction=horizontal")
+	vim.cmd("wincmd J")
+	vim.cmd("resize " .. math.floor(vim.o.lines / 2))
+end, { desc = "Terminal Below" }, { "toggleterm" })
+map("n", "<leader>wk", function()
+	vim.cmd("ToggleTerm direction=horizontal")
+	vim.cmd("wincmd K")
+	vim.cmd("resize " .. math.floor(vim.o.lines / 2))
+end, { desc = "Terminal Above" }, { "toggleterm" })
+map("n", "<leader>wl", function()
+	vim.cmd("ToggleTerm direction=vertical")
+	vim.cmd("wincmd L")
+end, { desc = "Terminal Right" }, { "toggleterm" })
+
 -- ========================================================
 -- Tab
 map("n", "[t", "<cmd>tabprev<cr>", { desc = "Prev Tab" })
@@ -1198,6 +1218,35 @@ map("n", "<leader>gd", function() require("fzf-lua").git_diff({ commit = "HEAD" 
 map("n", "<leader>gf", function() require("fzf-lua").git_bcommits() end, { desc = "Git Log File" }, { "fzf-lua" })
 
 -- ========================================================
+-- Terminal
+vim.keymap.set("t", "<Esc><Esc>", [[<C-\><C-n>]], { desc = "Exit terminal mode" })
+
+-- Lazygit (stateful floating terminal)
+local lazygit = nil
+map("n", "<leader>gg", function()
+	local Terminal = require("toggleterm.terminal").Terminal
+	if not lazygit or (not lazygit:is_open() and not vim.api.nvim_buf_is_valid(lazygit.bufnr or -1)) then
+		lazygit = Terminal:new({ cmd = "lazygit", hidden = true, direction = "float" })
+	end
+	lazygit:toggle()
+end, { desc = "Lazygit" }, { "toggleterm" })
+
+-- Claude Code (stateful vertical terminal)
+local claude_term = nil
+map("n", "<leader>ai", function()
+	local Terminal = require("toggleterm.terminal").Terminal
+	if not claude_term or (not claude_term:is_open() and not vim.api.nvim_buf_is_valid(claude_term.bufnr or -1)) then
+		claude_term = Terminal:new({
+			cmd = "env -u NVIM claude",
+			hidden = true,
+			direction = "vertical",
+			size = function() return math.floor(vim.o.columns * 0.4) end,
+		})
+	end
+	claude_term:toggle()
+end, { desc = "Claude Code" }, { "toggleterm" })
+
+-- ========================================================
 -- Search
 map("n", '<leader>s"', function() require("fzf-lua").registers() end, { desc = "Registers" }, { "fzf-lua" })
 -- map("n", "<leader>sa", function() require("fzf-lua").autocmds() end, { desc = "Autocmds" }, { "fzf-lua" })
@@ -1222,6 +1271,7 @@ map("n", "<leader>sR", function() require("fzf-lua").resume() end, { desc = "Res
 map("n", "<leader>ss", function() require("fzf-lua").lsp_document_symbols() end, { desc = "LSP Symbols" }, { "fzf-lua" })
 map("n", "<leader>sS", function() require("fzf-lua").lsp_workspace_symbols() end, { desc = "LSP Workspace Symbols" },
 	{ "fzf-lua" })
+map("n", "<leader>st", "<Cmd>TermSelect<CR>", { desc = "Terminals" }, { "toggleterm" })
 -- map("n", "<leader>sw", function() require("fzf-lua").grep_cword() end, { desc = "Grep Word" }, { "fzf-lua" })
 -- map("x", "<leader>sw", function() require("fzf-lua").grep_visual() end, { desc = "Grep Word" }, { "fzf-lua" })
 
@@ -1332,7 +1382,9 @@ vim.api.nvim_create_user_command("PackClean", function()
 	-- Extract active plugin names from the plugins table
 	local active = {}
 	for _, spec in ipairs(plugins) do
+		---@diagnostic disable-next-line: undefined-field
 		local url = type(spec) == "string" and spec or (spec.src or spec[1])
+		---@diagnostic disable-next-line: undefined-field
 		local name = spec.name or url:match("([^/]+)$")
 		if name then active[name] = true end
 	end

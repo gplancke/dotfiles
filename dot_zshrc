@@ -47,28 +47,13 @@ antidote_dir="${XDG_DATA_HOME:-$HOME/.local/share}/antidote"
 if [[ -d "$antidote_dir" ]]; then
   source "$antidote_dir/antidote.zsh"
   antidote load "${ZDOTDIR:-$HOME}/.zsh_plugins.txt"
+  if [[ -n "$NVIM" ]]; then
+    bindkey -e
+  else
+    source "$(antidote path laurenkt/zsh-vimto)/zsh-vimto.zsh" 2>/dev/null
+  fi
 fi
 unset antidote_dir
-
-# ##############################
-# Behavior inside Vim
-# ##############################
-# Vim
-if [[ -n "$VIM" || -n "$VIMRUNTIME" ]]; then
-    bindkey -e
-fi
-
-# ##############################
-# Launch nushell...
-# ##############################
-# nu
-
-# ##############################
-# Launch tmux
-# ##############################
-# if [[ -z "$TMUX" ]] && [[ "$TERM_PROGRAM" != "vscode" ]] && [[ "$TERM_PROGRAM" != "cursor" ]]; then
-# 	tm main
-# fi
 
 # ##############################
 echo "${SOURCED}" | tr ':' ' -> '
