@@ -265,7 +265,7 @@ vim.g.gitblame_ignored_filetypes = no_blame_ft
 -- Neovide settings
 --------------------------------------------------------------------------------
 if vim.g.neovide then
-	vim.o.guifont = "FiraMono Nerd Font:h11:b"
+	vim.o.guifont = "FiraMono Nerd Font:h10:b"
 
 	-- GUI apps on macOS don't inherit shell PATH.
 	-- Ensure mise shims are available for LSP servers and tools.
