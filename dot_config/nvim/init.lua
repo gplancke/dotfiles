@@ -261,6 +261,30 @@ vim.g.gitblame_highlight_group = "Comment"
 vim.g.gitblame_delay = 0
 vim.g.gitblame_ignored_filetypes = no_blame_ft
 
+--------------------------------------------------------------------------------
+-- Neovide settings
+--------------------------------------------------------------------------------
+if vim.g.neovide then
+	vim.o.guifont = "FiraMono Nerd Font:h11:b"
+
+	-- GUI apps on macOS don't inherit shell PATH.
+	-- Ensure mise shims are available for LSP servers and tools.
+	local mise_shims = vim.fn.expand("~/.local/share/mise/shims")
+	local mise_bin = vim.fn.expand("~/.local/bin")
+	for _, dir in ipairs({ mise_bin, mise_shims }) do
+		if vim.fn.isdirectory(dir) == 1 and not vim.env.PATH:find(dir, 1, true) then
+			vim.env.PATH = dir .. ":" .. vim.env.PATH
+		end
+	end
+	vim.g.neovide_padding_top = 0
+	vim.g.neovide_padding_bottom = 0
+	vim.g.neovide_padding_right = 0
+	vim.g.neovide_padding_left = 0
+	vim.g.neovide_hide_mouse_when_typing = true
+	-- vim.g.neovide_cursor_animation_length = 0.05
+	-- vim.g.neovide_scroll_animation_length = 0.1
+end
+
 -- ============================================================================
 -- ============================================================================
 -- Autocommands
@@ -598,6 +622,7 @@ setup("which-key", {
 		{ "<leader>u", group = "UI" },
 		{ "<leader>w", group = "Window" },
 		{ "<leader>x", group = "Diagnostics" },
+		{ "<leader>p", group = "Project" },
 	},
 })
 
@@ -766,8 +791,8 @@ require("tinted-nvim").setup({
 		cmd = "tinty current",
 	},
 	ui = {
-		transparent = true,
-		dim_inactive = false,
+		transparent = not vim.g.neovide,
+		dim_inactive = vim.g.neovide,
 	},
 })
 
@@ -1470,6 +1495,138 @@ vim.api.nvim_create_user_command("TSReinstall", function()
 	vim.notify("Deleted " .. #files .. " parsers. Reinstalling...", vim.log.levels.INFO)
 	require("nvim-treesitter").install(ts_parsers)
 end, { desc = "Delete and reinstall all Treesitter parsers" })
+
+-- =============================================================================
+-- =============================================================================
+-- Project Picker
+-- =============================================================================
+-- =============================================================================
+
+local projects_file = vim.fn.stdpath("data") .. "/projects.json"
+
+local function load_projects()
+	local f = io.open(projects_file, "r")
+	if not f then return {} end
+	local content = f:read("*a")
+	f:close()
+	local ok, data = pcall(vim.json.decode, content)
+	if ok and type(data) == "table" then return data end
+	return {}
+end
+
+local function save_projects(projects)
+	local f = io.open(projects_file, "w")
+	if not f then
+		vim.notify("Failed to save projects", vim.log.levels.ERROR)
+		return
+	end
+	f:write(vim.json.encode(projects))
+	f:close()
+end
+
+local function apply_mise_env(dir)
+	local result = vim.system({ "mise", "env", "-s", "bash", "-C", dir }):wait()
+	if result.code == 0 and result.stdout then
+		for line in result.stdout:gmatch("[^\n]+") do
+			local key, value = line:match("^export ([%w_]+)=(.+)$")
+			if key and value then
+				-- Strip surrounding quotes
+				value = value:gsub("^['\"]", ""):gsub("['\"]$", "")
+				vim.env[key] = value
+			end
+		end
+	else
+		-- Fallback: ensure mise shims are on PATH
+		local shims = vim.fn.expand("~/.local/share/mise/shims")
+		if not vim.env.PATH:find(shims, 1, true) then
+			vim.env.PATH = shims .. ":" .. vim.env.PATH
+		end
+	end
+end
+
+local function switch_project(dir)
+	vim.cmd.cd(dir)
+	apply_mise_env(dir)
+	vim.notify("Switched to: " .. dir)
+end
+
+local function pick_project()
+	local fzf = require("fzf-lua")
+	local projects = load_projects()
+	if #projects == 0 then
+		vim.notify("No projects. Use <leader>pa to add one.", vim.log.levels.WARN)
+		return
+	end
+
+	local entries = {}
+	for _, p in ipairs(projects) do
+		table.insert(entries, p.name .. " :: " .. p.path)
+	end
+
+	fzf.fzf_exec(entries, {
+		prompt = "Projects> ",
+		actions = {
+			["default"] = function(selected)
+				if not selected or #selected == 0 then return end
+				local path = selected[1]:match(":: (.+)$")
+				if path then switch_project(path) end
+			end,
+			["ctrl-d"] = function(selected)
+				if not selected or #selected == 0 then return end
+				local path = selected[1]:match(":: (.+)$")
+				if not path then return end
+				local current = load_projects()
+				local filtered = vim.tbl_filter(function(p) return p.path ~= path end, current)
+				save_projects(filtered)
+				vim.notify("Removed: " .. path)
+				-- Re-open picker
+				vim.schedule(pick_project)
+			end,
+		},
+	})
+end
+
+local function add_project(path)
+	path = path or vim.fn.getcwd()
+	path = vim.fn.fnamemodify(path, ":p"):gsub("/$", "")
+	local name = vim.fn.fnamemodify(path, ":h:t") .. "/" .. vim.fn.fnamemodify(path, ":t")
+	local projects = load_projects()
+	for _, p in ipairs(projects) do
+		if p.path == path then
+			vim.notify("Project already exists: " .. name, vim.log.levels.WARN)
+			return
+		end
+	end
+	table.insert(projects, { name = name, path = path })
+	save_projects(projects)
+	vim.notify("Added project: " .. name)
+end
+
+vim.keymap.set("n", "<leader>pp", pick_project, { desc = "Pick project" })
+vim.keymap.set("n", "<leader>pa", function() add_project() end, { desc = "Add current dir as project" })
+vim.keymap.set("n", "<leader>pA", function()
+	vim.ui.input({ prompt = "Project path: ", completion = "dir" }, function(input)
+		if input and input ~= "" then
+			local expanded = vim.fn.expand(input)
+			if vim.fn.isdirectory(expanded) == 1 then
+				add_project(expanded)
+			else
+				vim.notify("Not a directory: " .. input, vim.log.levels.ERROR)
+			end
+		end
+	end)
+end, { desc = "Add project by path" })
+
+if vim.g.neovide then
+	vim.api.nvim_create_autocmd("VimEnter", {
+		callback = function()
+			if vim.fn.argc() == 0 and #load_projects() > 0 then
+				vim.schedule(pick_project)
+			end
+		end,
+		once = true,
+	})
+end
 
 -- =============================================================================
 -- =============================================================================
