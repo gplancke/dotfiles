@@ -1,3 +1,4 @@
 SOURCED="${SOURCED:-root}:.zshenv"
 
 [[ -r ~/.profile ]] && source ~/.profile
+[[ -r ~/.shell.env ]] && source ~/.shell.env

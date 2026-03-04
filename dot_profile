@@ -9,10 +9,12 @@ if uname -r | grep -q 'microsoft'; then
 	export LINUX="1"
 	[ -f "${HOME}/.shell.wsl" ] && . "${HOME}/.shell.wsl"
 elif [ "$(uname)" = "Darwin" ]; then
-	sdkpath=$(xcrun --show-sdk-path)
 	export MACOS="1"
-	export SDKROOT="$sdkpath"
-	export XDG_CONFIG_HOME=$HOME/.config
+	# Cache xcrun result to avoid slowdown in subshells
+	if [ -z "$SDKROOT" ]; then
+		export SDKROOT="$(xcrun --show-sdk-path)"
+	fi
+	export XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-$HOME/.config}
 else
 	export LINUX="1"
 fi

@@ -4,7 +4,10 @@ SOURCED="${SOURCED:-root}:.bashrc"
 # BASH SHIT
 ##########################
 
-# If not running interactively, don't do anything
+# Environment must load even for non-interactive shells (SSH commands)
+[ -f "${HOME}/.shell.env" ] && source "${HOME}/.shell.env"
+
+# If not running interactively, don't do anything else
 case $- in
 *i*) ;;
 *) return ;;
