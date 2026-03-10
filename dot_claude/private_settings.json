@@ -1,14 +1,5 @@
 {
   "model": "opus",
-  "statusLine": {
-    "type": "command",
-    "command": "printf '\\033[01;32m%s@%s\\033[00m:\\033[01;34m%s\\033[00m' \"$(whoami)\" \"$(hostname -s)\" \"$(pwd)\""
-  },
-  "enabledPlugins": {
-    "typescript-lsp@claude-plugins-official": true,
-    "lua-lsp@claude-plugins-official": true
-  },
-  "effortLevel": "medium",
   "hooks": {
     "Notification": [
       {
@@ -20,6 +11,27 @@
           }
         ]
       }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/georgio/.claude/hooks/rtk-rewrite.sh"
+          }
+        ]
+      }
     ]
-  }
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "printf '\\033[01;32m%s@%s\\033[00m:\\033[01;34m%s\\033[00m' \"$(whoami)\" \"$(hostname -s)\" \"$(pwd)\""
+  },
+  "enabledPlugins": {
+    "typescript-lsp@claude-plugins-official": true,
+    "lua-lsp@claude-plugins-official": true,
+    "pyright-lsp@claude-plugins-official": true
+  },
+  "effortLevel": "medium"
 }

@@ -610,6 +610,7 @@ setup("which-key", {
 		align = "right",
 	},
 	spec = {
+		{ "<leader>a", group = "AI" },
 		{ "<leader>b", group = "Buffer" },
 		{ "<leader>c", group = "Code" },
 		{ "<leader>d", group = "Debug" },
@@ -1305,6 +1306,17 @@ map("n", "<leader>ai", function()
 	end
 	claude_term:toggle()
 end, { desc = "Claude Code" }, { "toggleterm" })
+map("v", "<leader>ay", function()
+	local start_line = vim.fn.line("'<")
+	local end_line = vim.fn.line("'>")
+	local file = vim.fn.expand("%:.")
+	local lines = vim.api.nvim_buf_get_lines(0, start_line - 1, end_line, false)
+	local selection = table.concat(lines, "\n")
+	local result = string.format("File: %s\nLine: %d,%d\nSelection:\n%s", file, start_line, end_line, selection)
+	vim.fn.setreg("+", result)
+	vim.notify("Copied selection with context")
+end, { desc = "Yank for AI" })
+
 
 -- ========================================================
 -- Search
