@@ -3,6 +3,7 @@ name: check
 description: Check current work for security issues, inefficiencies, and bad patterns
 user-invocable: true
 allowed-tools: Read, Grep, Glob, Bash
+agent: Plan
 ---
 
 # Review
