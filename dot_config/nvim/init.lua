@@ -261,6 +261,16 @@ vim.g.gitblame_highlight_group = "Comment"
 vim.g.gitblame_delay = 0
 vim.g.gitblame_ignored_filetypes = no_blame_ft
 
+-- Markdown: soft wrap, no hard line breaks
+vim.api.nvim_create_autocmd("FileType", {
+	pattern = "markdown",
+	callback = function()
+		vim.opt_local.textwidth = 0
+		vim.opt_local.wrap = true
+		vim.opt_local.linebreak = true
+	end,
+})
+
 --------------------------------------------------------------------------------
 -- Neovide settings
 --------------------------------------------------------------------------------
