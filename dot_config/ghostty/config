@@ -1,14 +1,15 @@
 title = Ghostty
 window-decoration = true
 maximize = true
+clipboard-read = allow
 
 theme = tinted-theming
 shell-integration = none
 quit-after-last-window-closed = true
 confirm-close-surface = false
 
-font-family = FiraMono Nerd Font
-font-style = Bold
+font-family = JetBrainsMono Nerd Font Mono
+font-style = Bold Italic
 font-size = 10
 font-thicken = true
 adjust-cell-width = -8%
