@@ -10,6 +10,8 @@ alias ovim='NVIM_APPNAME=ovim nvim'
 alias lvim='NVIM_APPNAME=lazyvim nvim'
 alias mvim='NVIM_APPNAME=minivim nvim'
 
+alias cc='claude --dangerously-skip-permissions'
+
 ################################################################################
 ################################################################################
 # A command to fetch all registered subdomains

@@ -10,6 +10,9 @@
 -- 3. We need to authenticate to Github for copilot to work
 -- 4. We need to install lsp server separately (Done via mise)
 
+-- Eagerly load vim.uri to avoid intermittent lazy-load failures on HEAD builds
+pcall(require, 'vim.uri')
+
 -- Capture startup time
 local start_time = vim.loop.hrtime()
 
@@ -369,7 +372,18 @@ do
 			if ok and navic.is_available() then
 				local loc = navic.get_location()
 				if loc and loc ~= "" then
-					vim.api.nvim_echo({ { loc, "Comment" } }, false, {})
+					local max_width = vim.v.echospace
+					if vim.api.nvim_strwidth(loc) > max_width then
+						while vim.api.nvim_strwidth("…" .. loc) > max_width do
+							local rest = loc:match("^[%z\1-\127\194-\253][\128-\191]*(.*)")
+							if not rest or rest == "" then break end
+							loc = rest
+						end
+						loc = "…" .. loc
+					end
+					vim.cmd("echohl Comment")
+					vim.cmd("echon " .. vim.fn.string(loc))
+					vim.cmd("echohl None")
 				end
 			end
 		end,
@@ -428,7 +442,7 @@ vim.api.nvim_create_autocmd("FileType", {
 		local max_filesize = 100 * 1024
 		local stats = vim.uv.fs_stat(vim.api.nvim_buf_get_name(bufnr))
 		if not (stats and stats.size > max_filesize) then
-			vim.treesitter.start(bufnr)
+			pcall(vim.treesitter.start, bufnr)
 		end
 
 		-- 2. Indentation (experimental but improved)
