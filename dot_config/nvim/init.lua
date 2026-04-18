@@ -675,7 +675,7 @@ setup("neo-tree", {
 				end
 			end,
 		},
-		follow_current_file = { enabled = true },
+		follow_current_file = { enabled = false },
 		use_libuv_file_watcher = true,
 		filtered_items = {
 			hide_dotfiles = false,
@@ -1224,6 +1224,7 @@ map({ "i", "x", "n", "s" }, "<C-s>", "<cmd>w<cr><esc>", { desc = "Save File" })
 -- ========================================================
 -- Filetree (file explorer)
 map("n", "<C-e>", "<cmd>Neotree toggle<cr>", { desc = "Explorer NeoTree (root dir)" }, { "neo-tree" })
+map("n", "<C-S-e>", "<cmd>Neotree reveal<cr>", { desc = "Reveal file in NeoTree" }, { "neo-tree" })
 
 -- ========================================================
 -- Top-level pickers
