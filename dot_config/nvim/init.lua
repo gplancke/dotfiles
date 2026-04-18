@@ -1224,7 +1224,7 @@ map({ "i", "x", "n", "s" }, "<C-s>", "<cmd>w<cr><esc>", { desc = "Save File" })
 -- ========================================================
 -- Filetree (file explorer)
 map("n", "<C-e>", "<cmd>Neotree toggle<cr>", { desc = "Explorer NeoTree (root dir)" }, { "neo-tree" })
-map("n", "<C-S-e>", "<cmd>Neotree reveal<cr>", { desc = "Reveal file in NeoTree" }, { "neo-tree" })
+map("n", "<leader>e", "<cmd>Neotree reveal<cr>", { desc = "Reveal file in NeoTree" }, { "neo-tree" })
 
 -- ========================================================
 -- Top-level pickers
