@@ -50,10 +50,12 @@ if [[ -d "$antidote_dir" ]]; then
   if [[ -n "$NVIM" ]]; then
     bindkey -e
   else
-    source "$(antidote path laurenkt/zsh-vimto)/zsh-vimto.zsh" 2>/dev/null
+    if vimto_dir="$(antidote path laurenkt/zsh-vimto 2>/dev/null)" && [[ -r "$vimto_dir/zsh-vimto.zsh" ]]; then
+      source "$vimto_dir/zsh-vimto.zsh"
+    fi
   fi
 fi
-unset antidote_dir
+unset antidote_dir vimto_dir
 
 autoload -z edit-command-line
 zle -N edit-command-line

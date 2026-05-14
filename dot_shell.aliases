@@ -11,6 +11,7 @@ alias lvim='NVIM_APPNAME=lazyvim nvim'
 alias mvim='NVIM_APPNAME=minivim nvim'
 
 alias cc='claude --dangerously-skip-permissions'
+alias cod='codex --yolo'
 
 ################################################################################
 ################################################################################
@@ -262,6 +263,52 @@ mkpro() {
 	(cd "${projectDir}/${scope}/${name}" && git init --quiet)
 
 	work_on "${scope}/${name}"
+}
+
+################################################################################
+################################################################################
+# Degit-like copy from a local repo
+################################################################################
+################################################################################
+
+tige() {
+	local sourceRepo="${1}"
+	local targetDir="${2}"
+	local sourcePath
+	local targetPath
+
+	if [ -z "${sourceRepo}" ] || [ -z "${targetDir}" ]; then
+		echo "Usage: tige <localRepo> <targetDir>"
+		return 1
+	fi
+
+	sourcePath="$(cd "${sourceRepo}" 2>/dev/null && pwd)"
+	if [ -z "${sourcePath}" ] || ! git -C "${sourcePath}" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+		echo "Not a git repo: ${sourceRepo}"
+		return 1
+	fi
+
+	mkdir -p "${targetDir}" || return 1
+	targetPath="$(cd "${targetDir}" 2>/dev/null && pwd)"
+
+	if [ -z "${targetPath}" ] || [ "${sourcePath}" = "${targetPath}" ]; then
+		echo "Invalid target directory: ${targetDir}"
+		return 1
+	fi
+
+	if [ -n "$(find "${targetPath}" -mindepth 1 -maxdepth 1 2>/dev/null)" ]; then
+		echo "Target directory is not empty: ${targetDir}"
+		return 1
+	fi
+
+	(
+		cd "${sourcePath}" || exit 1
+		git ls-files -z --cached --modified --others --exclude-standard \
+			| while IFS= read -r -d '' file; do
+				[ -e "${file}" ] && printf '%s\0' "${file}"
+			done \
+			| rsync -a --from0 --files-from=- "${sourcePath}/" "${targetPath}/"
+	)
 }
 
 ################################################################################
