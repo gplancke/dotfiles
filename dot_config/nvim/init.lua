@@ -355,6 +355,32 @@ vim.api.nvim_create_autocmd({ "WinLeave", "BufLeave", "InsertEnter", "FocusLost"
 do
 	local last_cmd_time = 0
 
+	local function truncate_cmdline_message(text)
+		text = tostring(text):gsub("[%r\n]+", " ")
+
+		local max_width = tonumber(vim.v.echospace) or 0
+		if max_width <= 0 then
+			max_width = vim.o.columns - 1
+		else
+			max_width = math.min(max_width, vim.o.columns - 1)
+		end
+		max_width = math.max(max_width, 0)
+
+		if max_width == 0 then return "" end
+		if vim.api.nvim_strwidth(text) <= max_width then return text end
+
+		local prefix = "…"
+		if max_width <= vim.api.nvim_strwidth(prefix) then return "" end
+
+		while vim.api.nvim_strwidth(prefix .. text) > max_width do
+			local rest = vim.fn.strcharpart(text, 1)
+			if rest == "" or rest == text then break end
+			text = rest
+		end
+
+		return prefix .. text
+	end
+
 	vim.api.nvim_create_autocmd("CmdlineLeave", {
 		group = vim.api.nvim_create_augroup("NavicCmdline", { clear = true }),
 		callback = function()
@@ -372,18 +398,11 @@ do
 			if ok and navic.is_available() then
 				local loc = navic.get_location()
 				if loc and loc ~= "" then
-					local max_width = vim.v.echospace
-					if vim.api.nvim_strwidth(loc) > max_width then
-						while vim.api.nvim_strwidth("…" .. loc) > max_width do
-							local rest = loc:match("^[%z\1-\127\194-\253][\128-\191]*(.*)")
-							if not rest or rest == "" then break end
-							loc = rest
-						end
-						loc = "…" .. loc
-					end
-					vim.cmd("echohl Comment")
-					vim.cmd("echon " .. vim.fn.string(loc))
-					vim.cmd("echohl None")
+					loc = truncate_cmdline_message(loc)
+					if loc == "" then return end
+
+					vim.cmd("redraw")
+					vim.api.nvim_echo({ { loc, "Comment" } }, false, { id = "user.navic.cmdline" })
 				end
 			end
 		end,
