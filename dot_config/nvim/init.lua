@@ -608,6 +608,21 @@ end)
 setup("fzf-lua", {
 	fzf_colors = true,
 	winopts = { border = "rounded" },
+	previewers = {
+		builtin = {
+			extensions = {
+				bmp = { "chafa", "--animate=off", "{file}" },
+				gif = { "chafa", "--animate=off", "{file}" },
+				ico = { "chafa", "--animate=off", "{file}" },
+				jpeg = { "chafa", "--animate=off", "{file}" },
+				jpg = { "chafa", "--animate=off", "{file}" },
+				png = { "chafa", "--animate=off", "{file}" },
+				svg = { "chafa", "--animate=off", "{file}" },
+				tiff = { "chafa", "--animate=off", "{file}" },
+				webp = { "chafa", "--animate=off", "{file}" },
+			},
+		},
+	},
 }, function(fzf)
 	-- Add ctrl-q to send selections to quickfix (extends defaults, doesn't replace)
 	fzf.config.defaults.actions.files["ctrl-q"] = fzf.actions.file_sel_to_qf
@@ -1351,13 +1366,19 @@ map("n", "<leader>ai", function()
 	claude_term:toggle()
 end, { desc = "Claude Code" }, { "toggleterm" })
 map("v", "<leader>ay", function()
-	local start_line = vim.fn.line("'<")
+	local start_pos = vim.fn.getpos("'<")
+	local start_line = start_pos[2]
+	local start_col = start_pos[3]
 	local end_line = vim.fn.line("'>")
 	local file = vim.fn.expand("%:.")
 	local lines = vim.api.nvim_buf_get_lines(0, start_line - 1, end_line, false)
 	local selection = table.concat(lines, "\n")
 	local result = string.format("File: %s\nLine: %d,%d\nSelection:\n%s", file, start_line, end_line, selection)
 	vim.fn.setreg("+", result)
+	vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Esc>", true, false, true), "n", false)
+	vim.schedule(function()
+		vim.api.nvim_win_set_cursor(0, { start_line, math.max(start_col - 1, 0) })
+	end)
 	vim.notify("Copied selection with context")
 end, { desc = "Yank for AI" })
 
