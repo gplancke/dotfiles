@@ -13,6 +13,12 @@
 -- Eagerly load vim.uri to avoid intermittent lazy-load failures on HEAD builds
 pcall(require, 'vim.uri')
 
+-- Snacks image detection can miss Ghostty behind tmux when tmux uses
+-- `extended-keys always`; force the known outer terminal for image previews.
+if (vim.env.GHOSTTY_BIN_DIR or vim.env.GHOSTTY_RESOURCES_DIR) and not vim.env.SNACKS_GHOSTTY then
+	vim.env.SNACKS_GHOSTTY = "true"
+end
+
 -- Capture startup time
 local start_time = vim.loop.hrtime()
 
@@ -35,10 +41,9 @@ local plugins = {
 	"https://github.com/tinted-theming/tinted-nvim",
 
 	-- Necessary utilities
-	"https://github.com/nvim-mini/mini.bufremove",
 	"https://github.com/mg979/vim-visual-multi",
 	"https://github.com/kylechui/nvim-surround",
-	"https://github.com/ibhagwan/fzf-lua",
+	"https://github.com/folke/snacks.nvim",
 
 	-- Nice to have utilities
 	"https://github.com/folke/which-key.nvim",
@@ -66,8 +71,6 @@ local plugins = {
 	{ src = "https://github.com/saghen/blink.cmp", version = "main" },
 	-- (removed: copilot.lua, blink-copilot)
 
-	-- Images (kitty terminal)
-
 	-- DAP (Debug Adapter Protocol)
 	-- "https://github.com/mfussenegger/nvim-dap",
 	-- "https://github.com/rcarriga/nvim-dap-ui",
@@ -77,7 +80,6 @@ local plugins = {
 	-- { src = "https://github.com/nicholasjs/vscode-js-debug", name = "vscode-js-debug" }, -- Fork that works with nvim-dap-vscode-js
 
 	-- Terminal
-	"https://github.com/akinsho/toggleterm.nvim",
 	-- "https://github.com/willothy/flatten.nvim",
 	-- "https://github.com/3rd/image.nvim",
 }
@@ -549,6 +551,118 @@ local function is_binary(path)
 	return bytes ~= nil and bytes:find("\0") ~= nil
 end
 
+local function snacks_item_path(item)
+	if not item then return nil end
+	local ok, util = pcall(require, "snacks.picker.util")
+	if ok then
+		local path = util.path(item)
+		if path then return path end
+	end
+	return item.file or item.path
+end
+
+local function snacks_picker_system_open(picker)
+	for _, item in ipairs(picker:selected({ fallback = true })) do
+		local path = snacks_item_path(item)
+		if path then system_open(path) end
+	end
+	picker:close()
+end
+
+local function snacks_file_confirm(picker, item, action)
+	local actions = require("snacks.picker.actions")
+	local selected = picker:selected({ fallback = true })
+	local external, editable = false, {}
+
+	for _, selected_item in ipairs(selected) do
+		local path = snacks_item_path(selected_item)
+		if path and is_binary(path) then
+			external = true
+			system_open(path)
+		elseif path then
+			table.insert(editable, path)
+		end
+	end
+
+	if not external then
+		return actions.jump(picker, item, action)
+	end
+
+	picker:close()
+	for _, path in ipairs(editable) do
+		vim.cmd.edit(vim.fn.fnameescape(path))
+	end
+end
+
+local function snacks_image_preview_file(path)
+	if vim.fn.executable("magick") ~= 1 then return path end
+
+	local stat = vim.uv.fs_stat(path)
+	local key = vim.fn.sha256(path .. ":" .. tostring(stat and stat.mtime.sec or 0) .. ":" .. tostring(stat and stat.size or 0))
+	local dir = vim.fn.stdpath("cache") .. "/snacks-picker-images"
+	local preview = dir .. "/" .. key .. ".png"
+
+	if vim.fn.filereadable(preview) == 1 then return preview end
+	vim.fn.mkdir(dir, "p")
+
+	local ok, result = pcall(function()
+		return vim.system({
+			"magick",
+			path .. "[0]",
+			"-auto-orient",
+			"-resize",
+			"640x640>",
+			preview,
+		}, { text = true }):wait(1200)
+	end)
+
+	if ok and result and result.code == 0 and vim.fn.filereadable(preview) == 1 then
+		return preview
+	end
+
+	return path
+end
+
+local function snacks_safe_file_preview(ctx)
+	local path = snacks_item_path(ctx.item)
+	if path and Snacks.image.supports_file(path) then
+		local preview_path = snacks_image_preview_file(path)
+		local buf = ctx.preview:scratch()
+		ctx.preview:set_title(vim.fn.fnamemodify(path, ":t"))
+		Snacks.image.buf.attach(buf, {
+			src = preview_path,
+			max_width = math.max(20, math.floor(vim.o.columns * 0.4)),
+			max_height = math.max(8, math.floor(vim.o.lines * 0.5)),
+		})
+		return
+	end
+
+	return Snacks.picker.preview.file(ctx)
+end
+
+local function snacks_file_picker_opts(opts)
+	return vim.tbl_deep_extend("force", {
+		preview = snacks_safe_file_preview,
+		actions = {
+			smart_confirm = snacks_file_confirm,
+			system_open = snacks_picker_system_open,
+		},
+		confirm = "smart_confirm",
+		win = {
+			input = {
+				keys = {
+					["<c-o>"] = { "system_open", mode = { "i", "n" } },
+				},
+			},
+			list = {
+				keys = {
+					["<c-o>"] = "system_open",
+				},
+			},
+		},
+	}, opts or {})
+end
+
 -- Helper to safely require and setup plugins
 local function setup(name, opts, config)
 	local ok, mod = pcall(require, name)
@@ -572,11 +686,11 @@ end
 -- 		end,
 -- 		post_open = function(_, _, _, is_blocking)
 -- 			if is_blocking then
--- 				require("toggleterm").toggle(0)
+-- 				Snacks.terminal.toggle()
 -- 			end
 -- 		end,
 -- 		block_end = function()
--- 			require("toggleterm").toggle(0)
+-- 			Snacks.terminal.toggle()
 -- 		end,
 -- 	},
 -- })
@@ -596,62 +710,31 @@ setup("nvim-tmux-navigation", {
 -- Icons
 setup('nvim-web-devicons')
 
--- Utils
-setup('mini.bufremove')
-
 -- Treesitter (syntax highlighting, indentation, folding)
 setup("nvim-treesitter", { install_dir = ts_install_dir }, function(ts)
 	ts.install(ts_parsers)
 end)
 
--- fzf-lua (fuzzy finder)
-setup("fzf-lua", {
-	fzf_colors = true,
-	winopts = { border = "rounded" },
-	previewers = {
-		builtin = {
-			extensions = {
-				bmp = { "chafa", "--animate=off", "{file}" },
-				gif = { "chafa", "--animate=off", "{file}" },
-				ico = { "chafa", "--animate=off", "{file}" },
-				jpeg = { "chafa", "--animate=off", "{file}" },
-				jpg = { "chafa", "--animate=off", "{file}" },
-				png = { "chafa", "--animate=off", "{file}" },
-				svg = { "chafa", "--animate=off", "{file}" },
-				tiff = { "chafa", "--animate=off", "{file}" },
-				webp = { "chafa", "--animate=off", "{file}" },
-			},
+-- Snacks (picker, image previews, terminal, lazygit, buffer deletion)
+setup("snacks", {
+	picker = {
+		ui_select = true,
+	},
+	image = {
+		enabled = true,
+	},
+	terminal = {
+		win = {
+			border = "rounded",
 		},
 	},
-}, function(fzf)
-	-- Add ctrl-q to send selections to quickfix (extends defaults, doesn't replace)
-	fzf.config.defaults.actions.files["ctrl-q"] = fzf.actions.file_sel_to_qf
-	-- Add ctrl-o to open files with OS default app (force-open externally)
-	fzf.config.defaults.actions.files["ctrl-o"] = function(selected)
-		for _, file in ipairs(selected) do
-			system_open(fzf.path.entry_to_file(file).path)
-		end
-	end
-	-- Smart enter: auto-detect binary files and open externally
-	fzf.config.defaults.actions.files["enter"] = function(selected, opts)
-		local to_open_externally = {}
-		local to_edit = {}
-		for _, sel in ipairs(selected) do
-			local path = fzf.path.entry_to_file(sel).path
-			if is_binary(path) then
-				table.insert(to_open_externally, path)
-			else
-				table.insert(to_edit, sel)
-			end
-		end
-		for _, path in ipairs(to_open_externally) do
-			system_open(path)
-		end
-		if #to_edit > 0 then
-			fzf.actions.file_edit_or_qf(to_edit, opts)
-		end
-	end
-end)
+	lazygit = {
+		enabled = true,
+	},
+	bufdelete = {
+		enabled = true,
+	},
+})
 
 -- Simple setups
 setup("nvim-surround")
@@ -751,21 +834,6 @@ setup("gitsigns", {
 
 -- Git
 setup('fugitive')
-
--- Terminal
-setup("toggleterm", {
-	size = function(term)
-		if term.direction == "horizontal" then
-			return 15
-		elseif term.direction == "vertical" then
-			return vim.o.columns * 0.4
-		end
-	end,
-	open_mapping = [[<C-\>]],
-	direction = "float",
-	float_opts = { border = "rounded" },
-})
-
 
 -- Indent guides
 pcall(function() require("blink.indent").setup({}) end)
@@ -1262,9 +1330,9 @@ map("n", "<leader>e", "<cmd>Neotree reveal<cr>", { desc = "Reveal file in NeoTre
 
 -- ========================================================
 -- Top-level pickers
-map("n", "<leader><space>", function() require("fzf-lua").files() end, { desc = "Find Files" }, { "fzf-lua" })
-map("n", "<leader>/", function() require("fzf-lua").live_grep() end, { desc = "Grep" }, { "fzf-lua" })
-map("n", "<leader>:", function() require("fzf-lua").command_history() end, { desc = "Command History" }, { "fzf-lua" })
+map("n", "<leader><space>", function() Snacks.picker.files(snacks_file_picker_opts()) end, { desc = "Find Files" }, { "snacks" })
+map("n", "<leader>/", function() Snacks.picker.grep() end, { desc = "Grep" }, { "snacks" })
+map("n", "<leader>:", function() Snacks.picker.command_history() end, { desc = "Command History" }, { "snacks" })
 
 -- ========================================================
 -- Windows
@@ -1299,72 +1367,60 @@ map("n", "<leader>tn", "<cmd>tabnext<cr>", { desc = "Next Tab" })
 -- Buffers
 map("n", "<C-q>", function()
 	if vim.bo.buftype == "terminal" then return end
-	require("mini.bufremove").delete()
-end, { desc = "Delete Buffer" }, { "mini.bufremove" })
+	Snacks.bufdelete()
+end, { desc = "Delete Buffer" }, { "snacks" })
 map("n", "[b", "<cmd>bprevious<cr>", { desc = "Prev Buffer" })
 map("n", "]b", "<cmd>bnext<cr>", { desc = "Next Buffer" })
 
-map("n", "<leader>bb", function() require("fzf-lua").buffers() end, { desc = "Buffers" }, { "fzf-lua" })
-map("n", "<leader>bd", function() require("mini.bufremove").delete() end, { desc = "Delete Buffer" },
-	{ "mini.bufremove" })
-map("n", "<leader>bD", function() require("mini.bufremove").delete(0, true) end, { desc = "Delete Buffer (Force)" },
-	{ "mini.bufremove" })
-map("n", "<leader>bo", function()
-	local current = vim.api.nvim_get_current_buf()
-	for _, buf in ipairs(vim.api.nvim_list_bufs()) do
-		if buf ~= current and vim.api.nvim_buf_is_loaded(buf) then
-			pcall(require("mini.bufremove").delete, buf)
-		end
-	end
-end, { desc = "Delete Other Buffers" }, { "mini.bufremove" })
+map("n", "<leader>bb", function() Snacks.picker.buffers() end, { desc = "Buffers" }, { "snacks" })
+map("n", "<leader>bd", function() Snacks.bufdelete() end, { desc = "Delete Buffer" }, { "snacks" })
+map("n", "<leader>bD", function() Snacks.bufdelete({ force = true }) end, { desc = "Delete Buffer (Force)" },
+	{ "snacks" })
+map("n", "<leader>bo", function() Snacks.bufdelete.other() end, { desc = "Delete Other Buffers" }, { "snacks" })
 
 -- ========================================================
 -- Find
-map("n", "<leader>fb", function() require("fzf-lua").buffers() end, { desc = "Buffers" }, { "fzf-lua" })
-map("n", "<leader>ff", function() require("fzf-lua").files() end, { desc = "Find Files" }, { "fzf-lua" })
-map("n", "<leader>fg", function() require("fzf-lua").git_files() end, { desc = "Find Git Files" }, { "fzf-lua" })
-map("n", "<leader>fr", function() require("fzf-lua").oldfiles() end, { desc = "Recent" }, { "fzf-lua" })
+map("n", "<leader>fb", function() Snacks.picker.buffers() end, { desc = "Buffers" }, { "snacks" })
+map("n", "<leader>ff", function() Snacks.picker.files(snacks_file_picker_opts()) end, { desc = "Find Files" }, { "snacks" })
+map("n", "<leader>fg", function() Snacks.picker.git_files(snacks_file_picker_opts()) end, { desc = "Find Git Files" }, { "snacks" })
+map("n", "<leader>fr", function() Snacks.picker.recent(snacks_file_picker_opts()) end, { desc = "Recent" }, { "snacks" })
 
 -- ========================================================
 -- Git
 map("n", "<leader>gb", "<cmd>GitBlameToggle<cr>", { desc = "Git Blame Line" }, { "gitblame" })
-map("n", "<leader>gB", function() require("fzf-lua").git_branches() end, { desc = "Git Branches" }, { "fzf-lua" })
-map("n", "<leader>gl", function() require("fzf-lua").git_commits() end, { desc = "Git Log" }, { "fzf-lua" })
-map("n", "<leader>gL", function() require("fzf-lua").git_bcommits() end, { desc = "Git Log Line" }, { "fzf-lua" })
-map("n", "<leader>gs", function() require("fzf-lua").git_status() end, { desc = "Git Status" }, { "fzf-lua" })
-map("n", "<leader>gS", function() require("fzf-lua").git_stash() end, { desc = "Git Stash" }, { "fzf-lua" })
-map("n", "<leader>gd", function() require("fzf-lua").git_diff({ commit = "HEAD" }) end, { desc = "Git Diff (Hunks)" },
-	{ "fzf-lua" })
-map("n", "<leader>gf", function() require("fzf-lua").git_bcommits() end, { desc = "Git Log File" }, { "fzf-lua" })
+map("n", "<leader>gB", function() Snacks.picker.git_branches() end, { desc = "Git Branches" }, { "snacks" })
+map("n", "<leader>gl", function() Snacks.picker.git_log() end, { desc = "Git Log" }, { "snacks" })
+map("n", "<leader>gL", function() Snacks.picker.git_log_line() end, { desc = "Git Log Line" }, { "snacks" })
+map("n", "<leader>gs", function() Snacks.picker.git_status() end, { desc = "Git Status" }, { "snacks" })
+map("n", "<leader>gS", function() Snacks.picker.git_stash() end, { desc = "Git Stash" }, { "snacks" })
+map("n", "<leader>gd", function() Snacks.picker.git_diff() end, { desc = "Git Diff (Hunks)" }, { "snacks" })
+map("n", "<leader>gf", function() Snacks.picker.git_log_file() end, { desc = "Git Log File" }, { "snacks" })
 
 -- ========================================================
 -- Terminal
 vim.keymap.set("t", "<Esc><Esc>", [[<C-\><C-n>]], { desc = "Exit terminal mode" })
+map("n", [[<C-\>]], function()
+	Snacks.terminal.toggle(nil, {
+		win = {
+			position = "float",
+			border = "rounded",
+		},
+	})
+end, { desc = "Terminal" }, { "snacks" })
 
 -- Lazygit (stateful floating terminal)
-local lazygit = nil
-map("n", "<leader>gg", function()
-	local Terminal = require("toggleterm.terminal").Terminal
-	if not lazygit or (not lazygit:is_open() and not vim.api.nvim_buf_is_valid(lazygit.bufnr or -1)) then
-		lazygit = Terminal:new({ cmd = "lazygit", hidden = true, direction = "float" })
-	end
-	lazygit:toggle()
-end, { desc = "Lazygit" }, { "toggleterm" })
+map("n", "<leader>gg", function() Snacks.lazygit() end, { desc = "Lazygit" }, { "snacks" })
 
 -- Claude Code (stateful vertical terminal)
-local claude_term = nil
 map("n", "<leader>ai", function()
-	local Terminal = require("toggleterm.terminal").Terminal
-	if not claude_term or (not claude_term:is_open() and not vim.api.nvim_buf_is_valid(claude_term.bufnr or -1)) then
-		claude_term = Terminal:new({
-			cmd = "env -u NVIM claude",
-			hidden = true,
-			direction = "vertical",
-			size = function() return math.floor(vim.o.columns * 0.4) end,
-		})
-	end
-	claude_term:toggle()
-end, { desc = "Claude Code" }, { "toggleterm" })
+	Snacks.terminal.toggle("env -u NVIM claude", {
+		win = {
+			position = "right",
+			width = 0.4,
+			border = "rounded",
+		},
+	})
+end, { desc = "Claude Code" }, { "snacks" })
 map("v", "<leader>ay", function()
 	local start_pos = vim.fn.getpos("'<")
 	local start_line = start_pos[2]
@@ -1385,32 +1441,30 @@ end, { desc = "Yank for AI" })
 
 -- ========================================================
 -- Search
-map("n", '<leader>s"', function() require("fzf-lua").registers() end, { desc = "Registers" }, { "fzf-lua" })
--- map("n", "<leader>sa", function() require("fzf-lua").autocmds() end, { desc = "Autocmds" }, { "fzf-lua" })
--- map("n", "<leader>sb", function() require("fzf-lua").blines() end, { desc = "Buffer Lines" }, { "fzf-lua" })
-map("n", "<leader>sc", function() require("fzf-lua").command_history() end, { desc = "Command History" }, { "fzf-lua" })
-map("n", "<leader>sC", function() require("fzf-lua").commands() end, { desc = "Commands" }, { "fzf-lua" })
-map("n", "<leader>sd", function() require("fzf-lua").diagnostics_workspace() end, { desc = "Diagnostics" }, { "fzf-lua" })
-map("n", "<leader>sD", function() require("fzf-lua").diagnostics_document() end, { desc = "Buffer Diagnostics" },
-	{ "fzf-lua" })
-map("n", "<leader>sg", function() require("fzf-lua").live_grep() end, { desc = "Grep Root Files" }, { "fzf-lua" })
-map("n", "<leader>sG", function() require("fzf-lua").live_grep({ grep_open_files = true }) end,
-	{ desc = "Grep Open Buffers" }, { "fzf-lua" })
-map("n", "<leader>sh", function() require("fzf-lua").helptags() end, { desc = "Help Pages" }, { "fzf-lua" })
--- map("n", "<leader>sH", function() require("fzf-lua").highlights() end, { desc = "Highlights" }, { "fzf-lua" })
-map("n", "<leader>sj", function() require("fzf-lua").jumps() end, { desc = "Jumps" }, { "fzf-lua" })
--- map("n", "<leader>sk", function() require("fzf-lua").keymaps() end, { desc = "Keymaps" }, { "fzf-lua" })
-map("n", "<leader>sl", function() require("fzf-lua").loclist() end, { desc = "Location List" }, { "fzf-lua" })
-map("n", "<leader>sm", function() require("fzf-lua").marks() end, { desc = "Marks" }, { "fzf-lua" })
--- map("n", "<leader>sM", function() require("fzf-lua").manpages() end, { desc = "Man Pages" }, { "fzf-lua" })
-map("n", "<leader>sq", function() require("fzf-lua").quickfix() end, { desc = "Quickfix List" }, { "fzf-lua" })
-map("n", "<leader>sR", function() require("fzf-lua").resume() end, { desc = "Resume" }, { "fzf-lua" })
-map("n", "<leader>ss", function() require("fzf-lua").lsp_document_symbols() end, { desc = "LSP Symbols" }, { "fzf-lua" })
-map("n", "<leader>sS", function() require("fzf-lua").lsp_workspace_symbols() end, { desc = "LSP Workspace Symbols" },
-	{ "fzf-lua" })
-map("n", "<leader>st", "<Cmd>TermSelect<CR>", { desc = "Terminals" }, { "toggleterm" })
--- map("n", "<leader>sw", function() require("fzf-lua").grep_cword() end, { desc = "Grep Word" }, { "fzf-lua" })
--- map("x", "<leader>sw", function() require("fzf-lua").grep_visual() end, { desc = "Grep Word" }, { "fzf-lua" })
+map("n", '<leader>s"', function() Snacks.picker.registers() end, { desc = "Registers" }, { "snacks" })
+-- map("n", "<leader>sa", function() Snacks.picker.autocmds() end, { desc = "Autocmds" }, { "snacks" })
+-- map("n", "<leader>sb", function() Snacks.picker.lines() end, { desc = "Buffer Lines" }, { "snacks" })
+map("n", "<leader>sc", function() Snacks.picker.command_history() end, { desc = "Command History" }, { "snacks" })
+map("n", "<leader>sC", function() Snacks.picker.commands() end, { desc = "Commands" }, { "snacks" })
+map("n", "<leader>sd", function() Snacks.picker.diagnostics() end, { desc = "Diagnostics" }, { "snacks" })
+map("n", "<leader>sD", function() Snacks.picker.diagnostics_buffer() end, { desc = "Buffer Diagnostics" },
+	{ "snacks" })
+map("n", "<leader>sg", function() Snacks.picker.grep() end, { desc = "Grep Root Files" }, { "snacks" })
+map("n", "<leader>sG", function() Snacks.picker.grep_buffers() end, { desc = "Grep Open Buffers" }, { "snacks" })
+map("n", "<leader>sh", function() Snacks.picker.help() end, { desc = "Help Pages" }, { "snacks" })
+-- map("n", "<leader>sH", function() Snacks.picker.highlights() end, { desc = "Highlights" }, { "snacks" })
+map("n", "<leader>sj", function() Snacks.picker.jumps() end, { desc = "Jumps" }, { "snacks" })
+-- map("n", "<leader>sk", function() Snacks.picker.keymaps() end, { desc = "Keymaps" }, { "snacks" })
+map("n", "<leader>sl", function() Snacks.picker.loclist() end, { desc = "Location List" }, { "snacks" })
+map("n", "<leader>sm", function() Snacks.picker.marks() end, { desc = "Marks" }, { "snacks" })
+-- map("n", "<leader>sM", function() Snacks.picker.man() end, { desc = "Man Pages" }, { "snacks" })
+map("n", "<leader>sq", function() Snacks.picker.qflist() end, { desc = "Quickfix List" }, { "snacks" })
+map("n", "<leader>sR", function() Snacks.picker.resume() end, { desc = "Resume" }, { "snacks" })
+map("n", "<leader>ss", function() Snacks.picker.lsp_symbols() end, { desc = "LSP Symbols" }, { "snacks" })
+map("n", "<leader>sS", function() Snacks.picker.lsp_workspace_symbols() end, { desc = "LSP Workspace Symbols" },
+	{ "snacks" })
+-- map("n", "<leader>sw", function() Snacks.picker.grep_word() end, { desc = "Grep Word" }, { "snacks" })
+-- map("x", "<leader>sw", function() Snacks.picker.grep_word() end, { desc = "Grep Word" }, { "snacks" })
 
 -- ========================================================
 -- Flash
@@ -1470,14 +1524,14 @@ map("n", "<leader>du", function() require("dapui").toggle() end, { desc = "Dap U
 map({ "n", "x" }, "<leader>de", function() require("dapui").eval() end, { desc = "Eval" }, { "dapui" })
 
 -- ========================================================
--- LSP keymaps - fzf-lua overrides gd, gD, gI, gy, gr below
+-- LSP keymaps - Snacks picker overrides gd, gD, gI, gy, gr below
 map("n", "K", vim.lsp.buf.hover, { desc = "Hover" })
 map("n", "gK", vim.lsp.buf.signature_help, { desc = "Signature Help" })
-map("n", "gd", function() require("fzf-lua").lsp_definitions() end, { desc = "Goto Definition" }, { "fzf-lua" })
-map("n", "gD", function() require("fzf-lua").lsp_declarations() end, { desc = "Goto Declaration" }, { "fzf-lua" })
-map("n", "gr", function() require("fzf-lua").lsp_references() end, { nowait = true, desc = "References" }, { "fzf-lua" })
-map("n", "gI", function() require("fzf-lua").lsp_implementations() end, { desc = "Goto Implementation" }, { "fzf-lua" })
-map("n", "gy", function() require("fzf-lua").lsp_typedefs() end, { desc = "Goto T[y]pe Definition" }, { "fzf-lua" })
+map("n", "gd", function() Snacks.picker.lsp_definitions() end, { desc = "Goto Definition" }, { "snacks" })
+map("n", "gD", function() Snacks.picker.lsp_declarations() end, { desc = "Goto Declaration" }, { "snacks" })
+map("n", "gr", function() Snacks.picker.lsp_references() end, { nowait = true, desc = "References" }, { "snacks" })
+map("n", "gI", function() Snacks.picker.lsp_implementations() end, { desc = "Goto Implementation" }, { "snacks" })
+map("n", "gy", function() Snacks.picker.lsp_type_definitions() end, { desc = "Goto T[y]pe Definition" }, { "snacks" })
 
 -- ========================================================
 -- Code actions
@@ -1628,7 +1682,6 @@ local function switch_project(dir)
 end
 
 local function pick_project()
-	local fzf = require("fzf-lua")
 	local projects = load_projects()
 	if #projects == 0 then
 		vim.notify("No projects. Use <leader>pa to add one.", vim.log.levels.WARN)
@@ -1637,28 +1690,44 @@ local function pick_project()
 
 	local entries = {}
 	for _, p in ipairs(projects) do
-		table.insert(entries, p.name .. " :: " .. p.path)
+		table.insert(entries, {
+			text = p.name .. " :: " .. p.path,
+			path = p.path,
+		})
 	end
 
-	fzf.fzf_exec(entries, {
+	Snacks.picker.pick({
+		items = entries,
 		prompt = "Projects> ",
+		format = "text",
+		confirm = "switch_project",
 		actions = {
-			["default"] = function(selected)
-				if not selected or #selected == 0 then return end
-				local path = selected[1]:match(":: (.+)$")
-				if path then switch_project(path) end
+			switch_project = function(picker, item)
+				if not item or not item.path then return end
+				picker:close()
+				switch_project(item.path)
 			end,
-			["ctrl-d"] = function(selected)
-				if not selected or #selected == 0 then return end
-				local path = selected[1]:match(":: (.+)$")
-				if not path then return end
+			delete_project = function(picker, item)
+				if not item or not item.path then return end
 				local current = load_projects()
-				local filtered = vim.tbl_filter(function(p) return p.path ~= path end, current)
+				local filtered = vim.tbl_filter(function(p) return p.path ~= item.path end, current)
 				save_projects(filtered)
-				vim.notify("Removed: " .. path)
-				-- Re-open picker
+				vim.notify("Removed: " .. item.path)
+				picker:close()
 				vim.schedule(pick_project)
 			end,
+		},
+		win = {
+			input = {
+				keys = {
+					["<c-d>"] = { "delete_project", mode = { "i", "n" } },
+				},
+			},
+			list = {
+				keys = {
+					["<c-d>"] = "delete_project",
+				},
+			},
 		},
 	})
 end
