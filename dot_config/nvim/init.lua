@@ -523,6 +523,19 @@ vim.api.nvim_create_autocmd("LspAttach", {
 
 vim.pack.add(plugins)
 
+local function preseed_snacks_ghostty_terminal()
+	if not vim.env.TMUX then return end
+	if vim.env.SNACKS_GHOSTTY == "0" or vim.env.SNACKS_GHOSTTY == "false" then return end
+	if not (vim.env.SNACKS_GHOSTTY or vim.env.GHOSTTY_BIN_DIR or vim.env.GHOSTTY_RESOURCES_DIR) then return end
+
+	local ok, terminal = pcall(require, "snacks.image.terminal")
+	if ok and not terminal._terminal then
+		terminal._terminal = { terminal = "ghostty", version = "unknown" }
+	end
+end
+
+preseed_snacks_ghostty_terminal()
+
 -- ============================================================================
 -- ============================================================================
 -- Plugin Setup (wrapped in pcall for resilience during initial install)
@@ -1398,14 +1411,20 @@ map("n", "<leader>gf", function() Snacks.picker.git_log_file() end, { desc = "Gi
 
 -- ========================================================
 -- Terminal
-vim.keymap.set("t", "<Esc><Esc>", [[<C-\><C-n>]], { desc = "Exit terminal mode" })
-map("n", [[<C-\>]], function()
+local function snacks_float_terminal_toggle()
 	Snacks.terminal.toggle(nil, {
 		win = {
 			position = "float",
 			border = "rounded",
 		},
 	})
+end
+
+vim.keymap.set("t", "<Esc><Esc>", [[<C-\><C-n>]], { desc = "Exit terminal mode" })
+map("n", [[<C-\>]], snacks_float_terminal_toggle, { desc = "Terminal" }, { "snacks" })
+map("t", [[<C-\>]], function()
+	vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes([[<C-\><C-n>]], true, false, true), "n", false)
+	vim.schedule(snacks_float_terminal_toggle)
 end, { desc = "Terminal" }, { "snacks" })
 
 -- Lazygit (stateful floating terminal)
