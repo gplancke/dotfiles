@@ -1420,11 +1420,25 @@ local function snacks_float_terminal_toggle()
 	})
 end
 
+local function snacks_current_terminal()
+	local buf = vim.api.nvim_get_current_buf()
+	for _, term in ipairs(Snacks.terminal.list()) do
+		if term.buf == buf and term:valid() then
+			return term
+		end
+	end
+end
+
 vim.keymap.set("t", "<Esc><Esc>", [[<C-\><C-n>]], { desc = "Exit terminal mode" })
 map("n", [[<C-\>]], snacks_float_terminal_toggle, { desc = "Terminal" }, { "snacks" })
 map("t", [[<C-\>]], function()
+	local term = snacks_current_terminal()
 	vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes([[<C-\><C-n>]], true, false, true), "n", false)
-	vim.schedule(snacks_float_terminal_toggle)
+	if term then
+		vim.schedule(function()
+			term:hide()
+		end)
+	end
 end, { desc = "Terminal" }, { "snacks" })
 
 -- Lazygit (stateful floating terminal)
