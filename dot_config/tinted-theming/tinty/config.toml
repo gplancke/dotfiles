@@ -44,6 +44,13 @@ hook = "tmux source-file ~/.tmux.conf 2>/dev/null"
 themes-dir = "colors"
 
 [[items]]
+path = "~/.config/tinted-theming/templates/zellij"
+name = "tinted-zellij"
+hook = "mkdir -p ~/.config/zellij/themes && cp -f %f ~/.config/zellij/themes/tinted.kdl"
+themes-dir = "themes"
+supported-systems = ["base16"]
+
+[[items]]
 path = "https://github.com/scaryrawr/base16-opencode"
 name = "tinted-opencode"
 hook = "mkdir -p ~/.config/opencode/themes && cp -f %f ~/.config/opencode/themes/tinted.json"

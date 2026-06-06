@@ -86,6 +86,226 @@ open_editor() {
 
 ################################################################################
 ################################################################################
+# Persistent Neovim daemon
+################################################################################
+################################################################################
+
+__nvd_usage() {
+	echo "Usage: nvd [--id name] [file ...]"
+	echo "       nvd-ui [--id name]"
+	echo "       nvd-kill [name]"
+}
+
+__nvd_default_id() {
+	local id
+
+	if [ -n "$TMUX" ] && command -v tmux >/dev/null 2>&1; then
+		id="$(tmux display-message -p '#S' 2>/dev/null)"
+	fi
+
+	if [ -z "$id" ] && [ -n "$ZELLIJ" ]; then
+		id="${ZELLIJ_SESSION_NAME:-${ZELLIJ_SESSION:-}}"
+	fi
+
+	[ -z "$id" ] && id="$(basename "$PWD")"
+	[ -z "$id" ] && id="default"
+
+	printf "%s\n" "$id"
+}
+
+__nvd_safe_id() {
+	printf "%s" "$1" | sed 's/[^A-Za-z0-9_.=-]/-/g'
+}
+
+__nvd_socket() {
+	local id="$1"
+	local safe_id
+	local runtime_dir
+
+	safe_id="$(__nvd_safe_id "$id")"
+	runtime_dir="${XDG_RUNTIME_DIR:-${TMPDIR:-/tmp}}"
+
+	printf "%s/nvim-%s-%s.sock\n" "$runtime_dir" "${USER:-user}" "$safe_id"
+}
+
+__nvd_server_alive() {
+	local socket="$1"
+
+	[ -S "$socket" ] || return 1
+	nvim --server "$socket" --remote-expr '1' >/dev/null 2>&1
+}
+
+__nvd_start_server() {
+	local socket="$1"
+	local cwd="$2"
+	local i
+
+	if __nvd_server_alive "$socket"; then
+		return 0
+	fi
+
+	[ -e "$socket" ] && rm -f "$socket"
+	mkdir -p "$(dirname "$socket")" || return 1
+
+	(
+		cd "$cwd" || exit 1
+		nohup nvim --headless --listen "$socket" \
+			+'silent! cnoreabbrev <expr> q getcmdtype() ==# ":" && getcmdline() ==# "q" ? "detach" : "q"' \
+			+'silent! cnoreabbrev <expr> quit getcmdtype() ==# ":" && getcmdline() ==# "quit" ? "detach" : "quit"' \
+			+'silent! cnoreabbrev <expr> qa getcmdtype() ==# ":" && getcmdline() ==# "qa" ? "detach" : "qa"' \
+			+'silent! cnoreabbrev <expr> qall getcmdtype() ==# ":" && getcmdline() ==# "qall" ? "detach" : "qall"' \
+			+'silent! cnoreabbrev <expr> wq getcmdtype() ==# ":" && getcmdline() ==# "wq" ? "write | detach" : "wq"' \
+			+'silent! cnoreabbrev <expr> x getcmdtype() ==# ":" && getcmdline() ==# "x" ? "write | detach" : "x"' \
+			>/dev/null 2>&1 &
+	)
+
+	i=0
+	while [ "$i" -lt 50 ]; do
+		__nvd_server_alive "$socket" && return 0
+		i=$((i + 1))
+		sleep 0.1
+	done
+
+	echo "Failed to start nvim server: $socket"
+	return 1
+}
+
+nvd() {
+	local id
+	local socket
+
+	while [ "$#" -gt 0 ]; do
+		case "$1" in
+			--id)
+				if [ -z "$2" ]; then
+					__nvd_usage
+					return 1
+				fi
+				id="$2"
+				shift 2
+				;;
+			--id=*)
+				id="${1#--id=}"
+				shift
+				;;
+			-h|--help)
+				__nvd_usage
+				return 0
+				;;
+			--)
+				shift
+				break
+				;;
+			*)
+				break
+				;;
+		esac
+	done
+
+	if ! command -v nvim >/dev/null 2>&1; then
+		echo "nvim not found"
+		return 1
+	fi
+
+	[ -z "$id" ] && id="$(__nvd_default_id)"
+	socket="$(__nvd_socket "$id")"
+
+	__nvd_start_server "$socket" "$PWD" || return 1
+
+	if [ "$#" -gt 0 ]; then
+		nvim --server "$socket" --remote "$@" || return 1
+	fi
+}
+
+nvd-ui() {
+	local id
+	local socket
+
+	while [ "$#" -gt 0 ]; do
+		case "$1" in
+			--id)
+				if [ -z "$2" ]; then
+					__nvd_usage
+					return 1
+				fi
+				id="$2"
+				shift 2
+				;;
+			--id=*)
+				id="${1#--id=}"
+				shift
+				;;
+			-h|--help)
+				__nvd_usage
+				return 0
+				;;
+			*)
+				__nvd_usage
+				return 1
+				;;
+		esac
+	done
+
+	if ! command -v nvim >/dev/null 2>&1; then
+		echo "nvim not found"
+		return 1
+	fi
+
+	[ -z "$id" ] && id="$(__nvd_default_id)"
+	socket="$(__nvd_socket "$id")"
+
+	__nvd_start_server "$socket" "$PWD" || return 1
+	nvim --server "$socket" --remote-ui
+}
+
+nvd-kill() {
+	local id="${1:-}"
+	local socket
+	local i
+
+	case "$id" in
+		-h|--help)
+			__nvd_usage
+			return 0
+			;;
+	esac
+
+	[ -z "$id" ] && id="$(__nvd_default_id)"
+	socket="$(__nvd_socket "$id")"
+
+	if ! __nvd_server_alive "$socket"; then
+		[ -e "$socket" ] && rm -f "$socket"
+		echo "No nvim server: $id"
+		return 0
+	fi
+
+	nvim --server "$socket" --remote-expr 'execute("qa!")' >/dev/null 2>&1 || true
+
+	i=0
+	while [ "$i" -lt 20 ]; do
+		__nvd_server_alive "$socket" || break
+		i=$((i + 1))
+		sleep 0.1
+	done
+
+	__nvd_server_alive "$socket" && {
+		echo "Failed to stop nvim server: $id"
+		return 1
+	}
+
+	[ -e "$socket" ] && rm -f "$socket"
+}
+
+nvp() {
+	nvd-ui "$@"
+}
+
+nvpkill() {
+	nvd-kill "$@"
+}
+
+################################################################################
+################################################################################
 # Failed attempt at a lighter zoxide
 ################################################################################
 ################################################################################
