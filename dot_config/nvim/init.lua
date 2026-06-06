@@ -149,7 +149,6 @@ local lsp_servers = {
 }
 
 local binary_extensions = {
-	-- images
 	png = true,
 	jpg = true,
 	jpeg = true,
@@ -158,7 +157,6 @@ local binary_extensions = {
 	webp = true,
 	ico = true,
 	tiff = true,
-	-- documents
 	pdf = true,
 	doc = true,
 	docx = true,
@@ -166,7 +164,6 @@ local binary_extensions = {
 	xlsx = true,
 	ppt = true,
 	pptx = true,
-	-- media
 	mp3 = true,
 	mp4 = true,
 	avi = true,
@@ -176,7 +173,6 @@ local binary_extensions = {
 	wav = true,
 	ogg = true,
 	webm = true,
-	-- archives
 	zip = true,
 	tar = true,
 	gz = true,
@@ -184,14 +180,12 @@ local binary_extensions = {
 	xz = true,
 	["7z"] = true,
 	rar = true,
-	-- binaries
 	exe = true,
 	dll = true,
 	so = true,
 	dylib = true,
 	o = true,
 	a = true,
-	-- fonts
 	ttf = true,
 	otf = true,
 	woff = true,
@@ -302,6 +296,62 @@ end
 
 -- ============================================================================
 -- ============================================================================
+-- Global Helpers
+-- ============================================================================
+-- ============================================================================
+
+local function system_open(filepath)
+	local cmd
+	if vim.fn.has("mac") == 1 then
+		cmd = { "open", filepath }
+	elseif vim.fn.has("unix") == 1 then
+		cmd = { "xdg-open", filepath }
+	elseif vim.fn.has("win32") == 1 then
+		cmd = { "cmd", "/c", "start", "", filepath }
+	end
+	if cmd then vim.fn.jobstart(cmd, { detach = true }) end
+end
+
+local function is_binary(path)
+	local ext = (path:match("%.([^%.]+)$") or ""):lower()
+	if binary_extensions[ext] then return true end
+	local f = io.open(path, "rb")
+	if not f then return false end
+	local bytes = f:read(512)
+	f:close()
+	return bytes ~= nil and bytes:find("\0") ~= nil
+end
+
+local function setup(name, opts, config)
+	local ok, mod = pcall(require, name)
+	if not (ok and mod) then
+		return nil
+	end
+
+	if config then
+		local config_ok, configured = pcall(config, mod, opts or {})
+		if not config_ok then
+			vim.notify(("Failed to configure %s: %s"):format(name, configured), vim.log.levels.ERROR)
+			return mod
+		elseif configured == false then
+			return mod
+		elseif configured ~= nil then
+			opts = configured
+		end
+	end
+
+	if mod.setup then
+		local setup_ok, err = pcall(mod.setup, opts or {})
+		if not setup_ok then
+			vim.notify(("Failed to setup %s: %s"):format(name, err), vim.log.levels.ERROR)
+		end
+	end
+
+	return mod
+end
+
+-- ============================================================================
+-- ============================================================================
 -- Autocommands
 -- ============================================================================
 -- ============================================================================
@@ -350,66 +400,6 @@ vim.api.nvim_create_autocmd({ "WinLeave", "BufLeave", "InsertEnter", "FocusLost"
 		vim.wo.cursorcolumn = false
 	end,
 })
-
---------------------------------------------------------------------------------
--- Breadcrumbs in cmdline area when idle
---------------------------------------------------------------------------------
-do
-	local last_cmd_time = 0
-
-	local function truncate_cmdline_message(text)
-		text = tostring(text):gsub("[%r\n]+", " ")
-
-		local max_width = tonumber(vim.v.echospace) or 0
-		if max_width <= 0 then
-			max_width = vim.o.columns - 1
-		else
-			max_width = math.min(max_width, vim.o.columns - 1)
-		end
-		max_width = math.max(max_width, 0)
-
-		if max_width == 0 then return "" end
-		if vim.api.nvim_strwidth(text) <= max_width then return text end
-
-		local prefix = "…"
-		if max_width <= vim.api.nvim_strwidth(prefix) then return "" end
-
-		while vim.api.nvim_strwidth(prefix .. text) > max_width do
-			local rest = vim.fn.strcharpart(text, 1)
-			if rest == "" or rest == text then break end
-			text = rest
-		end
-
-		return prefix .. text
-	end
-
-	vim.api.nvim_create_autocmd("CmdlineLeave", {
-		group = vim.api.nvim_create_augroup("NavicCmdline", { clear = true }),
-		callback = function()
-			last_cmd_time = vim.uv.hrtime()
-		end,
-	})
-
-	vim.api.nvim_create_autocmd("CursorHold", {
-		group = "NavicCmdline",
-		callback = function()
-			-- Don't overwrite recent command output (1s grace period)
-			if (vim.uv.hrtime() - last_cmd_time) / 1e9 < 1 then return end
-
-			local ok, navic = pcall(require, "nvim-navic")
-			if ok and navic.is_available() then
-				local loc = navic.get_location()
-				if loc and loc ~= "" then
-					loc = truncate_cmdline_message(loc)
-					if loc == "" then return end
-
-					vim.cmd("redraw")
-					vim.api.nvim_echo({ { loc, "Comment" } }, false, { id = "user.navic.cmdline" })
-				end
-			end
-		end,
-	})
-end
 
 --------------------------------------------------------------------------------
 -- Hook for post-install/update actions
@@ -523,172 +513,99 @@ vim.api.nvim_create_autocmd("LspAttach", {
 
 vim.pack.add(plugins)
 
-local function preseed_snacks_ghostty_terminal()
-	if not vim.env.TMUX then return end
+-- ============================================================================
+-- ============================================================================
+-- Plugin Setup
+-- ============================================================================
+-- ============================================================================
+
+--------------------------------------------------------------------------------
+-- Configure Breadcrumbs in cmdline area when idle
+--------------------------------------------------------------------------------
+do
+	local last_cmd_time = 0
+
+	local function truncate_cmdline_message(text)
+		text = tostring(text):gsub("[%r\n]+", " ")
+
+		local max_width = tonumber(vim.v.echospace) or 0
+		if max_width <= 0 then
+			max_width = vim.o.columns - 1
+		else
+			max_width = math.min(max_width, vim.o.columns - 1)
+		end
+		max_width = math.max(max_width, 0)
+
+		if max_width == 0 then return "" end
+		if vim.api.nvim_strwidth(text) <= max_width then return text end
+
+		local prefix = "…"
+		if max_width <= vim.api.nvim_strwidth(prefix) then return "" end
+
+		while vim.api.nvim_strwidth(prefix .. text) > max_width do
+			local rest = vim.fn.strcharpart(text, 1)
+			if rest == "" or rest == text then break end
+			text = rest
+		end
+
+		return prefix .. text
+	end
+
+	vim.api.nvim_create_autocmd("CmdlineLeave", {
+		group = vim.api.nvim_create_augroup("NavicCmdline", { clear = true }),
+		callback = function()
+			last_cmd_time = vim.uv.hrtime()
+		end,
+	})
+
+	vim.api.nvim_create_autocmd("CursorHold", {
+		group = "NavicCmdline",
+		callback = function()
+			-- Don't overwrite recent command output (1s grace period)
+			if (vim.uv.hrtime() - last_cmd_time) / 1e9 < 1 then return end
+
+			local ok, navic = pcall(require, "nvim-navic")
+			if ok and navic.is_available() then
+				local loc = navic.get_location()
+				if loc and loc ~= "" then
+					loc = truncate_cmdline_message(loc)
+					if loc == "" then return end
+
+					vim.cmd("redraw")
+					vim.api.nvim_echo({ { loc, "Comment" } }, false, { id = "user.navic.cmdline" })
+				end
+			end
+		end,
+	})
+end
+
+--------------------------------------------------------------------------------
+-- Configure snacks Terminal with info at startup
+--------------------------------------------------------------------------------
+local function preseed_snacks_ghostty_terminal(force)
+	if not (force or vim.env.TMUX) then return end
 	if vim.env.SNACKS_GHOSTTY == "0" or vim.env.SNACKS_GHOSTTY == "false" then return end
-	if not (vim.env.SNACKS_GHOSTTY or vim.env.GHOSTTY_BIN_DIR or vim.env.GHOSTTY_RESOURCES_DIR) then return end
+	if not (force or vim.env.SNACKS_GHOSTTY or vim.env.GHOSTTY_BIN_DIR or vim.env.GHOSTTY_RESOURCES_DIR) then return end
 
 	local ok, terminal = pcall(require, "snacks.image.terminal")
-	if ok and not terminal._terminal then
-		terminal._terminal = { terminal = "ghostty", version = "unknown" }
-	end
-end
-
-preseed_snacks_ghostty_terminal()
-
--- ============================================================================
--- ============================================================================
--- Plugin Setup (wrapped in pcall for resilience during initial install)
--- ============================================================================
--- ============================================================================
-
-local function system_open(filepath)
-	local cmd
-	if vim.fn.has("mac") == 1 then
-		cmd = { "open", filepath }
-	elseif vim.fn.has("unix") == 1 then
-		cmd = { "xdg-open", filepath }
-	elseif vim.fn.has("win32") == 1 then
-		cmd = { "cmd", "/c", "start", "", filepath }
-	end
-	if cmd then vim.fn.jobstart(cmd, { detach = true }) end
-end
-
-local function is_binary(path)
-	local ext = (path:match("%.([^%.]+)$") or ""):lower()
-	if binary_extensions[ext] then return true end
-	local f = io.open(path, "rb")
-	if not f then return false end
-	local bytes = f:read(512)
-	f:close()
-	return bytes ~= nil and bytes:find("\0") ~= nil
-end
-
-local function snacks_item_path(item)
-	if not item then return nil end
-	local ok, util = pcall(require, "snacks.picker.util")
 	if ok then
-		local path = util.path(item)
-		if path then return path end
-	end
-	return item.file or item.path
-end
-
-local function snacks_picker_system_open(picker)
-	for _, item in ipairs(picker:selected({ fallback = true })) do
-		local path = snacks_item_path(item)
-		if path then system_open(path) end
-	end
-	picker:close()
-end
-
-local function snacks_file_confirm(picker, item, action)
-	local actions = require("snacks.picker.actions")
-	local selected = picker:selected({ fallback = true })
-	local external, editable = false, {}
-
-	for _, selected_item in ipairs(selected) do
-		local path = snacks_item_path(selected_item)
-		if path and is_binary(path) then
-			external = true
-			system_open(path)
-		elseif path then
-			table.insert(editable, path)
+		terminal._terminal = { terminal = "ghostty", version = "unknown" }
+		pcall(vim.fn.system, { "tmux", "set", "-p", "allow-passthrough", "all" })
+		terminal.transform = function(data)
+			return ("\027Ptmux;" .. data:gsub("\027", "\027\027")) .. "\027\\"
 		end
-	end
-
-	if not external then
-		return actions.jump(picker, item, action)
-	end
-
-	picker:close()
-	for _, path in ipairs(editable) do
-		vim.cmd.edit(vim.fn.fnameescape(path))
+		terminal._env = {
+			name = "ghostty/tmux",
+			env = {},
+			supported = true,
+			placeholders = true,
+			transform = terminal.transform,
+		}
 	end
 end
 
-local function snacks_image_preview_file(path)
-	if vim.fn.executable("magick") ~= 1 then return path end
-
-	local stat = vim.uv.fs_stat(path)
-	local key = vim.fn.sha256(path .. ":" .. tostring(stat and stat.mtime.sec or 0) .. ":" .. tostring(stat and stat.size or 0))
-	local dir = vim.fn.stdpath("cache") .. "/snacks-picker-images"
-	local preview = dir .. "/" .. key .. ".png"
-
-	if vim.fn.filereadable(preview) == 1 then return preview end
-	vim.fn.mkdir(dir, "p")
-
-	local ok, result = pcall(function()
-		return vim.system({
-			"magick",
-			path .. "[0]",
-			"-auto-orient",
-			"-resize",
-			"640x640>",
-			preview,
-		}, { text = true }):wait(1200)
-	end)
-
-	if ok and result and result.code == 0 and vim.fn.filereadable(preview) == 1 then
-		return preview
-	end
-
-	return path
-end
-
-local function snacks_safe_file_preview(ctx)
-	local path = snacks_item_path(ctx.item)
-	if path and Snacks.image.supports_file(path) then
-		local preview_path = snacks_image_preview_file(path)
-		local buf = ctx.preview:scratch()
-		ctx.preview:set_title(vim.fn.fnamemodify(path, ":t"))
-		Snacks.image.buf.attach(buf, {
-			src = preview_path,
-			max_width = math.max(20, math.floor(vim.o.columns * 0.4)),
-			max_height = math.max(8, math.floor(vim.o.lines * 0.5)),
-		})
-		return
-	end
-
-	return Snacks.picker.preview.file(ctx)
-end
-
-local function snacks_file_picker_opts(opts)
-	return vim.tbl_deep_extend("force", {
-		preview = snacks_safe_file_preview,
-		actions = {
-			smart_confirm = snacks_file_confirm,
-			system_open = snacks_picker_system_open,
-		},
-		confirm = "smart_confirm",
-		win = {
-			input = {
-				keys = {
-					["<c-o>"] = { "system_open", mode = { "i", "n" } },
-				},
-			},
-			list = {
-				keys = {
-					["<c-o>"] = "system_open",
-				},
-			},
-		},
-	}, opts or {})
-end
-
--- Helper to safely require and setup plugins
-local function setup(name, opts, config)
-	local ok, mod = pcall(require, name)
-	if ok and mod and mod.setup then
-		mod.setup(opts or {})
-	end
-
-	if config and ok and mod then
-		config(mod, opts)
-	end
-
-	return ok and mod or nil
-end
+_G.UserPreseedSnacksGhosttyTerminal = preseed_snacks_ghostty_terminal
+preseed_snacks_ghostty_terminal()
 
 -- Flatten (prevent nested neovim - must load early)
 -- setup("flatten", {
@@ -723,12 +640,12 @@ setup("nvim-tmux-navigation", {
 -- Icons
 setup('nvim-web-devicons')
 
--- Treesitter (syntax highlighting, indentation, folding)
 setup("nvim-treesitter", { install_dir = ts_install_dir }, function(ts)
+	ts.setup({ install_dir = ts_install_dir })
 	ts.install(ts_parsers)
+	return false
 end)
 
--- Snacks (picker, image previews, terminal, lazygit, buffer deletion)
 setup("snacks", {
 	picker = {
 		ui_select = true,
@@ -747,7 +664,80 @@ setup("snacks", {
 	bufdelete = {
 		enabled = true,
 	},
-})
+}, function(snacks, opts)
+	local function item_path(item)
+		if not item then return nil end
+		local ok, util = pcall(require, "snacks.picker.util")
+		if ok then
+			local path = util.path(item)
+			if path then return path end
+		end
+		return item.file or item.path
+	end
+
+	local function picker_system_open(picker)
+		for _, item in ipairs(picker:selected({ fallback = true })) do
+			local path = item_path(item)
+			if path then system_open(path) end
+		end
+		picker:close()
+	end
+
+	local function file_confirm(picker, item, action)
+		local actions = require("snacks.picker.actions")
+		local selected = picker:selected({ fallback = true })
+		local external, editable = false, {}
+
+		for _, selected_item in ipairs(selected) do
+			local path = item_path(selected_item)
+			if path and is_binary(path) then
+				external = true
+				system_open(path)
+			elseif path then
+				table.insert(editable, path)
+			end
+		end
+
+		if not external then
+			return actions.jump(picker, item, action)
+		end
+
+		picker:close()
+		for _, path in ipairs(editable) do
+			vim.cmd.edit(vim.fn.fnameescape(path))
+		end
+	end
+
+	local file_picker = {
+		confirm = "smart_confirm",
+		win = {
+			input = {
+				keys = {
+					["<c-o>"] = { "system_open", mode = { "i", "n" } },
+				},
+			},
+			list = {
+				keys = {
+					["<c-o>"] = "system_open",
+				},
+			},
+		},
+	}
+
+	return vim.tbl_deep_extend("force", opts, {
+		picker = {
+			actions = {
+				smart_confirm = file_confirm,
+				system_open = picker_system_open,
+			},
+			sources = {
+				files = vim.deepcopy(file_picker),
+				git_files = vim.deepcopy(file_picker),
+				recent = vim.deepcopy(file_picker),
+			},
+		},
+	})
+end)
 
 -- Simple setups
 setup("nvim-surround")
@@ -849,7 +839,7 @@ setup("gitsigns", {
 setup('fugitive')
 
 -- Indent guides
-pcall(function() require("blink.indent").setup({}) end)
+setup('blink-indent')
 
 -- Copilot
 setup("copilot", {
@@ -922,7 +912,6 @@ setup("blink.cmp", {
 })
 
 
--- -- Colorscheme
 require("tinted-nvim").setup({
 	default_scheme = "base16-eighties",
 	selector = {
@@ -936,13 +925,7 @@ require("tinted-nvim").setup({
 	},
 })
 
--- =============================================================================
--- =============================================================================
--- Lualine (statusline)
--- =============================================================================
--- =============================================================================
-
-pcall(function()
+setup("lualine", nil, function()
 	local git_blame = (function()
 		local ok, mod = pcall(require, "gitblame")
 		return ok and mod or nil
@@ -957,7 +940,6 @@ pcall(function()
 		})
 	end
 
-	-- Build lualine_b: filename (parent/file) + breadcrumbs
 	local lualine_b_section = {
 		{
 			function()
@@ -1022,13 +1004,13 @@ pcall(function()
 		},
 	}
 
-	setup("lualine", {
+	return {
 		options = {
 			icons_enabled = true,
 			theme = "tinted",
 			component_separators = "|",
 			section_separators = "",
-			disabled_filetypes = no_line_ft
+			disabled_filetypes = no_line_ft,
 		},
 		sections = {
 			lualine_a = { "mode" },
@@ -1073,7 +1055,7 @@ pcall(function()
 			lualine_y = {},
 			lualine_z = {},
 		},
-	})
+	}
 end)
 
 -- =============================================================================
@@ -1343,7 +1325,7 @@ map("n", "<leader>e", "<cmd>Neotree reveal<cr>", { desc = "Reveal file in NeoTre
 
 -- ========================================================
 -- Top-level pickers
-map("n", "<leader><space>", function() Snacks.picker.files(snacks_file_picker_opts()) end, { desc = "Find Files" }, { "snacks" })
+map("n", "<leader><space>", function() Snacks.picker.files() end, { desc = "Find Files" }, { "snacks" })
 map("n", "<leader>/", function() Snacks.picker.grep() end, { desc = "Grep" }, { "snacks" })
 map("n", "<leader>:", function() Snacks.picker.command_history() end, { desc = "Command History" }, { "snacks" })
 
@@ -1394,9 +1376,9 @@ map("n", "<leader>bo", function() Snacks.bufdelete.other() end, { desc = "Delete
 -- ========================================================
 -- Find
 map("n", "<leader>fb", function() Snacks.picker.buffers() end, { desc = "Buffers" }, { "snacks" })
-map("n", "<leader>ff", function() Snacks.picker.files(snacks_file_picker_opts()) end, { desc = "Find Files" }, { "snacks" })
-map("n", "<leader>fg", function() Snacks.picker.git_files(snacks_file_picker_opts()) end, { desc = "Find Git Files" }, { "snacks" })
-map("n", "<leader>fr", function() Snacks.picker.recent(snacks_file_picker_opts()) end, { desc = "Recent" }, { "snacks" })
+map("n", "<leader>ff", function() Snacks.picker.files() end, { desc = "Find Files" }, { "snacks" })
+map("n", "<leader>fg", function() Snacks.picker.git_files() end, { desc = "Find Git Files" }, { "snacks" })
+map("n", "<leader>fr", function() Snacks.picker.recent() end, { desc = "Recent" }, { "snacks" })
 
 -- ========================================================
 -- Git
@@ -1446,7 +1428,7 @@ map("n", "<leader>gg", function() Snacks.lazygit() end, { desc = "Lazygit" }, { 
 
 -- Claude Code (stateful vertical terminal)
 map("n", "<leader>ai", function()
-	Snacks.terminal.toggle("env -u NVIM claude", {
+	Snacks.terminal.toggle("env -u NVIM codex --yolo", {
 		win = {
 			position = "right",
 			width = 0.4,

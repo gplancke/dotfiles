@@ -170,6 +170,17 @@ __nvd_start_server() {
 	return 1
 }
 
+__nvd_preseed_remote_ui() {
+	local socket="$1"
+	local expr
+
+	[ -n "$TMUX" ] || return 0
+	[ -n "$SNACKS_GHOSTTY" ] || [ -n "$GHOSTTY_BIN_DIR" ] || [ -n "$GHOSTTY_RESOURCES_DIR" ] || return 0
+
+	expr='execute("lua local ok,t=pcall(require,\"snacks.image.terminal\"); if ok then t._terminal={ terminal = \"ghostty\", version = \"unknown\" }; pcall(vim.fn.system, { \"tmux\", \"set\", \"-p\", \"allow-passthrough\", \"all\" }); t.transform = function(data) return (\"\\027Ptmux;\" .. data:gsub(\"\\027\", \"\\027\\027\")) .. \"\\027\\\\\" end; t._env = { name = \"ghostty/tmux\", env = {}, supported = true, placeholders = true, transform = t.transform } end")'
+	nvim --server "$socket" --remote-expr "$expr" >/dev/null 2>&1 || true
+}
+
 nvd() {
 	local id
 	local socket
@@ -255,6 +266,7 @@ nvd-ui() {
 	socket="$(__nvd_socket "$id")"
 
 	__nvd_start_server "$socket" "$PWD" || return 1
+	__nvd_preseed_remote_ui "$socket"
 	nvim --server "$socket" --remote-ui
 }
 
