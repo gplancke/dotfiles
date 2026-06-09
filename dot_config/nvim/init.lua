@@ -58,6 +58,7 @@ local plugins = {
 
 	-- Treesitter
 	"https://github.com/nvim-treesitter/nvim-treesitter",
+	"https://github.com/nvim-treesitter/nvim-treesitter-textobjects",
 
 	-- Git
 	"https://github.com/lewis6991/gitsigns.nvim",
@@ -646,6 +647,28 @@ setup("nvim-treesitter", { install_dir = ts_install_dir }, function(ts)
 	return false
 end)
 
+setup("nvim-treesitter-textobjects", {
+	select = {
+		lookahead = true,
+		selection_modes = {
+			["@parameter.outer"] = "v",
+			["@parameter.inner"] = "v",
+			["@function.outer"] = "V",
+			["@function.inner"] = "V",
+			["@class.outer"] = "V",
+			["@class.inner"] = "V",
+			["@loop.outer"] = "V",
+			["@loop.inner"] = "V",
+			["@conditional.outer"] = "V",
+			["@conditional.inner"] = "V",
+		},
+		include_surrounding_whitespace = false,
+	},
+	move = {
+		set_jumps = true,
+	},
+})
+
 setup("snacks", {
 	picker = {
 		ui_select = true,
@@ -764,6 +787,7 @@ setup("which-key", {
 		{ "<leader>s", group = "Search" },
 		{ "<leader>t", group = "Tab" },
 		{ "<leader>n", group = "Notification" },
+		{ "<leader>o", group = "Objects" },
 		{ "<leader>u", group = "UI" },
 		{ "<leader>w", group = "Window" },
 		{ "<leader>x", group = "Diagnostics" },
@@ -1307,6 +1331,81 @@ map("v", "<A-k>", ":<C-u>execute \"'<,'>move '<-\" . (v:count1 + 1)<cr>gv=gv", {
 -- Keep visual selection after indent/outdent
 map("v", "<", "<gv", { desc = "Outdent" })
 map("v", ">", ">gv", { desc = "Indent" })
+
+-- ========================================================
+-- Treesitter text objects
+local function ts_select(query, source)
+	return function()
+		require("nvim-treesitter-textobjects.select").select_textobject(query, source or "textobjects")
+	end
+end
+
+local function ts_move(method, query, source)
+	return function()
+		require("nvim-treesitter-textobjects.move")[method](query, source or "textobjects")
+	end
+end
+
+local function ts_swap(method, query)
+	return function()
+		require("nvim-treesitter-textobjects.swap")[method](query)
+	end
+end
+
+map({ "x", "o" }, "af", ts_select("@function.outer"), { desc = "Outer Function" },
+	{ "nvim-treesitter-textobjects.select" })
+map({ "x", "o" }, "if", ts_select("@function.inner"), { desc = "Inner Function" },
+	{ "nvim-treesitter-textobjects.select" })
+map({ "x", "o" }, "ac", ts_select("@class.outer"), { desc = "Outer Class" },
+	{ "nvim-treesitter-textobjects.select" })
+map({ "x", "o" }, "ic", ts_select("@class.inner"), { desc = "Inner Class" },
+	{ "nvim-treesitter-textobjects.select" })
+map({ "x", "o" }, "aa", ts_select("@parameter.outer"), { desc = "Outer Argument" },
+	{ "nvim-treesitter-textobjects.select" })
+map({ "x", "o" }, "ia", ts_select("@parameter.inner"), { desc = "Inner Argument" },
+	{ "nvim-treesitter-textobjects.select" })
+map({ "x", "o" }, "al", ts_select("@loop.outer"), { desc = "Outer Loop" },
+	{ "nvim-treesitter-textobjects.select" })
+map({ "x", "o" }, "il", ts_select("@loop.inner"), { desc = "Inner Loop" },
+	{ "nvim-treesitter-textobjects.select" })
+map({ "x", "o" }, "ad", ts_select("@conditional.outer"), { desc = "Outer Conditional" },
+	{ "nvim-treesitter-textobjects.select" })
+map({ "x", "o" }, "id", ts_select("@conditional.inner"), { desc = "Inner Conditional" },
+	{ "nvim-treesitter-textobjects.select" })
+
+map({ "n", "x", "o" }, "]m", ts_move("goto_next_start", "@function.outer"), { desc = "Next Function Start" },
+	{ "nvim-treesitter-textobjects.move" })
+map({ "n", "x", "o" }, "[m", ts_move("goto_previous_start", "@function.outer"), { desc = "Prev Function Start" },
+	{ "nvim-treesitter-textobjects.move" })
+map({ "n", "x", "o" }, "]M", ts_move("goto_next_end", "@function.outer"), { desc = "Next Function End" },
+	{ "nvim-treesitter-textobjects.move" })
+map({ "n", "x", "o" }, "[M", ts_move("goto_previous_end", "@function.outer"), { desc = "Prev Function End" },
+	{ "nvim-treesitter-textobjects.move" })
+map({ "n", "x", "o" }, "]]", ts_move("goto_next_start", "@class.outer"), { desc = "Next Class Start" },
+	{ "nvim-treesitter-textobjects.move" })
+map({ "n", "x", "o" }, "[[", ts_move("goto_previous_start", "@class.outer"), { desc = "Prev Class Start" },
+	{ "nvim-treesitter-textobjects.move" })
+map({ "n", "x", "o" }, "][", ts_move("goto_next_end", "@class.outer"), { desc = "Next Class End" },
+	{ "nvim-treesitter-textobjects.move" })
+map({ "n", "x", "o" }, "[]", ts_move("goto_previous_end", "@class.outer"), { desc = "Prev Class End" },
+	{ "nvim-treesitter-textobjects.move" })
+
+map("n", "<leader>oa", ts_swap("swap_next", "@parameter.inner"), { desc = "Swap Next Argument" },
+	{ "nvim-treesitter-textobjects.swap" })
+map("n", "<leader>oA", ts_swap("swap_previous", "@parameter.outer"), { desc = "Swap Previous Argument" },
+	{ "nvim-treesitter-textobjects.swap" })
+
+do
+	local ok, ts_repeat_move = pcall(require, "nvim-treesitter-textobjects.repeatable_move")
+	if ok then
+		map({ "n", "x", "o" }, ";", ts_repeat_move.repeat_last_move_next, { desc = "Repeat Next Move" })
+		map({ "n", "x", "o" }, ",", ts_repeat_move.repeat_last_move_previous, { desc = "Repeat Prev Move" })
+		map({ "n", "x", "o" }, "f", ts_repeat_move.builtin_f_expr, { expr = true, desc = "Find Forward" })
+		map({ "n", "x", "o" }, "F", ts_repeat_move.builtin_F_expr, { expr = true, desc = "Find Backward" })
+		map({ "n", "x", "o" }, "t", ts_repeat_move.builtin_t_expr, { expr = true, desc = "Till Forward" })
+		map({ "n", "x", "o" }, "T", ts_repeat_move.builtin_T_expr, { expr = true, desc = "Till Backward" })
+	end
+end
 
 -- ========================================================
 -- Clear search and flash with <esc>
