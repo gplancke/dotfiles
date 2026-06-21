@@ -135,6 +135,46 @@ __nvd_server_alive() {
 	nvim --server "$socket" --remote-expr '1' >/dev/null 2>&1
 }
 
+__nvd_wait_socket() {
+	local socket="$1"
+	local i=0
+
+	while [ "$i" -lt 80 ]; do
+		[ -S "$socket" ] && return 0
+		i=$((i + 1))
+		sleep 0.025
+	done
+
+	return 1
+}
+
+__nvd_daemonize() {
+	if command -v perl >/dev/null 2>&1; then
+		nohup perl -MPOSIX=setsid -e 'setsid() or die "setsid: $!"; exec @ARGV or die "exec: $!"' "$@" >/dev/null 2>&1 &
+	else
+		nohup "$@" >/dev/null 2>&1 &
+	fi
+}
+
+__nvd_spawn_server() {
+	local socket="$1"
+	local cwd="$2"
+
+	[ -e "$socket" ] && rm -f "$socket"
+	mkdir -p "$(dirname "$socket")" || return 1
+
+	(
+		cd "$cwd" || exit 1
+		__nvd_daemonize nvim --headless --listen "$socket" \
+			+'silent! cnoreabbrev <expr> q getcmdtype() ==# ":" && getcmdline() ==# "q" ? "detach" : "q"' \
+			+'silent! cnoreabbrev <expr> quit getcmdtype() ==# ":" && getcmdline() ==# "quit" ? "detach" : "quit"' \
+			+'silent! cnoreabbrev <expr> qa getcmdtype() ==# ":" && getcmdline() ==# "qa" ? "detach" : "qa"' \
+			+'silent! cnoreabbrev <expr> qall getcmdtype() ==# ":" && getcmdline() ==# "qall" ? "detach" : "qall"' \
+			+'silent! cnoreabbrev <expr> wq getcmdtype() ==# ":" && getcmdline() ==# "wq" ? "write | detach" : "wq"' \
+			+'silent! cnoreabbrev <expr> x getcmdtype() ==# ":" && getcmdline() ==# "x" ? "write | detach" : "x"'
+	)
+}
+
 __nvd_start_server() {
 	local socket="$1"
 	local cwd="$2"
@@ -144,20 +184,7 @@ __nvd_start_server() {
 		return 0
 	fi
 
-	[ -e "$socket" ] && rm -f "$socket"
-	mkdir -p "$(dirname "$socket")" || return 1
-
-	(
-		cd "$cwd" || exit 1
-		nohup nvim --headless --listen "$socket" \
-			+'silent! cnoreabbrev <expr> q getcmdtype() ==# ":" && getcmdline() ==# "q" ? "detach" : "q"' \
-			+'silent! cnoreabbrev <expr> quit getcmdtype() ==# ":" && getcmdline() ==# "quit" ? "detach" : "quit"' \
-			+'silent! cnoreabbrev <expr> qa getcmdtype() ==# ":" && getcmdline() ==# "qa" ? "detach" : "qa"' \
-			+'silent! cnoreabbrev <expr> qall getcmdtype() ==# ":" && getcmdline() ==# "qall" ? "detach" : "qall"' \
-			+'silent! cnoreabbrev <expr> wq getcmdtype() ==# ":" && getcmdline() ==# "wq" ? "write | detach" : "wq"' \
-			+'silent! cnoreabbrev <expr> x getcmdtype() ==# ":" && getcmdline() ==# "x" ? "write | detach" : "x"' \
-			>/dev/null 2>&1 &
-	)
+	__nvd_spawn_server "$socket" "$cwd" || return 1
 
 	i=0
 	while [ "$i" -lt 50 ]; do
@@ -168,17 +195,6 @@ __nvd_start_server() {
 
 	echo "Failed to start nvim server: $socket"
 	return 1
-}
-
-__nvd_preseed_remote_ui() {
-	local socket="$1"
-	local expr
-
-	[ -n "$TMUX" ] || return 0
-	[ -n "$SNACKS_GHOSTTY" ] || [ -n "$GHOSTTY_BIN_DIR" ] || [ -n "$GHOSTTY_RESOURCES_DIR" ] || return 0
-
-	expr='execute("lua local ok,t=pcall(require,\"snacks.image.terminal\"); if ok then t._terminal={ terminal = \"ghostty\", version = \"unknown\" }; pcall(vim.fn.system, { \"tmux\", \"set\", \"-p\", \"allow-passthrough\", \"all\" }); t.transform = function(data) return (\"\\027Ptmux;\" .. data:gsub(\"\\027\", \"\\027\\027\")) .. \"\\027\\\\\" end; t._env = { name = \"ghostty/tmux\", env = {}, supported = true, placeholders = true, transform = t.transform } end")'
-	nvim --server "$socket" --remote-expr "$expr" >/dev/null 2>&1 || true
 }
 
 nvd() {
@@ -231,6 +247,7 @@ nvd() {
 nvd-ui() {
 	local id
 	local socket
+	local i
 
 	while [ "$#" -gt 0 ]; do
 		case "$1" in
@@ -265,9 +282,25 @@ nvd-ui() {
 	[ -z "$id" ] && id="$(__nvd_default_id)"
 	socket="$(__nvd_socket "$id")"
 
-	__nvd_start_server "$socket" "$PWD" || return 1
-	__nvd_preseed_remote_ui "$socket"
-	nvim --server "$socket" --remote-ui
+	if [ -S "$socket" ]; then
+		nvim --server "$socket" --remote-ui 2>/dev/null && return 0
+		rm -f "$socket"
+	fi
+
+	__nvd_spawn_server "$socket" "$PWD" || return 1
+	__nvd_wait_socket "$socket" || {
+		echo "Failed to start nvim server: $socket"
+		return 1
+	}
+
+	i=0
+	while [ "$i" -lt 5 ]; do
+		nvim --server "$socket" --remote-ui && return 0
+		i=$((i + 1))
+		sleep 0.05
+	done
+
+	return 1
 }
 
 nvd-kill() {
@@ -306,14 +339,6 @@ nvd-kill() {
 	}
 
 	[ -e "$socket" ] && rm -f "$socket"
-}
-
-nvp() {
-	nvd-ui "$@"
-}
-
-nvpkill() {
-	nvd-kill "$@"
 }
 
 ################################################################################
