@@ -382,6 +382,23 @@ vim.api.nvim_create_autocmd("ColorScheme", {
 })
 
 --------------------------------------------------------------------------------
+-- Snacks picker: lift the dimmed directory prefix
+--------------------------------------------------------------------------------
+-- snacks links SnacksPickerDir (the path portion outside your match) to NonText,
+-- which is nearly invisible; Comment reads as muted but legible. snacks re-applies
+-- its own highlights on ColorScheme, so re-assert via vim.schedule to win the race.
+local function brighten_snacks_picker_dir()
+	vim.api.nvim_set_hl(0, "SnacksPickerDir", { link = "Comment" })
+end
+vim.api.nvim_create_autocmd("ColorScheme", {
+	group = augroup,
+	callback = function()
+		vim.schedule(brighten_snacks_picker_dir)
+	end,
+})
+brighten_snacks_picker_dir()
+
+--------------------------------------------------------------------------------
 -- Cursor Line (only in active window and for certain filetypes)
 --------------------------------------------------------------------------------
 vim.api.nvim_create_autocmd({ "WinEnter", "BufEnter", "InsertLeave", "FocusGained" }, {
@@ -626,6 +643,23 @@ preseed_snacks_ghostty_terminal()
 -- 	},
 -- })
 
+
+-- Pin nvim's `tmux` to the system build. devbox ships tmux 3.5a which shadows the
+-- system tmux (3.6b) on $PATH inside the project; that older client can't drive the
+-- 3.6b server ("server exited unexpectedly"), so nvim->tmux pane nav failed silently.
+-- A tmux-only shim dir keeps every other devbox binary first on PATH.
+do
+	local sys_tmux = "/opt/homebrew/bin/tmux"
+	if vim.env.TMUX and vim.fn.executable(sys_tmux) == 1 then
+		local shim = vim.fn.stdpath("cache") .. "/tmux-shim"
+		vim.fn.mkdir(shim, "p")
+		local link = shim .. "/tmux"
+		if vim.fn.filereadable(link) == 0 then
+			pcall(vim.uv.fs_symlink, sys_tmux, link)
+		end
+		vim.env.PATH = shim .. ":" .. vim.env.PATH
+	end
+end
 
 -- TMUX navigation (plugin falls back to native <C-w> navigation when $TMUX is unset)
 setup("nvim-tmux-navigation", {
@@ -1210,6 +1244,17 @@ vim.lsp.config("pyright", {
 	cmd = { "pyright-langserver", "--stdio" },
 	filetypes = { "python" },
 	root_markers = { "pyrightconfig.json", "pyproject.toml", "setup.py", "requirements.txt", ".git" },
+	-- Seed a stable settings table. nvim binds client.settings to this by reference at
+	-- client creation (before before_init runs), so before_init must mutate it in place;
+	-- reassigning config.settings would be dropped and the interpreter never applied.
+	settings = { python = {} },
+	before_init = function(_, config)
+		-- Point pyright at the project's venv interpreter so third-party imports resolve.
+		local venv_python = config.root_dir and config.root_dir .. "/.venv/bin/python"
+		if venv_python and vim.uv.fs_stat(venv_python) then
+			config.settings.python.pythonPath = venv_python
+		end
+	end,
 })
 
 -- Rust

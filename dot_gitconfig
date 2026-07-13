@@ -152,5 +152,18 @@
   cobrr = checkout-remote-branch
   rmbr = remove-branch
   rmbrc = remove-current-branch
+	merge-stack = !bash \"$HOME/.local/share/gis-merge-stack.sh\"
 [http]
 	sslVerify = true
+[credential "https://github.com"]
+	helper = 
+	helper = !/Users/georges.plancke/.local/bin/gh auth git-credential
+[credential "https://gist.github.com"]
+	helper = 
+	helper = !/Users/georges.plancke/.local/bin/gh auth git-credential
+
+
+[includeIf "hasconfig:remote.*.url:https://github.com/alan-eu/*"]
+path = ~/.gitconfig-alan
+[includeIf "hasconfig:remote.*.url:git@github.com:alan-eu/*"]
+path = ~/.gitconfig-alan

@@ -44,13 +44,6 @@ hook = "tmux source-file ~/.tmux.conf 2>/dev/null"
 themes-dir = "colors"
 
 [[items]]
-path = "~/.config/tinted-theming/templates/zellij"
-name = "tinted-zellij"
-hook = "mkdir -p ~/.config/zellij/themes && cp -f %f ~/.config/zellij/themes/tinted.kdl"
-themes-dir = "themes"
-supported-systems = ["base16"]
-
-[[items]]
 path = "https://github.com/scaryrawr/base16-opencode"
 name = "tinted-opencode"
 hook = "mkdir -p ~/.config/opencode/themes && cp -f %f ~/.config/opencode/themes/tinted.json"
@@ -61,3 +54,13 @@ path = "https://github.com/tinted-theming/tinted-fzf"
 name = "tinted-fzf"
 hook = ". %f"
 themes-dir = "sh"
+
+# ttyd (web terminal) — reuse the Ghostty theme output, convert it to an
+# xterm.js theme JSON and drop it at ~/.config/ttyd/theme.json. The ttyd
+# LaunchDaemon watches that file and restarts itself to pick up the new colors.
+[[items]]
+path = "https://github.com/tinted-theming/tinted-terminal"
+name = "tinted-ttyd"
+themes-dir = "themes/ghostty"
+hook = "~/.config/ttyd/tinty-ttyd-theme.sh %f"
+supported-systems = ["base16", "base24"]

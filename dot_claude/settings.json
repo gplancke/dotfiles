@@ -1,0 +1,188 @@
+{
+  "effortLevel": "xhigh",
+  "enabledPlugins": {
+    "lua-lsp@claude-plugins-official": true,
+    "pyright-lsp@claude-plugins-official": true,
+    "typescript-lsp@claude-plugins-official": true
+  },
+  "hooks": {
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/notify.sh"
+          }
+        ],
+        "matcher": ""
+      },
+      {
+        "matcher": "idle_prompt|permission_prompt",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/georges.plancke/.claude/hooks/ccmux-state-notify.sh"
+          }
+        ]
+      }
+    ],
+    "PermissionRequest": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -x '/Users/georges.plancke/.orca/agent-hooks/claude-hook.sh' ]; then /bin/sh '/Users/georges.plancke/.orca/agent-hooks/claude-hook.sh'; fi",
+            "timeout": 10
+          }
+        ],
+        "matcher": "*"
+      }
+    ],
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/usr/local/bin/aicodemetricsd hook claude --hook-input stdin",
+            "timeout": 2
+          }
+        ],
+        "matcher": "Write|Edit|MultiEdit"
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -x '/Users/georges.plancke/.orca/agent-hooks/claude-hook.sh' ]; then /bin/sh '/Users/georges.plancke/.orca/agent-hooks/claude-hook.sh'; fi",
+            "timeout": 10
+          }
+        ],
+        "matcher": "*"
+      }
+    ],
+    "PostToolUseFailure": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -x '/Users/georges.plancke/.orca/agent-hooks/claude-hook.sh' ]; then /bin/sh '/Users/georges.plancke/.orca/agent-hooks/claude-hook.sh'; fi",
+            "timeout": 10
+          }
+        ],
+        "matcher": "*"
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/usr/local/bin/aicodemetricsd hook claude --hook-input stdin",
+            "timeout": 2
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/usr/local/bin/aicodemetricsd hook claude --hook-input stdin",
+            "timeout": 2
+          }
+        ],
+        "matcher": "Write|Edit|MultiEdit"
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -x '/Users/georges.plancke/.orca/agent-hooks/claude-hook.sh' ]; then /bin/sh '/Users/georges.plancke/.orca/agent-hooks/claude-hook.sh'; fi",
+            "timeout": 10
+          }
+        ],
+        "matcher": "*"
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/usr/local/bin/aicodemetricsd hook claude --hook-input stdin",
+            "timeout": 2
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/georges.plancke/.claude/hooks/ccmux-session-end.sh"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -x '/Users/georges.plancke/.orca/agent-hooks/claude-hook.sh' ]; then /bin/sh '/Users/georges.plancke/.orca/agent-hooks/claude-hook.sh'; fi",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "StopFailure": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -x '/Users/georges.plancke/.orca/agent-hooks/claude-hook.sh' ]; then /bin/sh '/Users/georges.plancke/.orca/agent-hooks/claude-hook.sh'; fi",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -x '/Users/georges.plancke/.orca/agent-hooks/claude-hook.sh' ]; then /bin/sh '/Users/georges.plancke/.orca/agent-hooks/claude-hook.sh'; fi",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/georges.plancke/.claude/hooks/ccmux-session-start.sh"
+          }
+        ]
+      }
+    ]
+  },
+  "mcpServers": {
+    "ccmux": {
+      "args": [
+        "--allow-mutate"
+      ],
+      "command": "ccmux-mcp",
+      "type": "stdio"
+    }
+  },
+  "skipDangerousModePermissionPrompt": true,
+  "statusLine": {
+    "command": "printf '\\033[01;32m%s@%s\\033[00m:\\033[01;34m%s\\033[00m' \"$(whoami)\" \"$(hostname -s)\" \"$(pwd)\"",
+    "type": "command"
+  },
+  "theme": "auto"
+}

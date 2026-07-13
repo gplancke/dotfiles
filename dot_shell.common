@@ -4,6 +4,7 @@
 # Aliases
 ##########################
 [ -f "$HOME/.shell.aliases" ] && . "$HOME/.shell.aliases"
+[ -f "$HOME/.shell.work" ] && . "$HOME/.shell.work"
 
 if type install_theme_manager >/dev/null 2>&1; then
 	install_theme_manager
