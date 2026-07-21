@@ -1,0 +1,36 @@
+#!/bin/sh
+# Regenerate tinted-hunk theme files (base16/base24 -> hunk custom_theme).
+# tracked source: build.py. Generated output (themes/) is NOT tracked; this
+# hook rebuilds it after `chezmoi apply`, and reruns whenever build.py changes.
+#
+# build.py hash: {{ include "dot_config/tinted-theming/tinted-hunk/build.py" | sha256sum }}
+set -eu
+
+dir="$HOME/.config/tinted-theming/tinted-hunk"
+schemes="$HOME/.local/share/tinted-theming/tinty/repos/schemes"
+
+[ -f "$dir/build.py" ] || exit 0
+
+if ! command -v python3 >/dev/null 2>&1; then
+  echo "tinted-hunk: python3 not found — skipping theme build." >&2
+  exit 0
+fi
+if [ ! -d "$schemes" ]; then
+  echo "tinted-hunk: tinty schemes not cloned yet — run 'tinty install' then 'chezmoi apply'." >&2
+  exit 0
+fi
+
+# tinty treats each item path as a git repo and runs `git ... origin` on update.
+# Give it a self-referential origin so those calls stay quiet no-ops.
+if [ ! -d "$dir/.git" ]; then
+  git -C "$dir" init -q
+  git -C "$dir" add -A
+  git -C "$dir" -c user.email=chezmoi@localhost -c user.name=chezmoi \
+    commit -qm "tinted-hunk (generated)" >/dev/null 2>&1 || true
+  git -C "$dir" remote add origin "$dir" 2>/dev/null || true
+  git -C "$dir" fetch origin -q 2>/dev/null || true
+  br=$(git -C "$dir" symbolic-ref --short HEAD 2>/dev/null || echo main)
+  git -C "$dir" branch --set-upstream-to="origin/$br" "$br" >/dev/null 2>&1 || true
+fi
+
+python3 "$dir/build.py"

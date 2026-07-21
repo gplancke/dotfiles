@@ -11,3 +11,6 @@ TODO.txt
 
 .DS_Store
 */.DS_Store
+
+# tinted-hunk: generated theme files (rebuilt by run_onchange hook, not tracked)
+.config/tinted-theming/tinted-hunk/themes
