@@ -3,6 +3,4 @@ SOURCED="${SOURCED:-root}:.bash_profile"
 [ -f "$HOME/.profile" ] && source "$HOME/.profile"
 [ -f "$HOME/.shell.env" ] && source "$HOME/.shell.env"
 [ -f "$HOME/.bashrc" ] && source "$HOME/.bashrc"
-export PATH=$PATH:/Users/georges.plancke/Workspace/Projects/alan-apps/extra-tools/bin
-export PATH=$PATH:/Users/georges.plancke/Workspace/Projects/alan-apps-worktrees/flex-transactions-filters/extra-tools/bin
-export PATH=$PATH:/Users/georges.plancke/Workspace/Projects/alan-apps-worktrees/globalized-migrations/extra-tools/bin
+[ -f "$HOME/.bash_profile.work" ] && source "$HOME/.bash_profile.work"

@@ -64,3 +64,12 @@ name = "tinted-ttyd"
 themes-dir = "themes/ghostty"
 hook = "~/.config/ttyd/tinty-ttyd-theme.sh %f"
 supported-systems = ["base16", "base24"]
+
+# hunk (terminal diff viewer) — local template, no official tinted repo exists.
+# Pre-built [custom_theme] config per scheme; hook installs it as hunk's config.
+[[items]]
+path = "~/.config/tinted-theming/tinted-hunk"
+name = "tinted-hunk"
+themes-dir = "themes"
+hook = "mkdir -p ~/.config/hunk && cp -f %f ~/.config/hunk/config.toml"
+supported-systems = ["base16", "base24"]
