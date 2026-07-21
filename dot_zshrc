@@ -63,3 +63,6 @@ bindkey "^E" edit-command-line
 
 # ##############################
 echo "${SOURCED}" | tr ':' ' -> '
+export PATH=$PATH:/Users/georges.plancke/Workspace/Projects/alan-apps/extra-tools/bin
+export PATH=$PATH:/Users/georges.plancke/Workspace/Projects/alan-apps-worktrees/flex-transactions-filters/extra-tools/bin
+export PATH=$PATH:/Users/georges.plancke/Workspace/Projects/alan-apps-worktrees/globalized-migrations/extra-tools/bin
