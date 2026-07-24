@@ -4,3 +4,6 @@ SOURCED="${SOURCED:-root}:.bash_profile"
 [ -f "$HOME/.shell.env" ] && source "$HOME/.shell.env"
 [ -f "$HOME/.bashrc" ] && source "$HOME/.bashrc"
 [ -f "$HOME/.bash_profile.work" ] && source "$HOME/.bash_profile.work"
+export PATH=$PATH:/Users/georges.plancke/Workspace/Projects/alan-apps-worktrees/ksa-create-offer/extra-tools/bin
+export PATH=$PATH:/Users/georges.plancke/Workspace/Projects/alan-apps-worktrees/ksa-employee-listing/extra-tools/bin
+export PATH=$PATH:/Users/georges.plancke/Workspace/Projects/alan-apps-worktrees/nphies-conformance/extra-tools/bin

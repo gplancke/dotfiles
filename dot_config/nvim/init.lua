@@ -69,6 +69,10 @@ local plugins = {
 	"https://github.com/SmiteshP/nvim-navic",
 
 	-- Completion (blink.cmp)
+	-- blink.cmp v2 (the `main` branch) split its shared runtime into a separate
+	-- plugin, blink.lib. It must be present or v2 errors at load. Listed first so
+	-- it's on the runtimepath before blink.cmp requires it.
+	"https://github.com/saghen/blink.lib",
 	{ src = "https://github.com/saghen/blink.cmp", version = "main" },
 	-- (removed: copilot.lua, blink-copilot)
 
@@ -433,14 +437,23 @@ vim.api.nvim_create_autocmd("PackChanged", {
 				end
 			end, 100)
 		end
-		-- Build blink.cmp fuzzy matcher (requires Rust nightly)
+		-- Build blink.cmp fuzzy matcher (Rust).
+		-- blink.cmp v2 loads the compiled library from `<plugin>/lib/`, not
+		-- `target/release/`. Its own `build()` runs `cargo build --release` AND
+		-- moves the artifact into `lib/` with the commit-hash name the loader
+		-- expects — a bare `cargo build` would leave it where v2 can't find it and
+		-- silently fall back to the slow Lua matcher. Uses the default rust
+		-- toolchain (nightly here). `force = true` rebuilds for the new commit on
+		-- update; `:pwait()` blocks until it finishes.
 		if name == "blink.cmp" and (kind == "install" or kind == "update") then
-			vim.notify("Building blink.cmp fuzzy matcher (requires Rust nightly)...", vim.log.levels.INFO)
-			local obj = vim.system({ "rustup", "run", "nightly", "cargo", "build", "--release" }, { cwd = ev.data.path }):wait()
-			if obj.code == 0 then
+			vim.notify("Building blink.cmp fuzzy matcher...", vim.log.levels.INFO)
+			local ok, err = pcall(function()
+				require("blink.cmp").build({ force = true }):pwait()
+			end)
+			if ok then
 				vim.notify("blink.cmp build complete!", vim.log.levels.INFO)
 			else
-				vim.notify("blink.cmp build failed. Install Rust nightly: rustup install nightly", vim.log.levels.ERROR)
+				vim.notify("blink.cmp build failed: " .. tostring(err), vim.log.levels.ERROR)
 			end
 		end
 		-- Build vscode-js-debug

@@ -64,3 +64,6 @@ bindkey "^E" edit-command-line
 # ##############################
 echo "${SOURCED}" | tr ':' ' -> '
 [ -f "$HOME/.zshrc.work" ] && source "$HOME/.zshrc.work"
+export PATH=$PATH:/Users/georges.plancke/Workspace/Projects/alan-apps-worktrees/ksa-create-offer/extra-tools/bin
+export PATH=$PATH:/Users/georges.plancke/Workspace/Projects/alan-apps-worktrees/ksa-employee-listing/extra-tools/bin
+export PATH=$PATH:/Users/georges.plancke/Workspace/Projects/alan-apps-worktrees/nphies-conformance/extra-tools/bin
