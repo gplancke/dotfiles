@@ -621,7 +621,7 @@ chth() {
   theme="${1:=eighties}"
 
 	if command -v tinty >/dev/null 2>&1; then
-		tinty apply "base16-${theme}"
+		tinty apply "base16-${theme}" || tinty apply "base24-${theme}"
 		# local tinty_data_dir="${XDG_DATA_HOME:-$HOME/.local/share}/tinted-theming/tinty"
 		# while read -r script; do
 		# 	. "$script"

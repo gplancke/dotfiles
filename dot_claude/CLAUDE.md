@@ -26,6 +26,14 @@ When the user asks "how does this work?", answer with an actual explanation, not
 - Mention a file path only when the user would genuinely need to open that file. Keep paths few and put them at the end, not woven through every sentence.
 - Rule of thumb: if a third of the words in a paragraph are file or function names, rewrite it.
 
+## MANDATORY: Never write code comments about our workflow, plan, or PR-stack steps.
+
+Comments describe the code for the next reader — not the task we happen to be doing right now. These rot into noise and lies within a day. NEVER bake into the source:
+- Plan/step status: "migration not generated yet", "will be done in the catch-up work", "stub for step 2", "TODO after the drift fix".
+- PR-stack structure: "bottom of a 2-PR stack", "the child PR #103915 uses this", references to PR numbers or branch names.
+
+Anything about our plan, the order we're shipping things, or how the PRs are split belongs in the PR description, the ticket, or a message to the user — never in the code.
+
 # Svelte specific instructions
 
 You are able to use the Svelte MCP server, where you have access to comprehensive Svelte 5 and SvelteKit documentation. Here's how to use the available tools effectively:

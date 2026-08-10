@@ -67,3 +67,6 @@ echo "${SOURCED}" | tr ':' ' -> '
 export PATH=$PATH:/Users/georges.plancke/Workspace/Projects/alan-apps-worktrees/ksa-create-offer/extra-tools/bin
 export PATH=$PATH:/Users/georges.plancke/Workspace/Projects/alan-apps-worktrees/ksa-employee-listing/extra-tools/bin
 export PATH=$PATH:/Users/georges.plancke/Workspace/Projects/alan-apps-worktrees/nphies-conformance/extra-tools/bin
+export PATH=$PATH:/Users/georges.plancke/Workspace/Projects/alan-apps-worktrees/zzz-aladd-selftest/extra-tools/bin
+export PATH=$PATH:/Users/georges.plancke/Workspace/Projects/alan-apps-worktrees/nphies-full/extra-tools/bin
+export PATH=$PATH:/Users/georges.plancke/Workspace/Projects/alan-apps-worktrees/claims-poc/extra-tools/bin

@@ -1,20 +1,14 @@
 {
-  "effortLevel": "xhigh",
-  "enabledPlugins": {
-    "lua-lsp@claude-plugins-official": true,
-    "pyright-lsp@claude-plugins-official": true,
-    "typescript-lsp@claude-plugins-official": true
-  },
   "hooks": {
     "Notification": [
       {
+        "matcher": "",
         "hooks": [
           {
             "type": "command",
             "command": "~/.claude/hooks/notify.sh"
           }
-        ],
-        "matcher": ""
+        ]
       },
       {
         "matcher": "idle_prompt|permission_prompt",
@@ -28,93 +22,53 @@
     ],
     "PermissionRequest": [
       {
+        "matcher": "*",
         "hooks": [
           {
             "type": "command",
             "command": "if [ -x '/Users/georges.plancke/.orca/agent-hooks/claude-hook.sh' ]; then /bin/sh '/Users/georges.plancke/.orca/agent-hooks/claude-hook.sh'; fi",
             "timeout": 10
           }
-        ],
-        "matcher": "*"
+        ]
       }
     ],
     "PostToolUse": [
       {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "/usr/local/bin/aicodemetricsd hook claude --hook-input stdin",
-            "timeout": 2
-          }
-        ],
-        "matcher": "Write|Edit|MultiEdit"
-      },
-      {
+        "matcher": "*",
         "hooks": [
           {
             "type": "command",
             "command": "if [ -x '/Users/georges.plancke/.orca/agent-hooks/claude-hook.sh' ]; then /bin/sh '/Users/georges.plancke/.orca/agent-hooks/claude-hook.sh'; fi",
             "timeout": 10
           }
-        ],
-        "matcher": "*"
+        ]
       }
     ],
     "PostToolUseFailure": [
       {
+        "matcher": "*",
         "hooks": [
           {
             "type": "command",
             "command": "if [ -x '/Users/georges.plancke/.orca/agent-hooks/claude-hook.sh' ]; then /bin/sh '/Users/georges.plancke/.orca/agent-hooks/claude-hook.sh'; fi",
             "timeout": 10
-          }
-        ],
-        "matcher": "*"
-      }
-    ],
-    "PreCompact": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "/usr/local/bin/aicodemetricsd hook claude --hook-input stdin",
-            "timeout": 2
           }
         ]
       }
     ],
     "PreToolUse": [
       {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "/usr/local/bin/aicodemetricsd hook claude --hook-input stdin",
-            "timeout": 2
-          }
-        ],
-        "matcher": "Write|Edit|MultiEdit"
-      },
-      {
+        "matcher": "*",
         "hooks": [
           {
             "type": "command",
             "command": "if [ -x '/Users/georges.plancke/.orca/agent-hooks/claude-hook.sh' ]; then /bin/sh '/Users/georges.plancke/.orca/agent-hooks/claude-hook.sh'; fi",
             "timeout": 10
           }
-        ],
-        "matcher": "*"
+        ]
       }
     ],
     "SessionEnd": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "/usr/local/bin/aicodemetricsd hook claude --hook-input stdin",
-            "timeout": 2
-          }
-        ]
-      },
       {
         "matcher": "",
         "hooks": [
@@ -170,6 +124,19 @@
       }
     ]
   },
+  "statusLine": {
+    "type": "command",
+    "command": "printf '\\033[01;32m%s@%s\\033[00m:\\033[01;34m%s\\033[00m' \"$(whoami)\" \"$(hostname -s)\" \"$(pwd)\""
+  },
+  "enabledPlugins": {
+    "lua-lsp@claude-plugins-official": true,
+    "pyright-lsp@claude-plugins-official": true,
+    "typescript-lsp@claude-plugins-official": true,
+    "mattpocock-skills@claude-plugins-official": true
+  },
+  "effortLevel": "xhigh",
+  "skipDangerousModePermissionPrompt": true,
+  "theme": "auto",
   "mcpServers": {
     "ccmux": {
       "args": [
@@ -178,11 +145,5 @@
       "command": "ccmux-mcp",
       "type": "stdio"
     }
-  },
-  "skipDangerousModePermissionPrompt": true,
-  "statusLine": {
-    "command": "printf '\\033[01;32m%s@%s\\033[00m:\\033[01;34m%s\\033[00m' \"$(whoami)\" \"$(hostname -s)\" \"$(pwd)\"",
-    "type": "command"
-  },
-  "theme": "auto"
+  }
 }
