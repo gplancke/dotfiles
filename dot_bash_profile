@@ -10,3 +10,7 @@ export PATH=$PATH:/Users/georges.plancke/Workspace/Projects/alan-apps-worktrees/
 export PATH=$PATH:/Users/georges.plancke/Workspace/Projects/alan-apps-worktrees/zzz-aladd-selftest/extra-tools/bin
 export PATH=$PATH:/Users/georges.plancke/Workspace/Projects/alan-apps-worktrees/nphies-full/extra-tools/bin
 export PATH=$PATH:/Users/georges.plancke/Workspace/Projects/alan-apps-worktrees/claims-poc/extra-tools/bin
+export PATH=$PATH:/Users/georges.plancke/Workspace/Projects/alan-apps-worktrees/ksa-govt-api/extra-tools/bin
+export PATH=$PATH:/Users/georges.plancke/Workspace/Projects/alan-apps-worktrees/multi-regions-migs/extra-tools/bin
+export PATH=$PATH:/Users/georges.plancke/Workspace/Projects/alan-apps-worktrees/ksa-add-play/extra-tools/bin
+export PATH=$PATH:/Users/georges.plancke/Workspace/Projects/alan-apps-worktrees/scratchtest/extra-tools/bin

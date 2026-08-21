@@ -136,7 +136,7 @@
   },
   "effortLevel": "xhigh",
   "skipDangerousModePermissionPrompt": true,
-  "theme": "auto",
+  "theme": "custom:tinty",
   "mcpServers": {
     "ccmux": {
       "args": [
