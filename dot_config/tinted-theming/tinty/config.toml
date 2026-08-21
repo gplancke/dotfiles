@@ -13,13 +13,6 @@ themes-dir = "themes/wezterm"
 hook = "mkdir -p ~/.config/wezterm/colors && cp -f %f ~/.config/wezterm/colors/tinted-theming"
 supported-systems = ["base16", "base24"]
 
-# [[items]]
-# path = "https://github.com/tinted-theming/tinted-terminal"
-# name = "tinted-terminal"
-# themes-dir = "themes/alacritty"
-# hook = "cp -f %f ~/.config/alacritty/colors.toml && touch ~/.config/alacritty/alacritty.toml"
-# supported-systems = ["base16", "base24"]
-
 [[items]]
 path = "https://github.com/tinted-theming/tinted-shell"
 name = "tinted-shell"
@@ -32,10 +25,10 @@ name = "base16-vim"
 themes-dir = "colors"
 
 [[items]]
-path = "https://github.com/tinted-theming/base16-helix"
-name = "base16-helix"
-hook = "mkdir -p ~/.config/helix/themes && cp -f %f ~/.config/helix/themes/tinted.toml"
-themes-dir = "themes"
+path = "https://github.com/tinted-theming/tinted-fzf"
+name = "tinted-fzf"
+hook = ". %f"
+themes-dir = "sh"
 
 [[items]]
 path = "https://github.com/tinted-theming/tinted-tmux"
@@ -50,10 +43,10 @@ hook = "mkdir -p ~/.config/opencode/themes && cp -f %f ~/.config/opencode/themes
 themes-dir = "themes"
 
 [[items]]
-path = "https://github.com/tinted-theming/tinted-fzf"
-name = "tinted-fzf"
-hook = ". %f"
-themes-dir = "sh"
+path = "https://github.com/tinted-theming/base16-helix"
+name = "base16-helix"
+hook = "mkdir -p ~/.config/helix/themes && cp -f %f ~/.config/helix/themes/tinted.toml"
+themes-dir = "themes"
 
 # ttyd (web terminal) — reuse the Ghostty theme output, convert it to an
 # xterm.js theme JSON and drop it at ~/.config/ttyd/theme.json. The ttyd
@@ -65,11 +58,22 @@ themes-dir = "themes/ghostty"
 hook = "~/.config/ttyd/tinty-ttyd-theme.sh %f"
 supported-systems = ["base16", "base24"]
 
-# hunk (terminal diff viewer) — local template, no official tinted repo exists.
-# Pre-built [custom_theme] config per scheme; hook installs it as hunk's config.
+# hunk (terminal diff viewer) — no official tinted repo exists. The hook reads
+# the active palette from tinty's TINTY_SCHEME_* env vars and writes hunk's
+# [custom_theme] config on the fly (hunk's diff-row fills need pre-blended
+# colors — the script does the blending). We only borrow tinted-terminal's
+# per-scheme files as a matcher so tinty fires the hook; %f itself is unused.
 [[items]]
-path = "~/.config/tinted-theming/tinted-hunk"
+path = "https://github.com/tinted-theming/tinted-terminal"
 name = "tinted-hunk"
-themes-dir = "themes"
-hook = "mkdir -p ~/.config/hunk && cp -f %f ~/.config/hunk/config.toml"
+themes-dir = "themes/ghostty"
+hook = "python3 ~/.config/hunk/tinty-hunk-theme.py"
 supported-systems = ["base16", "base24"]
+
+[[items]]
+name = "tinted-claude-code"
+path = "https://github.com/tinted-theming/tinted-claude-code"
+themes-dir = "themes"
+theme-file-extension = ".json"
+supported-systems = ["base16", "base24", "tinted8"]
+hook = "mkdir -p \"$HOME/.claude/themes\" && cp -f \"$TINTY_THEME_FILE_PATH\" \"$HOME/.claude/themes/tinty.json\""
