@@ -13,6 +13,10 @@
       "rev": "5876dd95deeb70aadbe9f1c0b7117a135061cdac",
       "src": "https://github.com/saghen/blink.lib"
     },
+    "fzf-lua": {
+      "rev": "5921997472574fca3880b62949eb8679dc6f5afc",
+      "src": "https://github.com/ibhagwan/fzf-lua"
+    },
     "git-blame.nvim": {
       "rev": "5c536e2d4134d064aa3f41575280bc8a2a0e03d7",
       "src": "https://github.com/f-person/git-blame.nvim"
@@ -24,6 +28,10 @@
     "lualine.nvim": {
       "rev": "221ce6b2d999187044529f49da6554a92f740a96",
       "src": "https://github.com/nvim-lualine/lualine.nvim"
+    },
+    "mini.bufremove": {
+      "rev": "10857aa39160c127694151828914df3131ba83b6",
+      "src": "https://github.com/nvim-mini/mini.bufremove"
     },
     "neo-tree.nvim": {
       "rev": "b01ee1769144c4491ea44bc329cb84040e9793be",
@@ -72,6 +80,10 @@
     "tinted-nvim": {
       "rev": "167d4f4e9226df14fb9f397a5d5b434d6c4dccfc",
       "src": "https://github.com/tinted-theming/tinted-nvim"
+    },
+    "toggleterm.nvim": {
+      "rev": "9a88eae817ef395952e08650b3283726786fb5fb",
+      "src": "https://github.com/akinsho/toggleterm.nvim"
     },
     "vim-fugitive": {
       "rev": "3b753cf8c6a4dcde6edee8827d464ba9b8c4a6f0",
