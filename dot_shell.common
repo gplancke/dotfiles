@@ -19,5 +19,5 @@ if type install_docker_plugins >/dev/null 2>&1; then
 fi
 
 if [ -n "${SSH_CONNECTION:-}" ] && command -v tinty >/dev/null 2>&1; then
-  tinty init
+  tinty init >/dev/null 2>&1
 fi
