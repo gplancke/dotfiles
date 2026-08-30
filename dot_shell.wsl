@@ -1,3 +1,5 @@
+SOURCED="${SOURCED:-root}:.shell.wsl"
+
 export WINDOWS_FS="/mnt/c"
 export WINDOWS_HOME="${WINDOWS_FS}/Users/georg"
 

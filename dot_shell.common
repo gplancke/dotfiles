@@ -1,10 +1,12 @@
 #vim: ft=bash
+SOURCED="${SOURCED:-root}:.shell.common"
 
 ##########################
 # Aliases
 ##########################
 [ -f "$HOME/.shell.aliases" ] && . "$HOME/.shell.aliases"
 [ -f "$HOME/.shell.work" ] && . "$HOME/.shell.work"
+[ -f "$HOME/.shell.local" ] && . "$HOME/.shell.local"
 
 if type install_theme_manager >/dev/null 2>&1; then
 	install_theme_manager
@@ -14,4 +16,8 @@ if type install_tmux_manager >/dev/null 2>&1; then
 fi
 if type install_docker_plugins >/dev/null 2>&1; then
 	install_docker_plugins
+fi
+
+if [ -n "${SSH_CONNECTION:-}" ] && command -v tinty >/dev/null 2>&1; then
+  tinty init
 fi

@@ -1,4 +1,5 @@
 # vim: set filetype=sh
+SOURCED="${SOURCED:-root}:.shell.aliases"
 #
 ##########################
 # Aliases & Functions
