@@ -1,0 +1,275 @@
+#!/usr/bin/env bash
+# hunkstack -- review a git-spice stack in Hunk.
+#
+# `hunk diff <commit>` compares that commit with the working tree, so it folds
+# committed + staged + unstaged into one view (Hunk adds untracked on top).
+# A range like `main...HEAD` cannot: a range has no working tree on its right
+# side. So we resolve the stack's fork point ourselves and pass it as a commit.
+#
+# The base is always a merge-base against origin/<trunk>, never the local trunk
+# ref: a local `main` left behind by a restack drags all of upstream into the
+# diff (measured: 1874 files instead of 33).
+
+set -euo pipefail
+
+usage() {
+  cat <<'EOF'
+hunkstack -- review a git-spice stack in Hunk
+
+  hunkstack [hunk args...]      whole stack: trunk base -> working tree
+                                (every commit below HEAD, staged, unstaged, untracked)
+  hunkstack --pr [hunk args...] this branch's PR only: its gis base -> working tree
+  hunkstack --dirty [args...]   uncommitted changes only
+  hunkstack --list              per-branch summary + dirty worktrees, no TUI
+  hunkstack --reload [--pr]     load the view into the live Hunk window
+  hunkstack --base [--pr]       print the base commit and exit
+  hunkstack --no-watch ...      do not auto-reload while you keep editing
+
+Extra args pass through to hunk, e.g. `hunkstack --mode stack -- backend/`.
+EOF
+}
+
+die() { printf 'hunkstack: %s\n' "$1" >&2; exit 1; }
+
+for tool in git gis jq hunk; do
+  command -v "$tool" >/dev/null 2>&1 || die "$tool not found in PATH"
+done
+git rev-parse --git-dir >/dev/null 2>&1 || die "not a git repository"
+
+# ---------------------------------------------------------------- gis state --
+# One `gis ls` call, reused. NOTE: `--json` ignores the "current stack only"
+# filter and streams every tracked branch, so the stack is rebuilt below from
+# the down/ups graph rather than trusted as pre-filtered.
+STACK=$(gis ls -a --json 2>/dev/null) || die "gis ls failed (is this repo tracked by git-spice?)"
+[ -n "$STACK" ] || die "git-spice tracks no branches here"
+
+field() { printf '%s\n' "$STACK" | jq -r --arg b "$1" "select(.name == \$b) | $2"; }
+down_of() { field "$1" '.down.name // empty'; }
+ups_of()  { field "$1" '.ups[]?.name'; }
+wt_of()   { field "$1" '.worktree // empty'; }
+pr_of()   { field "$1" '.change.id // empty'; }
+
+# trunk = the one record with no branch below it. Never hardcoded to "main".
+TRUNK=$(printf '%s\n' "$STACK" | jq -r 'select(.down == null) | .name' | head -1)
+[ -n "$TRUNK" ] || die "could not determine trunk from gis state"
+
+BRANCH=$(git branch --show-current)
+[ -n "$BRANCH" ] || die "detached HEAD -- check out a stack branch first"
+
+# --------------------------------------------------------------------- base --
+# Newest merge-base of <ref> with <tip>, preferring origin/<ref> but keeping the
+# local ref when it is the fresher of the two.
+range_base() {
+  local ref=$1 tip=$2 a b
+  a=$(git merge-base "$ref" "$tip" 2>/dev/null || true)
+  b=$(git merge-base "origin/$ref" "$tip" 2>/dev/null || true)
+  if   [ -z "$a" ]; then printf '%s\n' "$b"
+  elif [ -z "$b" ]; then printf '%s\n' "$a"
+  elif git merge-base --is-ancestor "$a" "$b" 2>/dev/null; then printf '%s\n' "$b"
+  else printf '%s\n' "$a"
+  fi
+}
+
+stack_base() {  # fork point of the whole stack off trunk
+  local base
+  base=$(range_base "$TRUNK" HEAD)
+  [ -n "$base" ] || die "no common ancestor with $TRUNK -- run 'gis repo sync'?"
+  printf '%s\n' "$base"
+}
+
+pr_base() {     # fork point of this branch off the branch below it
+  local down base
+  down=$(down_of "$BRANCH")
+  [ -n "$down" ] || die "$BRANCH is not tracked by git-spice"
+  base=$(range_base "$down" HEAD)
+  [ -n "$base" ] || die "no common ancestor with $down"
+  printf '%s\n' "$base"
+}
+
+# ------------------------------------------------------------------- guards --
+upstack_all() {  # every branch above $1, transitively, in display order
+  local u
+  for u in $(ups_of "$1"); do
+    printf '%s\n' "$u"
+    upstack_all "$u"
+  done
+}
+
+warn_upstack() {
+  local ups n
+  ups=$(upstack_all "$BRANCH" || true)
+  [ -n "$ups" ] || return 0
+  # A whole-stack diff can only reach as far as HEAD.
+  n=$(printf '%s\n' "$ups" | wc -l | tr -d ' ')
+  printf '\033[33m!\033[0m %s branch(es) sit above %s and are NOT in this view:\n' "$n" "$BRANCH" >&2
+  printf '%s\n' "$ups" | sed 's/^/    /' >&2
+  printf '  check out the top of the stack to see everything.\n' >&2
+}
+
+warn_dirty_worktrees() {
+  # No single git diff spans two worktrees, so name the ones holding loose work.
+  # gis omits .worktree for the worktree we are in, so this only ever lists others.
+  local here b wt dirty found=""
+  here=$(git rev-parse --show-toplevel)
+  for b in $(stack_branches); do
+    wt=$(wt_of "$b")
+    [ -n "$wt" ] || continue
+    [ "$wt" != "$here" ] || continue
+    [ -d "$wt" ] || continue
+    dirty=$(git -C "$wt" status --porcelain 2>/dev/null | wc -l | tr -d ' ')
+    [ "$dirty" != "0" ] || continue
+    found="yes"
+    printf '\033[33m!\033[0m %s has %s uncommitted change(s) in %s\n' "$b" "$dirty" "$wt" >&2
+  done
+  [ -z "$found" ] || printf '  not included here -- run hunkstack in that worktree too.\n' >&2
+}
+
+# ------------------------------------------------------------------- layout --
+stack_branches() {  # whole stack, bottom-first, trunk excluded
+  local b chain="" u
+  b=$BRANCH
+  while [ -n "$b" ] && [ "$b" != "$TRUNK" ]; do
+    chain="$b
+$chain"
+    b=$(down_of "$b")
+  done
+  u=$(upstack_all "$BRANCH")
+  [ -z "$u" ] || chain="$chain$u
+"
+  printf '%s' "$chain" | sed '/^$/d'
+}
+
+shortstat() {  # "<n> files  +<add>  -<del>" from a git diff invocation
+  git diff --shortstat "$@" 2>/dev/null | awk '
+    { f=0; a=0; d=0
+      for (i = 1; i < NF; i++) {
+        if ($(i+1) ~ /^file/)      f = $i
+        else if ($(i+1) ~ /^inser/) a = $i
+        else if ($(i+1) ~ /^delet/) d = $i
+      }
+      printf "%3d files  +%-6d -%d", f, a, d }
+    END { if (NR == 0) printf "  (no change)" }'
+}
+
+show_base() {
+  local base=$1
+  printf '\033[2mbase\033[0m %s\n' "$(git log --oneline -1 --no-decorate "$base")"
+}
+
+# How far the review is running behind upstream. "N commits behind" on its own is
+# a poor signal -- 138 upstream commits that never touch your files are harmless.
+# So also count the upstream commits that touch the files this stack touches, and
+# ask git to merge in memory (--write-tree touches no worktree, ~20ms).
+drift_report() {
+  local base=$1 remote="origin/$TRUNK" ahead mine nfiles overlap verdict
+  git rev-parse --verify -q "$remote" >/dev/null 2>&1 || return 0
+  ahead=$(git rev-list --count "$base..$remote" 2>/dev/null || echo 0)
+  if [ "$ahead" = "0" ]; then
+    printf ' %-33s%s\n' "vs $remote" "up to date"
+    return 0
+  fi
+  mine=$(git diff --name-only "$base" HEAD | sed '/^$/d')
+  nfiles=$(printf '%s' "$mine" | grep -c . || true)
+  if [ "$nfiles" -gt 0 ] && [ "${#mine}" -lt 100000 ]; then
+    overlap=$(printf '%s\n' "$mine" | tr '\n' '\0' \
+      | xargs -0 git log --oneline --no-decorate "$base..$remote" -- 2>/dev/null \
+      | grep -c . || true)
+  else
+    overlap="?"
+  fi
+  if git merge-tree --write-tree "$remote" HEAD >/dev/null 2>&1; then
+    verdict="merges clean"
+  else
+    verdict="WOULD CONFLICT"
+  fi
+  printf ' %-33s%s\n' "behind $remote" \
+    "$ahead commits, $overlap touch your $nfiles files -- $verdict"
+  if [ "$verdict" != "merges clean" ]; then
+    printf ' %-33s\033[33m%s\033[0m\n' "" "-> gis repo sync && gis stack restack"
+  fi
+}
+
+warn_conflict() {  # pre-launch: only speak up when it is actionable
+  local remote="origin/$TRUNK"
+  git rev-parse --verify -q "$remote" >/dev/null 2>&1 || return 0
+  git merge-tree --write-tree "$remote" HEAD >/dev/null 2>&1 && return 0
+  printf '\033[33m!\033[0m your stack no longer merges cleanly into %s\n' "$remote" >&2
+  printf '    reviewing against an old base -- gis repo sync && gis stack restack\n' >&2
+}
+
+do_list() {
+  local base b down mb line indent="" untracked dirty
+  base=$(stack_base)
+  printf '\n'
+  show_base "$base"
+  printf '\033[2m%s\033[0m\n' "$TRUNK"
+  for b in $(stack_branches); do
+    indent="$indent  "
+    down=$(down_of "$b")
+    [ -n "$down" ] || continue
+    mb=$(range_base "$down" "$b")
+    line=$(shortstat "$mb" "$b")
+    if [ "$b" = "$BRANCH" ]; then
+      printf '\033[1m%-58s %-9s %s\033[0m  <- HEAD\n' \
+        "$indent+- $b" "$(pr_of "$b")" "$line"
+    else
+      printf '%-58s %-9s %s\n' "$indent+- $b" "$(pr_of "$b")" "$line"
+    fi
+  done
+  printf '%s\n' "-------------------------------------------------------------------------------"
+  printf ' %s -> working tree             %s\n' "$TRUNK" "$(shortstat "$base")"
+  untracked=$(git ls-files --others --exclude-standard | wc -l | tr -d ' ')
+  [ "$untracked" = "0" ] || printf ' untracked files                  %s\n' "$untracked"
+  dirty=$(git status --porcelain | wc -l | tr -d ' ')
+  printf ' this worktree                    %s uncommitted change(s)\n' "$dirty"
+  drift_report "$base"
+  printf '\n'
+  warn_upstack
+  warn_dirty_worktrees
+}
+
+# --------------------------------------------------------------------- main --
+MODE=whole
+WATCH=--watch
+ACTION=open
+while [ $# -gt 0 ]; do
+  case $1 in
+    --pr)        MODE=pr;     shift ;;
+    --dirty)     MODE=dirty;  shift ;;
+    --list|-l)   MODE=list;   shift ;;
+    --reload)    ACTION=reload; shift ;;
+    --base)      ACTION=base; shift ;;
+    --no-watch)  WATCH="";    shift ;;
+    -h|--help)   usage; exit 0 ;;
+    *)           break ;;
+  esac
+done
+
+case $MODE in
+  list) do_list; exit 0 ;;
+  pr)   BASE=$(pr_base) ;;
+  dirty) BASE="" ;;
+  *)    BASE=$(stack_base) ;;
+esac
+
+if [ "$ACTION" = base ]; then
+  [ -n "$BASE" ] || die "--dirty has no base commit"
+  printf '%s\n' "$BASE"
+  exit 0
+fi
+
+if [ "$ACTION" = reload ]; then
+  if [ -n "$BASE" ]; then
+    exec hunk session reload --repo "$(git rev-parse --show-toplevel)" -- diff "$BASE" ${@+"$@"}
+  fi
+  exec hunk session reload --repo "$(git rev-parse --show-toplevel)" -- diff ${@+"$@"}
+fi
+
+if [ -n "$BASE" ]; then
+  show_base "$BASE"
+  [ "$MODE" = pr ] || warn_upstack
+  warn_dirty_worktrees
+  warn_conflict
+  exec hunk diff ${WATCH:+$WATCH} "$BASE" ${@+"$@"}
+fi
+exec hunk diff ${WATCH:+$WATCH} ${@+"$@"}
