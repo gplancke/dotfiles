@@ -1,4 +1,5 @@
 {
+  "model": "opus[1m]",
   "hooks": {
     "Notification": [
       {
@@ -145,5 +146,6 @@
       "command": "ccmux-mcp",
       "type": "stdio"
     }
-  }
+  },
+  "agentPushNotifEnabled": true
 }

@@ -275,6 +275,42 @@ vim.api.nvim_create_autocmd("FileType", {
 	end,
 })
 
+-- Neo-tree: keep the view pinned to column 0 (no horizontal scrolling)
+local neo_tree_ft = { "neo-tree", "neo-tree-popup", "neo-tree-preview" }
+
+local function pin_neo_tree_left()
+	for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+		local buf = vim.api.nvim_win_get_buf(win)
+		if vim.tbl_contains(neo_tree_ft, vim.bo[buf].filetype) then
+			vim.api.nvim_win_call(win, function()
+				if vim.fn.winsaveview().leftcol ~= 0 then
+					vim.fn.winrestview({ leftcol = 0 })
+				end
+			end)
+		end
+	end
+end
+
+vim.api.nvim_create_autocmd("FileType", {
+	pattern = neo_tree_ft,
+	callback = function(ev)
+		vim.opt_local.sidescrolloff = 0
+		-- Trackpad side-swipes otherwise slide the tree out of view
+		for _, lhs in ipairs({
+			"<ScrollWheelLeft>",
+			"<ScrollWheelRight>",
+			"<S-ScrollWheelLeft>",
+			"<S-ScrollWheelRight>",
+		}) do
+			vim.keymap.set({ "n", "v", "i" }, lhs, "<Nop>", { buffer = ev.buf })
+		end
+	end,
+})
+
+vim.api.nvim_create_autocmd({ "WinScrolled", "CursorMoved", "BufEnter" }, {
+	callback = pin_neo_tree_left,
+})
+
 --------------------------------------------------------------------------------
 -- Neovide settings
 --------------------------------------------------------------------------------
