@@ -152,7 +152,8 @@
   cobrr = checkout-remote-branch
   rmbr = remove-branch
   rmbrc = remove-current-branch
-	merge-stack = !bash \"$HOME/.local/share/gis-merge-stack.sh\"
+	merge-stack = !gis stack merge
+	push-stack = !bash \"$HOME/.local/share/gis-push-stack.sh\"
 [http]
 	sslVerify = true
 [credential "https://github.com"]
