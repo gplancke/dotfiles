@@ -64,18 +64,3 @@ bindkey "^E" edit-command-line
 # ##############################
 echo "${SOURCED}" | tr ':' ' -> '
 [ -f "$HOME/.zshrc.work" ] && source "$HOME/.zshrc.work"
-export PATH=$PATH:/Users/georges.plancke/Workspace/Projects/alan-apps-worktrees/ksa-create-offer/extra-tools/bin
-export PATH=$PATH:/Users/georges.plancke/Workspace/Projects/alan-apps-worktrees/ksa-employee-listing/extra-tools/bin
-export PATH=$PATH:/Users/georges.plancke/Workspace/Projects/alan-apps-worktrees/nphies-conformance/extra-tools/bin
-export PATH=$PATH:/Users/georges.plancke/Workspace/Projects/alan-apps-worktrees/zzz-aladd-selftest/extra-tools/bin
-export PATH=$PATH:/Users/georges.plancke/Workspace/Projects/alan-apps-worktrees/nphies-full/extra-tools/bin
-export PATH=$PATH:/Users/georges.plancke/Workspace/Projects/alan-apps-worktrees/claims-poc/extra-tools/bin
-export PATH=$PATH:/Users/georges.plancke/Workspace/Projects/alan-apps-worktrees/ksa-govt-api/extra-tools/bin
-export PATH=$PATH:/Users/georges.plancke/Workspace/Projects/alan-apps-worktrees/multi-regions-migs/extra-tools/bin
-export PATH=$PATH:/Users/georges.plancke/Workspace/Projects/alan-apps-worktrees/ksa-add-play/extra-tools/bin
-export PATH=$PATH:/Users/georges.plancke/Workspace/Projects/alan-apps-worktrees/scratchtest/extra-tools/bin
-export PATH=$PATH:/Users/georges.plancke/Workspace/Projects/alan-apps-worktrees/pr-113199/extra-tools/bin
-export PATH=$PATH:/Users/georges.plancke/Workspace/Projects/alan-apps-worktrees/employment-gateway-di/extra-tools/bin
-export PATH=$PATH:/Users/georges.plancke/Workspace/Projects/alan-apps-worktrees/mobile-canary-sa/extra-tools/bin
-export PATH=$PATH:/Users/georges.plancke/Workspace/Projects/alan-apps-worktrees/claim-engines/extra-tools/bin
-export PATH=$PATH:/Users/georges.plancke/Workspace/Projects/alan-apps-worktrees/main/extra-tools/bin
